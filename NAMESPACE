@@ -1,0 +1,4 @@
+useDynLib(glmnet)
+import("Matrix")
+export(glmnet,print.glmnet,predict.glmnet,plot.glmnet,predict.elnet,predict.lognet,predict.multnet,coef.glmnet,nonzeroCoef,plotCoef,jerr)
+

@@ -1,0 +1,2 @@
+PKG_FCFLAGS=-fdefault-real-8 -ffixed-form
+

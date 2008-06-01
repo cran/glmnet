@@ -1,0 +1,5 @@
+glmnet	Compute the glmnet path
+predict.glmnet	Make predictions from a glmnet object
+coef.glmnet	Compute coefficients for a glmnet object
+print.glmnet	Print glmnet object
+plot.glmnet	Plot the coefficient profiles for a glmnet object

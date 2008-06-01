@@ -1,0 +1,42 @@
+AC_INIT(src/Makevars.in)
+###
+### It would be ideal if this worked, but it doesn't!
+### FC=`"${R_HOME}/bin/R" CMD config FC`
+###
+echo " R_HOME is ${R_HOME}"
+
+echo "Attempting to determine R_ARCH..."
+r_arch=`echo 'cat(.Platform$r_arch);q();' | ${R_HOME}/bin/R --silent --vanilla|grep -v 'cat'`
+
+if test -z "${r_arch}"; then
+  R_ARCH=
+else
+  R_ARCH="/${r_arch}"
+fi
+echo "R_ARCH is ${R_ARCH}"
+
+echo "Attempting to detect how R was configured for Fortran 90...."
+
+if test -f ${R_HOME}/etc${R_ARCH}/Makeconf ; then
+  FC=`grep '^FC ' ${R_HOME}/etc${R_ARCH}/Makeconf|cut -c6-`
+else
+  echo "I cannot find your Makeconf file; This seems to be"
+  echo "   a non-standard R build or R did not detect a"
+  echo "   Foftran 90 compiler during build time. So I will"
+  echo "   attempt Fortran 90 compiler detection on my own."
+  echo "   NOTE:  All bets are off!"
+  AC_PROG_FC()
+fi
+
+case "${FC}" in
+    gfortran*)
+      echo "  R configured for gfortran; Good!"
+      AC_SUBST(OUR_FCFLAGS, "-fdefault-real-8 -ffixed-form")
+      AC_OUTPUT(src/Makevars)
+      ;;
+    *)
+      echo "    Unsupported Fortran 90 compiler or Fortran 90"
+      echo "    compilers unavailable! Stop!"
+      exit 1
+      ;;
+esac

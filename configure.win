@@ -1,0 +1,13 @@
+#!/bin/sh
+
+echo "NOTE: This package requires gfortran!"
+echo "   So your build might fail if you don't have it.!"
+echo "   Either install a prebuilt binary of this package"
+echo "   or ensure that you have it. You can install"
+echo "   gfortran for Windows from the website:"
+echo "      http://gcc.gnu.org/wiki/GFortranBinaries"
+echo "   and edit the F95 variable in the file"
+echo "   src/gnuwin32/MkRules file in the R tree to point"
+echo "   to it. For more info, see the section on F95 code"
+echo "   in the R-exts manual."
+
