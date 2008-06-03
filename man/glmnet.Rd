@@ -22,7 +22,7 @@ glmnet(x, y, family=c("gaussian","binomial","multinomial"), weights, alpha = 1,
   \item{weights}{observation weights. Can be total counts if responses are proportion matrices. Default is 1 for each observation}
   \item{alpha}{The elasticnet mixing parameter, with
     \eqn{0<\alpha\le 1}. The penalty is defined
-    as \deqn{(1-\alpha)||\beta||_2^2+\alpha||\beta||_1.} \code{alpha=1}
+    as \deqn{(1-\alpha)/2||\beta||_2^2+\alpha||\beta||_1.} \code{alpha=1}
     is the lasso penalty; Currently \code{alpha<0.01} not reliable,
     unless you supply your own \code{lambda} sequence}
   \item{nlambda}{The number of \code{lambda} values - default is 100.}
@@ -76,7 +76,8 @@ glmnet(x, y, family=c("gaussian","binomial","multinomial"), weights, alpha = 1,
 \details{
   The sequence of models implied by \code{lambda} is fit by coordinate
   descent. For \code{family="gaussian"} this is the lasso sequence if
-  \code{alpha=1}, else it is the elasticnet sequence. For \code{family="binomial"}
+  \code{alpha=1}, else it is the elasticnet sequence.
+ For \code{family="binomial"}
   or \code{family="multinomial"}, this is a lasso or elasticnet regularization path
   for fitting the linear logistic or multinomial logistic regression
   paths. Sometimes the sequence is truncated before \code{nlambda}
@@ -89,6 +90,7 @@ glmnet(x, y, family=c("gaussian","binomial","multinomial"), weights, alpha = 1,
   will produce the same fit as the corresponding \code{"binomial"} model,
   except the pair of coefficient matrices will be equal in maxnitude and
   opposite in sign, and half the \code{"binomial"} values. 
+  Note that the objective function for \code{"gaussian"} is \deqn{1/(2*nobs)RSS + \lambda*penalty}, and for the logistic models it is  \deqn{1/nobs loglik + \lambda*penalty}
 }
 \value{
 An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
@@ -116,9 +118,9 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
 }
 \references{Friedman, J., Hastie, T. and Tibshirani, R. (2008)
   \emph{Regularization Paths for Generalized Linear Models via Coordinate
-  Descent}}
+  Descent}\url{http://www-stat.stanford.edu/~hastie/Papers/glmnet.pdf}}
 \author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr 
-Maintainer: Trevor Hastie <hastie@stanford.edu>}
+Maintainer: Trevor Hastie \email{hastie@stanford.edu}}
 \seealso{\code{print}, \code{predict} and \code{coef} methods.}
 \examples{
 x=matrix(rnorm(100*20),100,20)
@@ -126,11 +128,12 @@ y=rnorm(100)
 g2=sample(1:2,100,replace=TRUE)
 g4=sample(1:4,100,replace=TRUE)
 fit1=glmnet(x,y)
+print(fit1)
+coef(fit1,s=0.01) # extract coefficients at a single value of lambda
+predict(fit1,newx=x[1:10,],s=c(0.01,0.005)) # make predictions
 fit2=glmnet(x,g2,family="binomial")
 fit3=glmnet(x,g4,family="multinomial")
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{models}
 \keyword{regression}
 

@@ -3,6 +3,9 @@ AC_INIT(src/Makevars.in)
 ### It would be ideal if this worked, but it doesn't!
 ### FC=`"${R_HOME}/bin/R" CMD config FC`
 ###
+AC_PREREQ(2.60)
+echo " This package has only been tested with gfortran."
+echo " So some checks are needed."
 echo " R_HOME is ${R_HOME}"
 
 echo "Attempting to determine R_ARCH..."
@@ -26,6 +29,10 @@ else
   echo "   attempt Fortran 90 compiler detection on my own."
   echo "   NOTE:  All bets are off!"
   AC_PROG_FC()
+fi
+
+if test "x${FC}" != x; then
+	FC=`basename "${FC}"`
 fi
 
 case "${FC}" in
