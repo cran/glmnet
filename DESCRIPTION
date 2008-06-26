@@ -1,12 +1,12 @@
 Package: glmnet
 Type: Package
 Title: Lasso and elastic-net regularized generalized linear models
-Version: 1.1
-Date: 2008-05-26
+Version: 1.1-1
+Date: 2008-06-03
 Author: Jerome Friedman, Trevor Hastie, Rob Tibshirani
 Maintainer: Trevor Hastie <hastie@stanford.edu>
 Depends:    Matrix
 Description: Extremely efficient procedures for fitting the entire lasso or elastic-net regularization path for linear regression, logistic and multinomial regression models. The algorithm uses cyclical coordinate descent in a pathwise fashion, as described in the paper on the maintainer's website.
 License: GPL-2
 URL: http://www-stat.stanford.edu/~hastie/Papers/glmnet.pdf 
-Packaged: Sun Jun  1 18:48:44 2008; hastie
+Packaged: Thu Jun 26 11:30:01 2008; hastie

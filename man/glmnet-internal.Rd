@@ -6,6 +6,7 @@
 \alias{softmax}
 \alias{jerr}
 \alias{plotCoef}
+\alias{zeromat}
 \description{Internal glmnet functions}
 \usage{
 fix.lam(lam)
@@ -20,6 +21,6 @@ softmax(x,gap)
   \code{nonzeroCoef} determines in an efficient manner which variables
   are nonzero in each fit. \code{jerr} prints out error messages from
   the fortran. \code{plotCoef} is called by the \code{plot} method for
-  \code{glmnet} objects.
+  \code{glmnet} objects. 
 }
 \keyword{internal}
