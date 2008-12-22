@@ -162,13 +162,14 @@ if(family=="multinomial"){
       dd=c(nvars,lmu)
       if(ninmax>0){
         ca=array(fit$ca[seq(nx*lmu*nc)],c(nx,nc,lmu))[seq(ninmax),,,drop=FALSE]
-        ia=fit$ia[seq(ninmax)]
-        ja=rep(fit$ia[seq(ninmax)],lmu)
+        ja=fit$ia[seq(ninmax)]#confusing but too hard to change
+        oja=order(ja)
+        ja=rep(ja[oja],lmu)
         ia=cumsum(c(1,rep(ninmax,lmu)))
         df=apply(abs(ca)>0,c(1,3),any)
         df=apply(df,2,sum)
         for(k in seq(nc)){
-          cak=ca[,k, ,drop=FALSE]
+          cak=ca[oja,k, ,drop=FALSE]
           dfmat[k,]=apply(abs(cak)>0,2,sum)
           beta=new("dgCMatrix",Dim=dd,Dimnames=list(vnames,stepnames),x=as.vector(cak),p=as.integer(ia-1),i=as.integer(ja-1))
           beta.list[[k]]=beta
@@ -190,10 +191,11 @@ if(family=="multinomial"){
     if(ninmax>0){
            ca=matrix(fit$ca[seq(nx*lmu)],nx,lmu)[seq(ninmax),,drop=FALSE]
            df=apply(abs(ca)>0,2,sum)
-           ia=fit$ia[seq(ninmax)]
-           ja=rep(fit$ia[seq(ninmax)],lmu)
+           ja=fit$ia[seq(ninmax)]#confusing but too hard to change
+           oja=order(ja)
+           ja=rep(ja[oja],lmu)
            ia=cumsum(c(1,rep(ninmax,lmu)))
-           beta=new("dgCMatrix",Dim=dd,Dimnames=list(vnames,stepnames),x=as.vector(ca),p=as.integer(ia-1),i=as.integer(ja-1))
+           beta=new("dgCMatrix",Dim=dd,Dimnames=list(vnames,stepnames),x=as.vector(ca[oja,]),p=as.integer(ia-1),i=as.integer(ja-1))
          }else {
            beta = zeromat(nvars,lmu,vnames,stepnames)
            df=rep(0,lmu)
