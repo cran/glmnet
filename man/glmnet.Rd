@@ -41,7 +41,7 @@ glmnet(x, y, family=c("gaussian","binomial","multinomial"), weights, alpha = 1,
     is to have the 
     program compute its own \code{lambda} sequence based on
     \code{nlambda} and \code{lambda.min}. Supplying a value of
-    \code{lambda} overides this. Use with care - it is better to supply
+    \code{lambda} overrides this. Use with care - it is better to supply
     a decreasing sequence of \code{lambda} values than a single (small) value.}
   \item{standardize}{Logical flag for variable standardization, prior to
     fitting the model sequence. The coefficients are always returned on
@@ -59,7 +59,7 @@ glmnet(x, y, family=c("gaussian","binomial","multinomial"), weights, alpha = 1,
     coefficient. This is a number that multiplies \code{lambda} to allow
     differential shrinkage. Can be 0 for some variables, which implies
     no shrinkage, and that variable is always included in the
-    model. Default is 1 for all variables (and implictly infinity for
+    model. Default is 1 for all variables (and implicitly infinity for
     variables listed in \code{exclude}).}
     \item{maxit}{Maximum number of outer-loop iterations for
       \code{"binomial"} or \code{"multinomial"} families. Default is 100.}
@@ -88,9 +88,9 @@ glmnet(x, y, family=c("gaussian","binomial","multinomial"), weights, alpha = 1,
   each class is represented by a linear model (on the log-scale). The
   penalties take care of redundancies. A two-class \code{"multinomial"} model
   will produce the same fit as the corresponding \code{"binomial"} model,
-  except the pair of coefficient matrices will be equal in maxnitude and
+  except the pair of coefficient matrices will be equal in magnitude and
   opposite in sign, and half the \code{"binomial"} values. 
-  Note that the objective function for \code{"gaussian"} is \deqn{1/(2*nobs)RSS + \lambda*penalty}, and for the logistic models it is  \deqn{1/nobs loglik + \lambda*penalty}
+  Note that the objective function for \code{"gaussian"} is \deqn{1/(2*nobs)RSS + \lambda*penalty}, and for the logistic models it is  \deqn{1/nobs -loglik + \lambda*penalty}
 }
 \value{
 An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
@@ -103,9 +103,9 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
     format (\code{"dgCMatrix"}). For \code{"multnet"}, a list of \code{nc} such
     matrices, one for each class.}
   \item{lambda}{The actual sequence of \code{lambda} values used}
-  \item{dev}{The percentage deviance explained (for \code{"elnet"}, this
+  \item{dev}{The fraction of (null) deviance explained (for \code{"elnet"}, this
       is the R-square).}
-  \item{nulldev}{Null deviance}
+    \item{nulldev}{Null deviance (per observation)}
   \item{df}{The number of nonzero coefficients for each value of
     \code{lambda}. For \code{"multnet"}, this is the number of variables
     with a nonzero coefficient for \emph{any} class.}

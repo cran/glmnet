@@ -30,11 +30,14 @@ FALSE, ...)
     \code{"binomial"} or \code{"multinomial"}; for \code{"gaussian"}
     type \code{"response"} is equivalent to type \code{"link"}. Type
     \code{"coefficients"} computes the coefficients at the requested
-    values for \code{s}. Type \code{"class"} applies only to
+    values for \code{s}.  Note that for
+    \code{"binomial"} models, results are returned only for the class
+    corresponding to the second level of the factor response.
+    Type \code{"class"} applies only to
     \code{"binomial"} or \code{"multinomial"} models, and produces the
     class label corresponding to the maximum probability. Type
     \code{"nonzero"} returns a list of the indices of the nonzero
-    coefficients for each value of \code{s}. }
+    coefficients for each value of \code{s}.}
   \item{exact}{By default (\code{exact=FALSE}) the predict function uses linear interpolation
   to make predictions for values of \code{s} that do not coincide with
   those used in the fitting algorithm. Currently \code{exact=TRUE} is
