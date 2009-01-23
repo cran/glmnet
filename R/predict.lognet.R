@@ -11,6 +11,10 @@ predict.lognet=function(object,newx,s=object$lambda,type=c("link","response","co
     nbeta=nbeta[,lamlist$left,drop=FALSE]*lamlist$frac +nbeta[,lamlist$right,drop=FALSE]*(1-lamlist$frac)
     dimnames(nbeta)=list(vnames,paste(seq(along=s)))
   }
+  ### remember that although the fortran lognet makes predictions
+  ### for the first class, we make predictions for the second class
+  ### to avoid confusion with 0/1 responses.
+  ### glmnet flipped the signs of the coefficients 
   if(type=="coefficients")return(nbeta)
   if(type=="nonzero")return(nonzeroCoef(nbeta[-1,,drop=FALSE],bystep=TRUE))
   nfit=as.matrix(cbind2(1,newx)%*%nbeta)
@@ -20,7 +24,7 @@ predict.lognet=function(object,newx,s=object$lambda,type=c("link","response","co
            1/(1+pp)
          },
          link=nfit,
-         class=ifelse(nfit>0,1,2)
+         class=ifelse(nfit>0,2,1)
          )
 }  
     

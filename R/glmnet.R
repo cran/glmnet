@@ -30,8 +30,18 @@ glmnet=function(x,y,family=c("gaussian","binomial","multinomial"),weights,alpha=
       if(nc>2)stop("More than two classes; use multinomial family instead")
       nc=as.integer(1) # for calling multnet
     }
-    if(!missing(weights))y=y*weights
-       ### Compute the null deviance
+    if(!missing(weights)){
+      ### check if any are zero
+      o=weights>0
+      if(!all(o)){ #subset the data
+        y=y[o,]
+        x=x[o,,drop=FALSE]
+        weights=weights[o]
+        nobs=sum(o)
+      }
+      y=y*weights
+    }
+     ### Compute the null deviance
     prior=apply(y,2,sum)
     sumw=sum(y)
     prior=prior/sumw

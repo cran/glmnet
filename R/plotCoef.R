@@ -1,4 +1,4 @@
-plotCoef=function(beta,norm,lambda,df,dev,label=FALSE,xvar=c("norm","lambda","dev"),ylab="Coefficients",...){
+plotCoef=function(beta,norm,lambda,df,dev,label=FALSE,xvar=c("norm","lambda","dev"),xlab=iname,ylab="Coefficients",...){
   ##beta should be in "dgCMatrix" format
   which=nonzeroCoef(beta)
   beta=as.matrix(beta[which,])
@@ -14,14 +14,14 @@ plotCoef=function(beta,norm,lambda,df,dev,label=FALSE,xvar=c("norm","lambda","de
     },
     "dev"= {
       index=dev
-      iname="Percent Deviance Explained"
+      iname="Fraction Deviance Explained"
     }
          )
   dotlist=list(...)
   type=dotlist$type
   if(is.null(type))
-    matplot(index,t(beta),lty=1,xlab=iname,ylab=ylab,type="l",...)
-  else matplot(index,t(beta),lty=1,xlab=iname,ylab=ylab,...)
+    matplot(index,t(beta),lty=1,xlab=xlab,ylab=ylab,type="l",...)
+  else matplot(index,t(beta),lty=1,xlab=xlab,ylab=ylab,...)
   atdf=pretty(index)
  prettydf=trunc(approx(x=index,y=df,xout=atdf,rule=2)$y)
  axis(3,at=atdf,label=prettydf,cex.axis=.5,tcl=NA)
