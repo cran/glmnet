@@ -2,7 +2,7 @@ predict.lognet=function(object,newx,s=object$lambda,type=c("link","response","co
   type=match.arg(type)
   a0=t(as.matrix(object$a0))
   rownames(a0)="(Intercept)"
-  nbeta=rbind2(object$a0,object$beta)
+  nbeta=rbind2(a0,object$beta)
   if(!missing(s)){
     vnames=dimnames(nbeta)[[1]]
     dimnames(nbeta)=list(NULL,NULL)

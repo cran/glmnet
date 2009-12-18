@@ -25,8 +25,6 @@ model, a coefficient plot is produced for each class.
   Descent}}
 \author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr
   Maintainer: Trevor Hastie <hastie@stanford.edu>}
-\note{
-}
 \seealso{\code{glmnet}, and \code{print}, \code{predict} and \code{coef} methods.}
 \examples{
 x=matrix(rnorm(100*20),100,20)
