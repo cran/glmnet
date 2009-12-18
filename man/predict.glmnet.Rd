@@ -58,8 +58,6 @@ model types. \code{coef(...)} is equivalent to \code{predict(type="coefficients"
   Descent}}
 \author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr
   Maintainer: Trevor Hastie <hastie@stanford.edu>}
-\note{
-}
 \seealso{\code{glmnet}, and \code{print}, and \code{coef} methods.}
 \examples{
 x=matrix(rnorm(100*20),100,20)

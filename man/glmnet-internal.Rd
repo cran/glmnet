@@ -1,6 +1,10 @@
 \name{glmnet-internal}
 \title{Internal glmnet functions}
 \alias{fix.lam}
+\alias{error.bars}
+\alias{getmin}
+\alias{cvlognet}
+\alias{cvelnet}
 \alias{lambda.interp}
 \alias{nonzeroCoef}
 \alias{softmax}

@@ -1,4 +1,15 @@
-useDynLib(glmnet)
+useDynLib("glmnet")
 import("Matrix")
-export(glmnet,print.glmnet,predict.glmnet,plot.glmnet,predict.elnet,predict.lognet,predict.multnet,coef.glmnet,nonzeroCoef,plotCoef,jerr)
+export(glmnet,
+       cv.glmnet,
+       predict.elnet,predict.lognet,predict.multnet,nonzeroCoef,plotCoef,jerr)
+
+S3method("print","glmnet")
+S3method("plot","glmnet")
+S3method("predict","glmnet")
+S3method("coef","glmnet")
+S3method("plot","cv.glmnet")
+
+
+
 
