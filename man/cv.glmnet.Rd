@@ -4,28 +4,49 @@
 \description{Does k-fold cross-validation for glmnet, produces a plot,
   and returns a value for \code{lambda}}
 \usage{
-cv.glmnet(x, y, ..., nfolds, foldid, type)
+cv.glmnet(x, y, weights, offset, ..., nfolds, foldid, type, grouped)
 }
 \arguments{
   \item{x}{\code{x} matrix as in \code{glmnet}.}
   \item{y}{response \code{y} as in \code{glmnet}.}
+  \item{weights}{Observation weights; defaults to 1 per observation}
+  \item{offset}{Offset vector (matrix) as in \code{glmnet}}
   \item{\dots}{Other arguments that can be passed to \code{glmnet}.}
   \item{nfolds}{number of folds - default is 10.}
   \item{foldid}{an optional vector of values between 1 and \code{nfold}
     identifying whhat fold each observation is in. If supplied,
     \code{nfold} can be missing.}
-  \item{type}{loss to use for cross-validation. Currently two
-    options. The default is \code{type="response"}, which uses
-    squared-error for gaussian models, and deviance for logistic
-    regression. \code{type="class"} applies to logistic regression only,
-    and gives misclassification error.}
+  \item{type}{loss to use for cross-validation. Currently five
+    options, not all available for all models. The default is \code{type="deviance"}, which uses
+    squared-error for gaussian models (a.k.a \code{type="mse"} there), deviance
+    for logistic and poisson
+    regression, and partial-likelihood for the Cox
+    model. \code{type="class"} applies to binomial and multinomial logistic regression only,
+    and gives misclassification error.  \code{type="auc"} is for
+    two-class logistic regression only, and gives area under the ROC
+    curve. \code{type="mse"} or \code{type="mae"} (mean absolute error)
+    can be used by all models except the \code{"cox"}; they measure the
+    deviation from the fitted mean to the response.} 
+    \item{grouped}{This is an experimental argument, with default
+      \code{TRUE}, and can be ignored by most users. For all models
+      except the \code{"cox"}, this refers to computing \code{nfolds}
+      separate statistics, and then using their mean and estimated
+      standard error to describe the CV curve. If \code{grouped=FALSE},
+      an error matrix is built up at the observation level from the predictions
+      from the \code{nfold} fits, and then summarized (does not apply to
+      \code{type="auc"}). For the \code{"cox"} family,
+      \code{grouped=TRUE} obtains the CV partial likelihood for the Kth
+      fold by \emph{subtraction}; by subtracting the log partial
+      likelihood evaluated on the full dataset from that evaluated on
+      the  on the (K-1)/K dataset. This makes more efficient use of risk
+      sets. With \code{grouped=FALSE} the log partial likelihood is
+      computed only on the Kth fold}
 }
 \details{The function runs \code{glmnet} \code{nfolds}+1 times; the
   first to get the \code{lambda} sequence, and then the remainder to
   compute the fit with each of the folds omitted. The error is
   accumulated, and the average error and standard deviation over the
-  folds is computed. This function is a preliminary version, since it
-  does not allow the full range of data-types for \code{glmnet} yet.
+  folds is computed. 
 }
 \value{an object of class \code{"cv.glmnet"} is returned, which is a
   list with the ingredients of the cross-validation fit.
@@ -45,8 +66,12 @@ cv.glmnet(x, y, ..., nfolds, foldid, type)
 }
 \references{Friedman, J., Hastie, T. and Tibshirani, R. (2008)
   \emph{Regularization Paths for Generalized Linear Models via Coordinate
-  Descent}\url{http://www-stat.stanford.edu/~hastie/Papers/glmnet.pdf}}
+    Descent, Journal of Statistical Software, Vol. 33, Issue 1, Feb 2010}\cr
+  \url{http://www-stat.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
+  \url{http://www.jstatsoft.org/v33/i01/}
+}
 \author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr 
+Noah Simon helped develop the 'coxnet' function.\cr
 Maintainer: Trevor Hastie \email{hastie@stanford.edu}}
 \seealso{\code{glmnet} and \code{plot} method for \code{"cv.glmnet"} object.}
 \examples{
@@ -55,25 +80,72 @@ n=1000;p=100
 nzc=trunc(p/10)
 x=matrix(rnorm(n*p),n,p)
 beta=rnorm(nzc)
-fx= (x[,seq(nzc)] \%*\% beta)
+fx= x[,seq(nzc)] \%*\% beta
 eps=rnorm(n)*5
 y=drop(fx+eps)
 px=exp(fx)
 px=px/(1+px)
 ly=rbinom(n=length(px),prob=px,size=1)
+set.seed(1011)
 cvob1=cv.glmnet(x,y)
 plot(cvob1)
 title("Gaussian Family",line=2.5)
-frame()
+set.seed(1011)
+cvob1a=cv.glmnet(x,y,type="mae")
+plot(cvob1a)
+title("Gaussian Family",line=2.5)
 set.seed(1011)
 par(mfrow=c(2,2),mar=c(4.5,4.5,4,1))
 cvob2=cv.glmnet(x,ly,family="binomial")
 plot(cvob2)
 title("Binomial Family",line=2.5)
+frame()
 set.seed(1011)
 cvob3=cv.glmnet(x,ly,family="binomial",type="class")
 plot(cvob3)
 title("Binomial Family",line=2.5)
+set.seed(1011)
+cvob3a=cv.glmnet(x,ly,family="binomial",type="auc")
+plot(cvob3a)
+title("Binomial Family",line=2.5)
+set.seed(1011)
+mu=exp(fx/10)
+y=rpois(n,mu)
+cvob4=cv.glmnet(x,y,family="poisson")
+plot(cvob4)
+title("Poisson Family",line=2.5)
+# Multinomial
+n=1000;p=30
+nzc=trunc(p/10)
+x=matrix(rnorm(n*p),n,p)
+beta3=matrix(rnorm(30),10,3)
+beta3=rbind(beta3,matrix(0,p-10,3))
+f3=x\%*\% beta3
+p3=exp(f3)
+p3=p3/apply(p3,1,sum)
+g3=rmult(p3)
+set.seed(10101)
+cvfit=cv.glmnet(x,g3,family="multinomial")
+plot(cvfit)
+title("Multinomial Family",line=2.5)
+set.seed(10101)
+cvfit=cv.glmnet(x,g3,family="mult",type="mse")
+plot(cvfit)
+title("Multinomial Family",line=2.5)
+set.seed(10101)
+cvfit=cv.glmnet(x,g3,family="mult",type="class")
+plot(cvfit)
+# Cox
+beta=rnorm(nzc)
+fx=x[,seq(nzc)]\%*\%beta/3
+hx=exp(fx)
+ty=rexp(n,hx)
+tcens=rbinom(n=n,prob=.3,size=1)# censoring indicator
+y=cbind(time=ty,status=1-tcens) # y=Surv(ty,1-tcens) with library(survival)
+foldid=sample(rep(seq(10),length=n))
+fit1_cv=cv.glmnet(x,y,family="cox",foldid=foldid)
+plot(fit1_cv)
+title("Cox Family",line=2.5)
 }
 \keyword{models}
 \keyword{regression}

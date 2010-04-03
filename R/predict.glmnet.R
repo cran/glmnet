@@ -1,2 +1,2 @@
-predict.glmnet=function(object,newx,s=object$lambda,type=c("link","response","coefficients","class","nonzero"),exact=FALSE,...)
+predict.glmnet=function(object,newx,s=NULL,type=c("link","response","coefficients","class","nonzero"),exact=FALSE,offset,...)
 NextMethod("predict")

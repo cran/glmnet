@@ -1,14 +1,33 @@
 \name{glmnet-internal}
 \title{Internal glmnet functions}
+\alias{auc}
+\alias{auc.mat}
+\alias{coxnet.deviance}
+\alias{cvcompute}
+\alias{getcoef}
+\alias{getcoef.multinomial}
+\alias{response.coxnet}
 \alias{fix.lam}
 \alias{error.bars}
 \alias{getmin}
-\alias{cvlognet}
-\alias{cvelnet}
+\alias{elnet}
+\alias{lognet}
+\alias{fishnet}
+\alias{coxnet}
+\alias{cv.lognet}
+\alias{cv.elnet}
+\alias{cv.multnet}
+\alias{cv.coxnet}
+\alias{cv.fishnet}
 \alias{lambda.interp}
 \alias{nonzeroCoef}
+\alias{rmult}
 \alias{softmax}
 \alias{jerr}
+\alias{jerr.elnet}
+\alias{jerr.lognet}
+\alias{jerr.fishnet}
+\alias{jerr.coxnet}
 \alias{plotCoef}
 \alias{zeromat}
 \description{Internal glmnet functions}
