@@ -1,30 +1,41 @@
 \name{glmnet}
 \alias{glmnet}
-\title{fit an elasticnet model path}
+\title{fit a GLM with lasso or elasticnet regularization}
 \description{
-Fit a regularization path for the elasticnet at a grid of values for the
-regularization parameter lambda. Can deal with all shapes of data,
-including very large sparse data matrices. Fits linear,
-logistic and multinomial regression models.
-}
+    Fit a generalized linear model via penalized maximum likelihood.  The
+  regularization path is computed for the lasso or elasticnet penalty at a grid
+  of values for the regularization parameter lambda. Can deal with all
+  shapes of data, including very large sparse data matrices. Fits
+  linear, logistic and multinomial, poisson, and Cox regression models.
+  }
 \usage{
-glmnet(x, y, family=c("gaussian","binomial","multinomial"), weights, alpha = 1,
-  nlambda = 100, lambda.min = ifelse(nobs<nvars,0.05,0.0001), lambda,
-  standardize = TRUE, thresh = 1e-04,  dfmax = nvars + 1,
-  pmax = min(dfmax * 1.2, nvars), exclude, penalty.factor = rep(1, nvars),
-  maxit=100, HessianExact = FALSE, type = c("covariance", "naive"))
+glmnet(x, y,
+family=c("gaussian","binomial","poisson","multinomial","cox"), weights, offset=NULL,
+alpha = 1, nlambda = 100, lambda.min = ifelse(nobs<nvars,0.05,0.0001), lambda,
+standardize = TRUE, thresh = 1e-04,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, nvars),
+ exclude, penalty.factor = rep(1, nvars), maxit=100, HessianExact = FALSE, type = c("covariance", "naive"))
 }
 
 \arguments{
-  \item{x}{input matrix, of dimension nobs x nvars; each row is an observation vector. Can be in sparse column format (class \code{"dgCMatrix"} as in package \code{Matrix})}
-  \item{y}{response variable. Quantitative for \code{family="gaussian"}. For \code{family="binomial"} should be either a factor with two levels, or a two-column matrix of counts or proportions. For \code{family="multinomial"}, can be a \code{nc>=2} level factor, or a matrix with \code{nc} columns of counts or proportions}
+  \item{x}{input matrix, of dimension nobs x nvars; each row is an observation vector. Can be in sparse column format (class \code{"dgCMatrix"} as in package \code{Matrix}; not yet available for \code{family="cox"})}
+  \item{y}{response variable. Quantitative for \code{family="gaussian"}
+  or \code{family="poisson"} (non-negative counts). For
+  \code{family="binomial"} should be either a factor with two levels, or
+  a two-column matrix of counts or proportions. For
+  \code{family="multinomial"}, can be a \code{nc>=2} level factor, or a
+  matrix with \code{nc} columns of counts or proportions. For
+  \code{family="cox"}, \code{y} should be a two-column matrix with
+  columns named 'time' and 'status'. The latter is a binary variable,
+  with '1' indicating death, and '0' indicating right censored. The
+  function \code{Surv()} in package \pkg{survival} produces such a matrix}
   \item{family}{Response type (see above)}
   \item{weights}{observation weights. Can be total counts if responses are proportion matrices. Default is 1 for each observation}
+  \item{offset}{A vector of length \code{nobs} that is included in the linear predictor (a \code{nobs x nc} matrix for the \code{"multinomial"} family). Useful for the \code{"poisson"} family (e.g. log of exposure time), or for refining a model by starting at a current fit. Default is \code{NULL}. If supplied, then values must also be supplied to the \code{predict} function.}
   \item{alpha}{The elasticnet mixing parameter, with
     \eqn{0<\alpha\le 1}. The penalty is defined
     as \deqn{(1-\alpha)/2||\beta||_2^2+\alpha||\beta||_1.} \code{alpha=1}
-    is the lasso penalty; Currently \code{alpha<0.01} not reliable,
-    unless you supply your own \code{lambda} sequence}
+    is the lasso penalty; for \code{alpha<0.01}, users should supply their
+    own \code{lambda} sequence}
   \item{nlambda}{The number of \code{lambda} values - default is 100.}
   \item{lambda.min}{Smallest value for \code{lambda}, as a fraction of
     \code{lambda.max}, the (data derived) entry value (i.e. the smallest
@@ -77,12 +88,11 @@ glmnet(x, y, family=c("gaussian","binomial","multinomial"), weights, alpha = 1,
   The sequence of models implied by \code{lambda} is fit by coordinate
   descent. For \code{family="gaussian"} this is the lasso sequence if
   \code{alpha=1}, else it is the elasticnet sequence.
- For \code{family="binomial"}
-  or \code{family="multinomial"}, this is a lasso or elasticnet regularization path
-  for fitting the linear logistic or multinomial logistic regression
-  paths. Sometimes the sequence is truncated before \code{nlambda}
+ For the other families, this is a lasso or elasticnet regularization path
+  for fitting the generalized linear regression
+  paths, by maximizing the appropriate penalized log-likelihood (partial likelihood for the "cox" model). Sometimes the sequence is truncated before \code{nlambda}
   values of \code{lambda} have been used, because of instabilities in
-  the logistic or multinomial models near a saturated fit. \code{glmnet(...,family="binomial")}
+  the inverse link functions near a saturated fit. \code{glmnet(...,family="binomial")}
   fits a traditional logistic regression model for the
   log-odds. \code{glmnet(...,family="multinomial")} fits a symmetric multinomial model, where
   each class is represented by a linear model (on the log-scale). The
@@ -90,12 +100,12 @@ glmnet(x, y, family=c("gaussian","binomial","multinomial"), weights, alpha = 1,
   will produce the same fit as the corresponding \code{"binomial"} model,
   except the pair of coefficient matrices will be equal in magnitude and
   opposite in sign, and half the \code{"binomial"} values. 
-  Note that the objective function for \code{"gaussian"} is \deqn{1/(2*nobs)RSS + \lambda*penalty}, and for the logistic models it is  \deqn{1/nobs -loglik + \lambda*penalty}
+  Note that the objective function for \code{"gaussian"} is \deqn{1/2 RSS/nobs + \lambda*penalty,} and for the other models it is  \deqn{-loglik/nobs + \lambda*penalty}
 }
 \value{
 An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
-\code{"elnet"}, \code{"lognet"} or
-\code{"multnet"}  for the three types of models.
+\code{"elnet"}, \code{"lognet"}, 
+\code{"multnet"}, \code{"fishnet"} (poisson) or \code{"coxnet"}  for the five types of models.
   \item{call}{the call that produced this object}
   \item{a0}{Intercept sequence of length \code{length(lambda)}}
   \item{beta}{For \code{"elnet"} and \code{"lognet"} models, a \code{nvars x
@@ -104,7 +114,7 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
     matrices, one for each class.}
   \item{lambda}{The actual sequence of \code{lambda} values used}
   \item{dev}{The fraction of (null) deviance explained (for \code{"elnet"}, this
-      is the R-square).}
+      is the R-square). The deviance calculations incorporate weights if present in the model. The deviance is defined to be -2*(loglike_sat - loglike), where loglike_sat is the log-likelihood for the saturated model (a model with a free parameter per observation)}
     \item{nulldev}{Null deviance (per observation)}
   \item{df}{The number of nonzero coefficients for each value of
     \code{lambda}. For \code{"multnet"}, this is the number of variables
@@ -114,25 +124,79 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
   \item{dim}{dimension of coefficient matrix (ices)}
   \item{npasses}{total passes over the data summed over all lambda
     values}
+  \item{offset}{a logical variable indicating whether an offset was included in the model}
   \item{jerr}{error flag, for warnings and errors (largely for internal debugging).}
 }
 \references{Friedman, J., Hastie, T. and Tibshirani, R. (2008)
   \emph{Regularization Paths for Generalized Linear Models via Coordinate
-  Descent}\url{http://www-stat.stanford.edu/~hastie/Papers/glmnet.pdf}}
+    Descent, Journal of Statistical Software, Vol. 33, Issue 1, Feb 2010}\cr
+  \url{http://www-stat.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
+  \url{http://www.jstatsoft.org/v33/i01/}
+}
 \author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr 
+Noah Simon helped develop the 'cox' feature.\cr
 Maintainer: Trevor Hastie \email{hastie@stanford.edu}}
-\seealso{\code{print}, \code{predict} and \code{coef} methods.}
+\seealso{\code{print}, \code{predict}, \code{coef} and \code{plot} methods, and the \code{cv.glmnet} function.}
 \examples{
+# Gaussian
 x=matrix(rnorm(100*20),100,20)
 y=rnorm(100)
-g2=sample(1:2,100,replace=TRUE)
-g4=sample(1:4,100,replace=TRUE)
 fit1=glmnet(x,y)
 print(fit1)
 coef(fit1,s=0.01) # extract coefficients at a single value of lambda
 predict(fit1,newx=x[1:10,],s=c(0.01,0.005)) # make predictions
+
+#binomial
+g2=sample(1:2,100,replace=TRUE)
 fit2=glmnet(x,g2,family="binomial")
+
+#multinomial
+g4=sample(1:4,100,replace=TRUE)
 fit3=glmnet(x,g4,family="multinomial")
+
+#poisson
+N=500; p=20
+nzc=5
+x=matrix(rnorm(N*p),N,p)
+beta=rnorm(nzc)
+f = x[,seq(nzc)]\%*\%beta
+mu=exp(f)
+y=rpois(N,mu)
+fit=glmnet(x,y,family="poisson")
+plot(fit)
+pfit = predict(fit,x,s=0.001,type="response")
+plot(pfit,y)
+
+#Cox
+set.seed(10101)
+N=1000;p=30
+nzc=p/3
+x=matrix(rnorm(N*p),N,p)
+beta=rnorm(nzc)
+fx=x[,seq(nzc)]\%*\%beta/3
+hx=exp(fx)
+ty=rexp(N,hx)
+tcens=rbinom(n=N,prob=.3,size=1)# censoring indicator
+y=cbind(time=ty,status=1-tcens) # y=Surv(ty,1-tcens) with library(survival)
+fit=glmnet(x,y,family="cox")
+plot(fit)
+
+# Sparse
+n=10000;p=200
+nzc=trunc(p/10)
+x=matrix(rnorm(n*p),n,p)
+iz=sample(1:(n*p),size=n*p*.85,replace=FALSE)
+x[iz]=0
+sx=Matrix(x,sparse=TRUE)
+beta=rnorm(nzc)
+fx=x[,seq(nzc)]\%*\%beta
+eps=rnorm(n)
+y=fx+eps
+px=exp(fx)
+px=px/(1+px)
+ly=rbinom(n=length(px),prob=px,size=1)
+system.time(fit1<-glmnet(sx,y))
+system.time(fit2n<-glmnet(x,y))
 }
 \keyword{models}
 \keyword{regression}

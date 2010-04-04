@@ -2,7 +2,9 @@ useDynLib("glmnet")
 import("Matrix")
 export(glmnet,
        cv.glmnet,
-       predict.elnet,predict.lognet,predict.multnet,nonzeroCoef,plotCoef,jerr)
+       cv.elnet,cv.lognet,cv.multnet,cv.fishnet,cv.coxnet,getmin,auc,auc.mat,cvcompute,coxnet.deviance,
+       lambda.interp,response.coxnet,rmult,softmax,
+       predict.elnet,predict.lognet,predict.fishnet,predict.multnet,predict.coxnet,nonzeroCoef,plotCoef,jerr,jerr.elnet,jerr.lognet,jerr.fishnet,jerr.coxnet,elnet,lognet,fishnet,coxnet,getcoef,getcoef.multinomial)
 
 S3method("print","glmnet")
 S3method("plot","glmnet")

@@ -4,16 +4,17 @@
 \alias{predict.elnet}
 \alias{predict.lognet}
 \alias{predict.multnet}
+\alias{predict.fishnet}
+\alias{predict.coxnet}
 \title{make predictions from a "glmnet" object.}
 \description{
 Similar to other predict methods, this functions predicts fitted values, logits,
 coefficients and more from a fitted \code{"glmnet"} object.
 }
 \usage{
-\method{predict}{glmnet}(object, newx, s = object$lambda,
-type=c("link","response","coefficients","class","nonzero"), exact =
-FALSE, ...)
-\method{coef}{glmnet}(object,s=object$lambda, exact=FALSE, ...)
+\method{predict}{glmnet}(object, newx, s = NULL,
+type=c("link","response","coefficients","class","nonzero"), exact = FALSE, offset, ...)
+\method{coef}{glmnet}(object,s=NULL, exact=FALSE, ...)
 }
 \arguments{
   \item{object}{Fitted \code{"glmnet"} model object.}
@@ -24,10 +25,12 @@ FALSE, ...)
     predictions are required. Default is the entire sequence used to
     create the model. }
   \item{type}{Type of prediction required. Type \code{"link"} gives the
-    linear predictors for \code{"binomial"} or \code{"multinomial"}
-    models; for  \code{"gaussian"} models it gives the fitted
+    linear predictors for \code{"binomial"}, \code{"multinomial"},
+    \code{"poisson"} or \code{"cox"}  models; for  \code{"gaussian"}
+    models it gives the fitted
     values. Type \code{"response"} gives the fitted probabilities for
-    \code{"binomial"} or \code{"multinomial"}; for \code{"gaussian"}
+    \code{"binomial"} or \code{"multinomial"}, fitted mean for
+    \code{"poisson"} and the fitted relative-risk for \code{"cox"}; for \code{"gaussian"}
     type \code{"response"} is equivalent to type \code{"link"}. Type
     \code{"coefficients"} computes the coefficients at the requested
     values for \code{s}.  Note that for
@@ -46,6 +49,9 @@ FALSE, ...)
 with the desired values interspersed (in order) with the values used in
 the original fit. This is easily achieved via the R command
 \code{lamba=sort(c(object$lambda, new.lambda))}}
+ \item{offset}{If an offset is used in the fit, then one must be
+   supplied for making predictions (except for
+   \code{type="coefficients"} or \code{type="nonzero"})}
   \item{\dots}{Not used. Other arguments to predict. } }
 \details{The shape of the objects returned are different for
   \code{"multinomial"} objects. This function actually calls
@@ -55,10 +61,13 @@ model types. \code{coef(...)} is equivalent to \code{predict(type="coefficients"
 \value{The object returned depends on type.}
 \references{Friedman, J., Hastie, T. and Tibshirani, R. (2008)
   \emph{Regularization Paths for Generalized Linear Models via Coordinate
-  Descent}}
+    Descent, Journal of Statistical Software, Vol. 33, Issue 1, Feb 2010}\cr
+  \url{http://www-stat.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
+  \url{http://www.jstatsoft.org/v33/i01/}
+}
 \author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr
   Maintainer: Trevor Hastie <hastie@stanford.edu>}
-\seealso{\code{glmnet}, and \code{print}, and \code{coef} methods.}
+\seealso{\code{glmnet}, and \code{print}, and \code{coef} methods, and \code{cv.glmnet}.}
 \examples{
 x=matrix(rnorm(100*20),100,20)
 y=rnorm(100)
