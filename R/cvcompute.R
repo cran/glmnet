@@ -4,6 +4,7 @@ cvcompute=function(mat,weights,foldid,nlams){
   nfolds=max(foldid)
   outmat=matrix(NA,nfolds,ncol(mat))
   good=matrix(0,nfolds,ncol(mat))
+  mat[is.infinite(mat)]=NA#just in case some infinities crept in
   for(i in seq(nfolds)){
     mati=mat[foldid==i,]
     wi=weights[foldid==i]

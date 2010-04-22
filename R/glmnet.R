@@ -1,4 +1,4 @@
-glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"),weights,offset=NULL,alpha=1.0,nlambda=100,lambda.min=ifelse(nobs<nvars,5e-2,1e-4),lambda,standardize=TRUE,thresh=1e-4,dfmax=nvars+1,pmax=min(dfmax*1.2,nvars),exclude,penalty.factor=rep(1,nvars),maxit=100,HessianExact=FALSE,type=c("covariance","naive")){
+glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"),weights,offset=NULL,alpha=1.0,nlambda=100,lambda.min=ifelse(nobs<nvars,5e-2,1e-4),lambda=NULL,standardize=TRUE,thresh=1e-4,dfmax=nvars+1,pmax=min(dfmax*1.2,nvars),exclude,penalty.factor=rep(1,nvars),maxit=100,HessianExact=FALSE,type=c("covariance","naive")){
 
 ### Prepare all the generic arguments, then hand off to family functions
   family=match.arg(family)
@@ -20,7 +20,7 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   vp=as.double(penalty.factor)
   isd=as.integer(standardize)
   thresh=as.double(thresh)
-  if(missing(lambda)){
+  if(is.null(lambda)){
      if(lambda.min>=1)stop("lambda.min should be less than 1")
     flmin=as.double(lambda.min)
     ulam=double(1)
@@ -48,7 +48,7 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
     "cox"=coxnet(x,is.sparse,ix,jx,y,weights,offset,type,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit)
     )
     
-  if(missing(lambda))fit$lambda=fix.lam(fit$lambda)##first lambda is infinity; changed to entry point
+  if(is.null(lambda))fit$lambda=fix.lam(fit$lambda)##first lambda is infinity; changed to entry point
 fit$call=this.call
   class(fit)=c("glmnet",class(fit))
   fit

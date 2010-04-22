@@ -11,7 +11,7 @@
 \usage{
 glmnet(x, y,
 family=c("gaussian","binomial","poisson","multinomial","cox"), weights, offset=NULL,
-alpha = 1, nlambda = 100, lambda.min = ifelse(nobs<nvars,0.05,0.0001), lambda,
+alpha = 1, nlambda = 100, lambda.min = ifelse(nobs<nvars,0.05,0.0001), lambda=NULL,
 standardize = TRUE, thresh = 1e-04,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, nvars),
  exclude, penalty.factor = rep(1, nvars), maxit=100, HessianExact = FALSE, type = c("covariance", "naive"))
 }
