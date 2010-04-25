@@ -5,6 +5,9 @@ cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
     warning("Only 'deviance', 'class',  'mse' or 'mae'  available for multinomial models; 'deviance' used")
     type="deviance"
   }
+###These are hard coded in the Fortran, so we do that here too
+  prob_min=1e-5
+  prob_max=1-prob_min
 
   ###Turn y into a matrix
   nc = dim(y)
@@ -39,6 +42,7 @@ cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
     "mse"=apply((bigY-predmat)^2,c(1,3),sum),
     "mae"=apply(abs(bigY-predmat),c(1,3),sum),
     "deviance"= {
+      predmat=pmin(pmax(predmat,prob_min),prob_max)
       lp=bigY*log(predmat)
       ly=bigY*log(bigY)
       ly[bigY==0]=0

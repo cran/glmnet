@@ -1,10 +1,10 @@
-cv.glmnet=function(x,y,weights,offset=NULL,...,nfolds=10,foldid,type=c("mse","deviance","class","auc","mae"),grouped=TRUE){
+cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,...,nfolds=10,foldid,type=c("mse","deviance","class","auc","mae"),grouped=TRUE){
   if(missing(type))type="default"
   else type=match.arg(type)
   N=nrow(x)
   if(missing(weights))weights=rep(1.0,N)else weights=as.double(weights)
 ###Fit the model once to get dimensions etc of output
-  glmnet.object=glmnet(x,y,weights=weights,offset=offset,...)
+  glmnet.object=glmnet(x,y,weights=weights,offset=offset,lambda=lambda,...)
   is.offset=glmnet.object$offset
   lambda=glmnet.object$lambda
   if(inherits(glmnet.object,"multnet")){

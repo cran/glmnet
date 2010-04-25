@@ -5,7 +5,9 @@ cv.lognet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
     warning("Only 'deviance', 'class', 'auc', 'mse' or 'mae'  available for binomial models; 'deviance' used")
     type="deviance"
   }
-
+###These are hard coded in the Fortran, so we do that here too
+  prob_min=1e-5
+  prob_max=1-prob_min
   ###Turn y into a matrix
   nc = dim(y)
   if (is.null(nc)) {
@@ -56,6 +58,7 @@ cv.lognet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
     "mse"=(y[,1]-(1-predmat))^2 +(y[,2]-predmat)^2,
     "mae"=abs(y[,1]-(1-predmat)) +abs(y[,2]-predmat),
     "deviance"= {
+      predmat=pmin(pmax(predmat,prob_min),prob_max)
       lp=y[,1]*log(1-predmat)+y[,2]*log(predmat)
       ly=log(y)
       ly[y==0]=0

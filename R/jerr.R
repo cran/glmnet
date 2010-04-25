@@ -1,5 +1,5 @@
 jerr=function(n,maxit,pmax,family){
-  if(n==0) list(n=0,msg="",fatal=FALSE)
+  if(n==0) list(n=0,fatal=FALSE,msg="")
   else {
     errlist=switch(family,
               "gaussian"=jerr.elnet(n),
@@ -8,6 +8,7 @@ jerr=function(n,maxit,pmax,family){
               "poisson"=jerr.fishnet(n,maxit,pmax),
               "cox"=jerr.coxnet(n,maxit,pmax)
       )
+    names(errlist)=c("n","fatal","msg")
     errlist$msg=paste("from glmnet Fortran code -", errlist$msg)
     errlist
   }

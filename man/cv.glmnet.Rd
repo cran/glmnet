@@ -4,13 +4,15 @@
 \description{Does k-fold cross-validation for glmnet, produces a plot,
   and returns a value for \code{lambda}}
 \usage{
-cv.glmnet(x, y, weights, offset, ..., nfolds, foldid, type, grouped)
+cv.glmnet(x, y, weights, offset, lambda, ..., nfolds, foldid, type, grouped)
 }
 \arguments{
   \item{x}{\code{x} matrix as in \code{glmnet}.}
   \item{y}{response \code{y} as in \code{glmnet}.}
   \item{weights}{Observation weights; defaults to 1 per observation}
   \item{offset}{Offset vector (matrix) as in \code{glmnet}}
+  \item{lambda}{Optional user-supplied lambda sequence; default is
+    \code{NULL}, and \code{glmnet} chooses its own sequence}
   \item{\dots}{Other arguments that can be passed to \code{glmnet}.}
   \item{nfolds}{number of folds - default is 10.}
   \item{foldid}{an optional vector of values between 1 and \code{nfold}
