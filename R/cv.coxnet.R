@@ -2,7 +2,7 @@ cv.coxnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
   typenames=c("deviance"="Partial Likelihood Deviance")
   if(type=="default")type="deviance"
   if(!match(type,c("deviance"),FALSE)){
-    warning("Only 'deviance'  available for Cox models; 'deviance' used")
+    warning("Only 'deviance'  available for Cox models; changed to type='deviance'")
     type="deviance"
   }
      if(!is.null(offset)){
@@ -12,6 +12,10 @@ cv.coxnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
 
 
     nfolds=max(foldid)
+  if( (length(weights)/nfolds <10)&&!grouped){
+    warning("Option grouped=TRUE enforced for cv.coxnet, since < 3 observations per fold",call.=FALSE)
+    grouped=TRUE
+  }
   cvraw=matrix(NA,nfolds,length(lambda))
   for(i in seq(nfolds)){
     which=foldid==i

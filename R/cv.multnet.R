@@ -25,8 +25,8 @@ cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
   for(i in seq(nfolds)){
       which=foldid==i
       fitobj=outlist[[i]]
-      if(is.offset)off_sub=offset[which,]
-      preds=predict(fitobj,x[which,],offset=off_sub,type="response")
+      if(is.offset)off_sub=offset[which,,drop=FALSE]
+      preds=predict(fitobj,x[which,,drop=FALSE],offset=off_sub,type="response")
       nlami=length(outlist[[i]]$lambda)
       predmat[which,,seq(nlami)]=preds
       nlams[i]=nlami
@@ -55,7 +55,10 @@ cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
      }
 
     )
-
+ if( (nrow(y)/nfolds <3)&&grouped){
+    warning("Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold",call.=FALSE)
+    grouped=FALSE
+  }
  if(grouped){
    cvob=cvcompute(cvraw,weights,foldid,nlams)
   cvraw=cvob$cvraw;weights=cvob$weights;N=cvob$N

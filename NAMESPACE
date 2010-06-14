@@ -1,3 +1,6 @@
+.onLoad=function(libname,pkgname){
+  cat("Loaded glmnet",installed.packages()["glmnet","Version"],"\n")
+}
 useDynLib("glmnet")
 import("Matrix")
 export(glmnet,

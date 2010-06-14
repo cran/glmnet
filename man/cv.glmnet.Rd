@@ -14,7 +14,9 @@ cv.glmnet(x, y, weights, offset, lambda, ..., nfolds, foldid, type, grouped)
   \item{lambda}{Optional user-supplied lambda sequence; default is
     \code{NULL}, and \code{glmnet} chooses its own sequence}
   \item{\dots}{Other arguments that can be passed to \code{glmnet}.}
-  \item{nfolds}{number of folds - default is 10.}
+  \item{nfolds}{number of folds - default is 10. Although \code{nfolds}
+    can be as large as the sample size (leave-one-out CV), it is not
+    recommended for large datasets. Smallest value allowable is \code{nfolds=3}}
   \item{foldid}{an optional vector of values between 1 and \code{nfold}
     identifying whhat fold each observation is in. If supplied,
     \code{nfold} can be missing.}

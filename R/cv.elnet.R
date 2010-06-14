@@ -8,14 +8,14 @@ cv.elnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
      if(!is.null(offset))y=y-drop(offset)
      predmat=matrix(NA,length(y),length(lambda))
     nfolds=max(foldid)
-  nlams=double(nfolds)
+    nlams=double(nfolds)
     for(i in seq(nfolds)){
       which=foldid==i
       fitobj=outlist[[i]]
       fitobj$offset=FALSE
-      preds=predict(fitobj,x[which,])
+      preds=predict(fitobj,x[which,,drop=FALSE])
       nlami=length(outlist[[i]]$lambda)
-      predmat[which,seq(nlami)]=preds
+       predmat[which,seq(nlami)]=preds
       nlams[i]=nlami
     }
 
@@ -25,7 +25,11 @@ cv.elnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
     "deviance"=(y-predmat)^2,
     "mae"=abs(y-predmat)
     )
-   if(grouped){
+   if( (length(y)/nfolds <3)&&grouped){
+    warning("Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold",call.=FALSE)
+    grouped=FALSE
+  }
+ if(grouped){
    cvob=cvcompute(cvraw,weights,foldid,nlams)
   cvraw=cvob$cvraw;weights=cvob$weights;N=cvob$N
  }
