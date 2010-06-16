@@ -5,6 +5,7 @@ cv.lognet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
     warning("Only 'deviance', 'class', 'auc', 'mse' or 'mae'  available for binomial models; 'deviance' used")
     type="deviance"
   }
+
 ###These are hard coded in the Fortran, so we do that here too
   prob_min=1e-5
   prob_max=1-prob_min
@@ -16,19 +17,29 @@ cv.lognet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
     nc = as.integer(length(ntab))
     y = diag(nc)[as.numeric(y), ]
     }
+  N=nrow(y)
+  nfolds=max(foldid)
+  if( (N/nfolds <10)&&type=="auc"){
+    warning("Too few (< 10) observations per fold for type='auc' in cv.lognet; changed to type='deviance'. Alternatively, use smaller value for nfolds",call.=FALSE)
+    type="deviance"
+  }
+  if( (N/nfolds <3)&&grouped){
+    warning("Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold",call.=FALSE)
+    grouped=FALSE
+  }
+
 
   if(!is.null(offset)){
     is.offset=TRUE
     offset=drop(offset)
   }else is.offset=FALSE
   predmat=matrix(NA,nrow(y),length(lambda))
-  nfolds=max(foldid)
-  nlams=double(nfolds)
+   nlams=double(nfolds)
   for(i in seq(nfolds)){
       which=foldid==i
       fitobj=outlist[[i]]
       if(is.offset)off_sub=offset[which]
-      preds=predict(fitobj,x[which,],offset=off_sub,type="response")
+      preds=predict(fitobj,x[which,,drop=FALSE],offset=off_sub,type="response")
       nlami=length(outlist[[i]]$lambda)
       predmat[which,seq(nlami)]=preds
       nlams[i]=nlami

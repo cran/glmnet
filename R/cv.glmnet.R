@@ -14,7 +14,8 @@ cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,...,nfolds=10,foldid,type
   }
   else  nz=sapply(predict(glmnet.object,type="nonzero"),length)
   if(missing(foldid)) foldid=sample(rep(seq(nfolds),length=N)) else nfolds=max(foldid)
-  outlist=as.list(seq(nfolds))
+  if(nfolds<3)stop("nfolds must be bigger than 3; nfolds=10 recommended")
+   outlist=as.list(seq(nfolds))
 ###Now fit the nfold models and store them
   for(i in seq(nfolds)){
     which=foldid==i

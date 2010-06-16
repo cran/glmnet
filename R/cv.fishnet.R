@@ -23,7 +23,7 @@ cv.fishnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
       which=foldid==i
       fitobj=outlist[[i]]
       if(is.offset)off_sub=offset[which]
-      preds=predict(fitobj,x[which,],offset=off_sub)
+      preds=predict(fitobj,x[which,,drop=FALSE],offset=off_sub)
       nlami=length(outlist[[i]]$lambda)
       predmat[which,seq(nlami)]=preds
       nlams[i]=nlami
@@ -35,7 +35,11 @@ cv.fishnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
     "mae"=abs(y-exp(predmat)),
     "deviance"=devi(y,predmat)
     )
-   if(grouped){
+  if( (length(y)/nfolds <3)&&grouped){
+    warning("Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold",call.=FALSE)
+    grouped=FALSE
+  }
+ if(grouped){
    cvob=cvcompute(cvraw,weights,foldid,nlams)
   cvraw=cvob$cvraw;weights=cvob$weights;N=cvob$N
  }
