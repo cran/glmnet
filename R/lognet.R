@@ -1,37 +1,37 @@
 lognet=function(x,is.sparse,ix,jx,y,weights,offset,type,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,HessianExact,family){
-    nc=dim(y)
-    maxit=as.integer(maxit)
-    kopt=as.integer(HessianExact)
-    if(is.null(nc)){
-      ## Need to construct a y matrix, and include the weights
-      y=as.factor(y)
-      ntab=table(y)
-      classnames=names(ntab)
-      nc=as.integer(length(ntab))
-      y=diag(nc)[as.numeric(y),]
-    }
-    else{
-      noo=nc[1]
-      if(noo!=nobs)stop("x and y have different number of rows in call to glmnet",call.=FALSE)
-      nc=as.integer(nc[2])
-      classnames=colnames(y)
-    }
-    if(family=="binomial"){
-      if(nc>2)stop("More than two classes; use multinomial family instead in call to glmnet",call.=FALSE)
-      nc=as.integer(1) # for calling multnet
-    }
-    o=NULL
-    if(!missing(weights)){
+  nc=dim(y)
+  maxit=as.integer(maxit)
+  kopt=as.integer(HessianExact)
+  if(is.null(nc)){
+    ## Need to construct a y matrix, and include the weights
+    y=as.factor(y)
+    ntab=table(y)
+    classnames=names(ntab)
+    nc=as.integer(length(ntab))
+    y=diag(nc)[as.numeric(y),]
+  }
+  else{
+    noo=nc[1]
+    if(noo!=nobs)stop("x and y have different number of rows in call to glmnet",call.=FALSE)
+    nc=as.integer(nc[2])
+    classnames=colnames(y)
+  }
+  if(family=="binomial"){
+    if(nc>2)stop("More than two classes; use multinomial family instead in call to glmnet",call.=FALSE)
+    nc=as.integer(1) # for calling multnet
+  }
+  o=NULL
+  if(!missing(weights)){
 ### check if any are zero
-      o=weights>0
-      if(!all(o)){ #subset the data
-        y=y[o,]
-        x=x[o,,drop=FALSE]
-        weights=weights[o]
-        nobs=sum(o)
-      }else o=NULL
-      y=y*weights
-    }
+    o=weights>0
+    if(!all(o)){ #subset the data
+      y=y[o,]
+      x=x[o,,drop=FALSE]
+      weights=weights[o]
+      nobs=sum(o)
+    }else o=NULL
+    y=y*weights
+  }
     
 
   
@@ -87,7 +87,7 @@ if(fit$jerr!=0){
  }
  else  outlist=getcoef.multinomial(fit,nvars,nx,vnames,nc,classnames)
  dev=fit$dev[seq(fit$lmu)]
-outlist=c(outlist,list(dev=dev,nulldev=fit$nulldev,npasses=fit$nlp,jerr=fit$jerr,offset=is.offset))
+outlist=c(outlist,list(dev.ratio=dev,nulldev=fit$nulldev,npasses=fit$nlp,jerr=fit$jerr,offset=is.offset))
   class(outlist)=switch(family,
          "binomial"="lognet",
          "multinomial"="multnet"

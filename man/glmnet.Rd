@@ -11,7 +11,7 @@
 \usage{
 glmnet(x, y,
 family=c("gaussian","binomial","poisson","multinomial","cox"), weights, offset=NULL,
-alpha = 1, nlambda = 100, lambda.min = ifelse(nobs<nvars,0.05,0.0001), lambda=NULL,
+alpha = 1, nlambda = 100, lambda.min.ratio = ifelse(nobs<nvars,0.01,0.0001), lambda=NULL,
 standardize = TRUE, thresh = 1e-04,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, nvars),
  exclude, penalty.factor = rep(1, nvars), maxit=100, HessianExact = FALSE, type = c("covariance", "naive"))
 }
@@ -34,29 +34,34 @@ standardize = TRUE, thresh = 1e-04,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, 
   \item{alpha}{The elasticnet mixing parameter, with
     \eqn{0<\alpha\le 1}. The penalty is defined
     as \deqn{(1-\alpha)/2||\beta||_2^2+\alpha||\beta||_1.} \code{alpha=1}
-    is the lasso penalty; for \code{alpha<0.01}, users should supply their
-    own \code{lambda} sequence}
+    is the lasso penalty.}
   \item{nlambda}{The number of \code{lambda} values - default is 100.}
-  \item{lambda.min}{Smallest value for \code{lambda}, as a fraction of
+  \item{lambda.min.ratio}{Smallest value for \code{lambda}, as a fraction of
     \code{lambda.max}, the (data derived) entry value (i.e. the smallest
   value for which all coefficients are zero). The default depends on the
   sample size \code{nobs} relative to the number of variables
   \code{nvars}. If \code{nobs > nvars}, the default is \code{0.0001},
-  close to zero.  If \code{nobs < nvars}, the default is \code{0.05}.
+  close to zero.  If \code{nobs < nvars}, the default is \code{0.01}.
   A very small value of
-  \code{lambda.min} will lead to a saturated fit. This is undefined for
+  \code{lambda.min.ratio} will lead to a saturated fit in the \code{nobs <
+  nvars} case. This is undefined for
   \code{"binomial"} and \code{"multinomial"} models, and \code{glmnet}
   will exit gracefully when the percentage deviance explained is almost
   1.} 
   \item{lambda}{A user supplied \code{lambda} sequence. Typical usage
     is to have the 
     program compute its own \code{lambda} sequence based on
-    \code{nlambda} and \code{lambda.min}. Supplying a value of
-    \code{lambda} overrides this. Use with care - it is better to supply
-    a decreasing sequence of \code{lambda} values than a single (small) value.}
+    \code{nlambda} and \code{lambda.min.ratio}. Supplying a value of
+    \code{lambda} overrides this. WARNING: use with care. Do not supply
+  a single value for \code{lambda} (for predictions after CV use \code{predict()}
+  instead).  Supply instead
+    a decreasing sequence of \code{lambda} values. \code{glmnet} relies
+  on its warms starts for speed, and its often faster to fit a whole
+  path than compute a single fit.}
   \item{standardize}{Logical flag for variable standardization, prior to
     fitting the model sequence. The coefficients are always returned on
-    the original scale. Default is is \code{standardize=TRUE}}
+    the original scale. Default is is \code{standardize=TRUE}.
+  If variables are in the same units already, you might not wish to standardize.}
   \item{thresh}{Convergence threshold for coordinate descent. Each inner
   coordinate-descent loop continues until the relative change in any
   coefficient is less than \code{thresh}. Defaults value is \code{1E-4}.}
@@ -113,9 +118,14 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
     format (\code{"dgCMatrix"}). For \code{"multnet"}, a list of \code{nc} such
     matrices, one for each class.}
   \item{lambda}{The actual sequence of \code{lambda} values used}
-  \item{dev}{The fraction of (null) deviance explained (for \code{"elnet"}, this
-      is the R-square). The deviance calculations incorporate weights if present in the model. The deviance is defined to be -2*(loglike_sat - loglike), where loglike_sat is the log-likelihood for the saturated model (a model with a free parameter per observation)}
-    \item{nulldev}{Null deviance (per observation)}
+  \item{dev.fraction}{The fraction of (null) deviance explained (for \code{"elnet"}, this
+      is the R-square). The deviance calculations incorporate weights if
+  present in the model. The deviance is defined to be -2*(loglike_sat -
+  loglike), where loglike_sat is the log-likelihood for the saturated
+  model (a model with a free parameter per observation). Hence dev.fraction=1-dev/nulldev.}
+    \item{nulldev}{Null deviance (per observation). This is defined to
+  be  -2*(loglike_sat -loglike(Null)); The NULL model refers to the
+  intercept model, except for the Cox, where it is the 0 model.}
   \item{df}{The number of nonzero coefficients for each value of
     \code{lambda}. For \code{"multnet"}, this is the number of variables
     with a nonzero coefficient for \emph{any} class.}

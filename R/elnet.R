@@ -51,7 +51,7 @@ if(fit$jerr!=0){
 }
   outlist=getcoef(fit,nvars,nx,vnames)
   dev=fit$rsq[seq(fit$lmu)]
-  outlist=c(outlist,list(dev=dev,nulldev=nulldev,npasses=fit$nlp,jerr=fit$jerr,offset=is.offset))
+  outlist=c(outlist,list(dev.ratio=dev,nulldev=nulldev,npasses=fit$nlp,jerr=fit$jerr,offset=is.offset))
   class(outlist)="elnet"
   outlist
 }

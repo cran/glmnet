@@ -33,7 +33,7 @@ if(fit$jerr!=0){
 }
   outlist=getcoef(fit,nvars,nx,vnames)
   dev=fit$dev[seq(fit$lmu)]
-outlist=c(outlist,list(dev=dev,nulldev=fit$nulldev,npasses=fit$nlp,jerr=fit$jerr,offset=is.offset))
+outlist=c(outlist,list(dev.ratio=dev,nulldev=fit$nulldev,npasses=fit$nlp,jerr=fit$jerr,offset=is.offset))
 class(outlist)="coxnet"
 outlist
 }
