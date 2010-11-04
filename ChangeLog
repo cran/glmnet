@@ -1,0 +1,21 @@
+2010-11-01  Trevor Hastie  <hastie@stanford.edu>
+
+	* glmnet.Rd (lambda.min) : changed value to 0.01 if nobs<nvars
+	  (lambda) added warnings to avoid single value
+	  (lambda.min): renamed it lamda.min.ratio
+	* glmnet (lambda.min) : changed	value to 0.01 if nobs<nvars
+	    (HessianExact) : changed the sense (it was wrong)
+	   (lambda.min): renamed it lamda.min.ratio # this allows it to be called lambda.min in a call though
+	* predict.cv.glmnet (new function) : makes predictions directly from the saved glmnet object on the cv object
+	* coef.cv.glmnet (new function) : as above
+	* predict.cv.glmnet.Rd : help functions for the above
+	* cv.glmnet : insert drop(y) to avoid 1 column matrices
+	    now include a glmnet.fit object for later predictions
+	* nonzeroCoef : added a special case for a single variable in x; it was dying on this
+	* deviance.glmnet : included
+	* deviance.glmnet.Rd : included
+	
+
+2010-06-26 Trevor Hastie <hastie@stanford.edu>
+	###	Note that this starts from glmnet_1.4
+	

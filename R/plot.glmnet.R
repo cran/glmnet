@@ -15,9 +15,9 @@ plot.glmnet=function(x, xvar=c("norm","lambda","dev"),label=FALSE,...){
     ncl=nrow(dfmat)
     clnames=rownames(dfmat)
     for( i in seq(ncl)){
-      plotCoef(beta[[i]],norm,x$lambda,dfmat[i,],x$dev,label=label,xvar=xvar,ylab=paste("Coefficients: Class",clnames[i]),...)
+      plotCoef(beta[[i]],norm,x$lambda,dfmat[i,],x$dev.ratio,label=label,xvar=xvar,ylab=paste("Coefficients: Class",clnames[i]),...)
     }
-  }else plotCoef(x$beta,lambda=x$lambda,df=x$df,dev=x$dev,label=label,xvar=xvar,...)
+  }else plotCoef(x$beta,lambda=x$lambda,df=x$df,dev=x$dev.ratio,label=label,xvar=xvar,...)
 }
       
       

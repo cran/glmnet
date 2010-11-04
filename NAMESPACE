@@ -1,6 +1,3 @@
-.onLoad=function(libname,pkgname){
-  cat("Loaded glmnet",installed.packages()["glmnet","Version"],"\n")
-}
 useDynLib("glmnet")
 import("Matrix")
 export(glmnet,
@@ -13,7 +10,10 @@ S3method("print","glmnet")
 S3method("plot","glmnet")
 S3method("predict","glmnet")
 S3method("coef","glmnet")
+S3method("coef","cv.glmnet")
+S3method("predict","cv.glmnet")
 S3method("plot","cv.glmnet")
+S3method("deviance","glmnet")
 
 
 

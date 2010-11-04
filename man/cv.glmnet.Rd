@@ -63,6 +63,7 @@ cv.glmnet(x, y, weights, offset, lambda, ..., nfolds, foldid, type, grouped)
   \item{nzero}{number of non-zero coefficients at each \code{lambda}.}
   \item{name}{a text string indicating type of measure (for plotting
     purposes).}
+ \item{glmnet.fit}{a fitted glmnet object for the full data.}
   \item{lambda.min}{value of \code{lambda} that gives minimum
     \code{cvm}.}
   \item{lambda.1se}{largest value of \code{lambda} such that error is
@@ -77,7 +78,7 @@ cv.glmnet(x, y, weights, offset, lambda, ..., nfolds, foldid, type, grouped)
 \author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr 
 Noah Simon helped develop the 'coxnet' function.\cr
 Maintainer: Trevor Hastie \email{hastie@stanford.edu}}
-\seealso{\code{glmnet} and \code{plot} method for \code{"cv.glmnet"} object.}
+\seealso{\code{glmnet} and \code{plot}, \code{predict}, and \code{coef} methods for \code{"cv.glmnet"} object.}
 \examples{
 set.seed(1010)
 n=1000;p=100
@@ -93,6 +94,8 @@ ly=rbinom(n=length(px),prob=px,size=1)
 set.seed(1011)
 cvob1=cv.glmnet(x,y)
 plot(cvob1)
+coef(cvob1)
+predict(cvob1,newx=x[1:5,], s="lambda.min")
 title("Gaussian Family",line=2.5)
 set.seed(1011)
 cvob1a=cv.glmnet(x,y,type="mae")
