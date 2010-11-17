@@ -1,9 +1,9 @@
-cv.elnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
+cv.elnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped){
   typenames=c(deviance="Mean-Squared Error",mse="Mean-Squared Error",mae="Mean Absolute Error")
-  if(type=="default")type="mse"
-  if(!match(type,c("mse","mae","deviance"),FALSE)){
+  if(type.measure=="default")type.measure="mse"
+  if(!match(type.measure,c("mse","mae","deviance"),FALSE)){
     warning("Only 'mse', 'deviance' or 'mae'  available for Gaussian models; 'mse' used")
-    type="mse"
+    type.measure="mse"
   }
      if(!is.null(offset))y=y-drop(offset)
      predmat=matrix(NA,length(y),length(lambda))
@@ -20,7 +20,7 @@ cv.elnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
     }
 
   N=length(y) - apply(is.na(predmat),2,sum)
-  cvraw=switch(type,
+  cvraw=switch(type.measure,
     "mse"=(y-predmat)^2,
     "deviance"=(y-predmat)^2,
     "mae"=abs(y-predmat)
@@ -36,5 +36,5 @@ cv.elnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
 
   cvm=apply(cvraw,2,weighted.mean,w=weights,na.rm=TRUE)
   cvsd=sqrt(apply(scale(cvraw,cvm,FALSE)^2,2,weighted.mean,w=weights,na.rm=TRUE)/(N-1))
-  list(cvm=cvm,cvsd=cvsd,name=typenames[type])
+  list(cvm=cvm,cvsd=cvsd,name=typenames[type.measure])
 }

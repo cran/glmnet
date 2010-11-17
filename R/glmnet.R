@@ -1,4 +1,4 @@
-glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"),weights,offset=NULL,alpha=1.0,nlambda=100,lambda.min.ratio=ifelse(nobs<nvars,1e-2,1e-4),lambda=NULL,standardize=TRUE,thresh=1e-4,dfmax=nvars+1,pmax=min(dfmax*1.2,nvars),exclude,penalty.factor=rep(1,nvars),maxit=100,HessianExact=FALSE,type=c("covariance","naive")){
+glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"),weights,offset=NULL,alpha=1.0,nlambda=100,lambda.min.ratio=ifelse(nobs<nvars,1e-2,1e-4),lambda=NULL,standardize=TRUE,thresh=1e-4,dfmax=nvars+1,pmax=min(dfmax*1.2,nvars),exclude,penalty.factor=rep(1,nvars),maxit=100,HessianExact=FALSE,type.gaussian=ifelse(nvars<500,"covariance","naive")){
 
 ### Prepare all the generic arguments, then hand off to family functions
   family=match.arg(family)
@@ -42,11 +42,11 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   }
 
   fit=switch(family,
-    "gaussian"=elnet(x,is.sparse,ix,jx,y,weights,offset,type,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames),
-    "poisson"=fishnet(x,is.sparse,ix,jx,y,weights,offset,type,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit),
-    "binomial"=lognet(x,is.sparse,ix,jx,y,weights,offset,type,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,!HessianExact,family),
-    "multinomial"=lognet(x,is.sparse,ix,jx,y,weights,offset,type,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,!HessianExact,family),
-    "cox"=coxnet(x,is.sparse,ix,jx,y,weights,offset,type,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit)
+    "gaussian"=elnet(x,is.sparse,ix,jx,y,weights,offset,type.gaussian,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames),
+    "poisson"=fishnet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit),
+    "binomial"=lognet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,!HessianExact,family),
+    "multinomial"=lognet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,!HessianExact,family),
+    "cox"=coxnet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit)
     )
     
   if(is.null(lambda))fit$lambda=fix.lam(fit$lambda)##first lambda is infinity; changed to entry point

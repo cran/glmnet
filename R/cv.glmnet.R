@@ -1,6 +1,6 @@
-cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,...,nfolds=10,foldid,type=c("mse","deviance","class","auc","mae"),grouped=TRUE){
-  if(missing(type))type="default"
-  else type=match.arg(type)
+cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,type.measure=c("mse","deviance","class","auc","mae"),...,nfolds=10,foldid,grouped=TRUE){
+  if(missing(type.measure))type.measure="default"
+  else type.measure=match.arg(type.measure)
   N=nrow(x)
   if(missing(weights))weights=rep(1.0,N)else weights=as.double(weights)
 ###Fit the model once to get dimensions etc of output
@@ -25,15 +25,15 @@ cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,...,nfolds=10,foldid,type
     else offset_sub=NULL
     outlist[[i]]=glmnet(x[!which,,drop=FALSE],y_sub,lambda=lambda,offset=offset_sub,weights=weights[!which],...)
   }
-  ###What to do depends on the type and the model fit
+  ###What to do depends on the type.measure and the model fit
   fun=paste("cv",class(glmnet.object)[[2]],sep=".")
-  cvstuff=do.call(fun,list(outlist,lambda,x,y,weights,offset,foldid,type,grouped))
+  cvstuff=do.call(fun,list(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped))
   cvm=cvstuff$cvm
   cvsd=cvstuff$cvsd
   cvname=cvstuff$name
   
 out=list(lambda=lambda,cvm=cvm,cvsd=cvsd,cvup=cvm+cvsd,cvlo=cvm-cvsd,nzero=nz,name=cvname,glmnet.fit=glmnet.object)
-  lamin=if(type=="auc")getmin(lambda,-cvm,cvsd)
+  lamin=if(type.measure=="auc")getmin(lambda,-cvm,cvsd)
   else getmin(lambda,cvm,cvsd)
   obj=c(out,as.list(lamin))
   class(obj)="cv.glmnet"

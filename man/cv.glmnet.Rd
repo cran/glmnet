@@ -4,7 +4,7 @@
 \description{Does k-fold cross-validation for glmnet, produces a plot,
   and returns a value for \code{lambda}}
 \usage{
-cv.glmnet(x, y, weights, offset, lambda, ..., nfolds, foldid, type, grouped)
+cv.glmnet(x, y, weights, offset, lambda, type.measure, ..., nfolds, foldid, grouped)
 }
 \arguments{
   \item{x}{\code{x} matrix as in \code{glmnet}.}
@@ -20,15 +20,15 @@ cv.glmnet(x, y, weights, offset, lambda, ..., nfolds, foldid, type, grouped)
   \item{foldid}{an optional vector of values between 1 and \code{nfold}
     identifying whhat fold each observation is in. If supplied,
     \code{nfold} can be missing.}
-  \item{type}{loss to use for cross-validation. Currently five
-    options, not all available for all models. The default is \code{type="deviance"}, which uses
-    squared-error for gaussian models (a.k.a \code{type="mse"} there), deviance
+  \item{type.measure}{loss to use for cross-validation. Currently five
+    options, not all available for all models. The default is \code{type.measure="deviance"}, which uses
+    squared-error for gaussian models (a.k.a \code{type.measure="mse"} there), deviance
     for logistic and poisson
     regression, and partial-likelihood for the Cox
-    model. \code{type="class"} applies to binomial and multinomial logistic regression only,
-    and gives misclassification error.  \code{type="auc"} is for
+    model. \code{type.measure="class"} applies to binomial and multinomial logistic regression only,
+    and gives misclassification error.  \code{type.measure="auc"} is for
     two-class logistic regression only, and gives area under the ROC
-    curve. \code{type="mse"} or \code{type="mae"} (mean absolute error)
+    curve. \code{type.measure="mse"} or \code{type.measure="mae"} (mean absolute error)
     can be used by all models except the \code{"cox"}; they measure the
     deviation from the fitted mean to the response.} 
     \item{grouped}{This is an experimental argument, with default
@@ -38,7 +38,7 @@ cv.glmnet(x, y, weights, offset, lambda, ..., nfolds, foldid, type, grouped)
       standard error to describe the CV curve. If \code{grouped=FALSE},
       an error matrix is built up at the observation level from the predictions
       from the \code{nfold} fits, and then summarized (does not apply to
-      \code{type="auc"}). For the \code{"cox"} family,
+      \code{type.measure="auc"}). For the \code{"cox"} family,
       \code{grouped=TRUE} obtains the CV partial likelihood for the Kth
       fold by \emph{subtraction}; by subtracting the log partial
       likelihood evaluated on the full dataset from that evaluated on
@@ -98,7 +98,7 @@ coef(cvob1)
 predict(cvob1,newx=x[1:5,], s="lambda.min")
 title("Gaussian Family",line=2.5)
 set.seed(1011)
-cvob1a=cv.glmnet(x,y,type="mae")
+cvob1a=cv.glmnet(x,y,type.measure="mae")
 plot(cvob1a)
 title("Gaussian Family",line=2.5)
 set.seed(1011)
@@ -108,11 +108,11 @@ plot(cvob2)
 title("Binomial Family",line=2.5)
 frame()
 set.seed(1011)
-cvob3=cv.glmnet(x,ly,family="binomial",type="class")
+cvob3=cv.glmnet(x,ly,family="binomial",type.measure="class")
 plot(cvob3)
 title("Binomial Family",line=2.5)
 set.seed(1011)
-cvob3a=cv.glmnet(x,ly,family="binomial",type="auc")
+cvob3a=cv.glmnet(x,ly,family="binomial",type.measure="auc")
 plot(cvob3a)
 title("Binomial Family",line=2.5)
 set.seed(1011)

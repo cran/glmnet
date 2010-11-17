@@ -1,9 +1,9 @@
-cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
+cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped){
   typenames=c(mse="Mean-Squared Error",mae="Mean Absolute Error",deviance="Multinomial Deviance",class="Misclassification Error")
-  if(type=="default")type="deviance"
-  if(!match(type,c("mse","mae","deviance","class"),FALSE)){
+  if(type.measure=="default")type.measure="deviance"
+  if(!match(type.measure,c("mse","mae","deviance","class"),FALSE)){
     warning("Only 'deviance', 'class',  'mse' or 'mae'  available for multinomial models; 'deviance' used")
-    type="deviance"
+    type.measure="deviance"
   }
 ###These are hard coded in the Fortran, so we do that here too
   prob_min=1e-5
@@ -38,7 +38,7 @@ cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
 
     N=nrow(y) - apply(is.na(predmat[,1,]),2,sum)
      bigY=array(y,dim(predmat))
-    cvraw=switch(type,
+    cvraw=switch(type.measure,
     "mse"=apply((bigY-predmat)^2,c(1,3),sum),
     "mae"=apply(abs(bigY-predmat),c(1,3),sum),
     "deviance"= {
@@ -66,5 +66,5 @@ cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
 
    cvm=apply(cvraw,2,weighted.mean,w=weights,na.rm=TRUE)
   cvsd=sqrt(apply(scale(cvraw,cvm,FALSE)^2,2,weighted.mean,w=weights,na.rm=TRUE)/(N-1))
-  list(cvm=cvm,cvsd=cvsd,name=typenames[type])
+  list(cvm=cvm,cvsd=cvsd,name=typenames[type.measure])
 }
