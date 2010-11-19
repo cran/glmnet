@@ -1,11 +1,11 @@
-elnet=function(x,is.sparse,ix,jx,y,weights,offset,type=c("covariance","naive"),alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames){
+elnet=function(x,is.sparse,ix,jx,y,weights,offset,type.gaussian=c("covariance","naive"),alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames){
   weights=as.double(weights)
 ### compute the null deviance
   ybar=weighted.mean(y,weights)
   nulldev=sum(weights* (y-ybar)^2)
-  type=match.arg(type)
+  type.gaussian=match.arg(type.gaussian)
 
-  ka=as.integer(switch(type,
+  ka=as.integer(switch(type.gaussian,
     covariance=1,
     naive=2,
     ))

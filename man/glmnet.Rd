@@ -13,7 +13,7 @@ glmnet(x, y,
 family=c("gaussian","binomial","poisson","multinomial","cox"), weights, offset=NULL,
 alpha = 1, nlambda = 100, lambda.min.ratio = ifelse(nobs<nvars,0.01,0.0001), lambda=NULL,
 standardize = TRUE, thresh = 1e-04,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, nvars),
- exclude, penalty.factor = rep(1, nvars), maxit=100, HessianExact = FALSE, type = c("covariance", "naive"))
+ exclude, penalty.factor = rep(1, nvars), maxit=100, HessianExact = FALSE, type.gaussian=ifelse(nvars<500,"covariance","naive"))
 }
 
 \arguments{
@@ -83,11 +83,13 @@ standardize = TRUE, thresh = 1e-04,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, 
 	  \code{"multinomial"} families.
 	  If \code{FALSE} (the default), an upper-bound approximation is made to the
     hessian, which is not recalculated at each outer loop.} 
-  \item{type}{Two algorithm types are supported for (only)
-    \code{family="gaussian"}. The default \code{type="covariance"} saves all
-    inner-products ever computed, and can be much faster than
-    \code{type="naive"}. The latter can be more efficient for \code{p >>
-      N} situations.}
+  \item{type.gaussian}{Two algorithm types are supported for (only)
+    \code{family="gaussian"}. The default when \code{nvar<500} is
+  \code{type.gaussian="covariance"}, and saves all
+    inner-products ever computed. This  can be much faster than
+    \code{type.gaussian="naive"}, which loops through \code{nobs} every
+  time an inner-product is computed. The latter can be far more efficient for \code{nvar >>
+      nobs} situations, or when \code{nvar > 500}.}
 }
 \details{
   The sequence of models implied by \code{lambda} is fit by coordinate

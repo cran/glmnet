@@ -1,9 +1,9 @@
-cv.lognet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
+cv.lognet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped){
   typenames=c(mse="Mean-Squared Error",mae="Mean Absolute Error",deviance="Binomial Deviance",auc="AUC",class="Misclassification Error")
-  if(type=="default")type="deviance"
-  if(!match(type,c("mse","mae","deviance","auc","class"),FALSE)){
+  if(type.measure=="default")type.measure="deviance"
+  if(!match(type.measure,c("mse","mae","deviance","auc","class"),FALSE)){
     warning("Only 'deviance', 'class', 'auc', 'mse' or 'mae'  available for binomial models; 'deviance' used")
-    type="deviance"
+    type.measure="deviance"
   }
 
 ###These are hard coded in the Fortran, so we do that here too
@@ -19,9 +19,9 @@ cv.lognet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
     }
   N=nrow(y)
   nfolds=max(foldid)
-  if( (N/nfolds <10)&&type=="auc"){
-    warning("Too few (< 10) observations per fold for type='auc' in cv.lognet; changed to type='deviance'. Alternatively, use smaller value for nfolds",call.=FALSE)
-    type="deviance"
+  if( (N/nfolds <10)&&type.measure=="auc"){
+    warning("Too few (< 10) observations per fold for type.measure='auc' in cv.lognet; changed to type.measure='deviance'. Alternatively, use smaller value for nfolds",call.=FALSE)
+    type.measure="deviance"
   }
   if( (N/nfolds <3)&&grouped){
     warning("Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold",call.=FALSE)
@@ -45,7 +45,7 @@ cv.lognet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
       nlams[i]=nlami
     }
    ###If auc we behave differently
-  if(type=="auc"){
+  if(type.measure=="auc"){
     cvraw=matrix(NA,nfolds,length(lambda))
     good=cvraw*0
     for(i in seq(nfolds)){
@@ -65,7 +65,7 @@ cv.lognet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
     weights=weights*ywt
 
     N=nrow(y) - apply(is.na(predmat),2,sum)
-    cvraw=switch(type,
+    cvraw=switch(type.measure,
     "mse"=(y[,1]-(1-predmat))^2 +(y[,2]-predmat)^2,
     "mae"=abs(y[,1]-(1-predmat)) +abs(y[,2]-predmat),
     "deviance"= {
@@ -85,5 +85,5 @@ cv.lognet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
   }
    cvm=apply(cvraw,2,weighted.mean,w=weights,na.rm=TRUE)
   cvsd=sqrt(apply(scale(cvraw,cvm,FALSE)^2,2,weighted.mean,w=weights,na.rm=TRUE)/(N-1))
-  list(cvm=cvm,cvsd=cvsd,name=typenames[type])
+  list(cvm=cvm,cvsd=cvsd,name=typenames[type.measure])
 }

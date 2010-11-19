@@ -1,4 +1,4 @@
-fishnet=function(x,is.sparse,ix,jx,y,weights,offset,type,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit){
+fishnet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit){
   if(any(y<0))stop("negative responses encountered;  not permitted for Poisson family")
   maxit=as.integer(maxit)
   weights=as.double(weights)

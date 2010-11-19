@@ -1,9 +1,9 @@
-cv.coxnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
+cv.coxnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped){
   typenames=c("deviance"="Partial Likelihood Deviance")
-  if(type=="default")type="deviance"
-  if(!match(type,c("deviance"),FALSE)){
-    warning("Only 'deviance'  available for Cox models; changed to type='deviance'")
-    type="deviance"
+  if(type.measure=="default")type.measure="deviance"
+  if(!match(type.measure,c("deviance"),FALSE)){
+    warning("Only 'deviance'  available for Cox models; changed to type.measure='deviance'")
+    type.measure="deviance"
   }
      if(!is.null(offset)){
        is.offset=TRUE
@@ -38,5 +38,5 @@ cv.coxnet=function(outlist,lambda,x,y,weights,offset,foldid,type,grouped){
 
   cvm=apply(cvraw,2,weighted.mean,w=weights,na.rm=TRUE)
   cvsd=sqrt(apply(scale(cvraw,cvm,FALSE)^2,2,weighted.mean,w=weights,na.rm=TRUE)/(N-1))
-  list(cvm=cvm,cvsd=cvsd,name=typenames[type])
+  list(cvm=cvm,cvsd=cvsd,name=typenames[type.measure])
 }

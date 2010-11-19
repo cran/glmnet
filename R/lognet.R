@@ -1,4 +1,4 @@
-lognet=function(x,is.sparse,ix,jx,y,weights,offset,type,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,HessianExact,family){
+lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,HessianExact,family){
   nc=dim(y)
   maxit=as.integer(maxit)
   kopt=as.integer(HessianExact)
