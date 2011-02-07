@@ -12,7 +12,7 @@
 glmnet(x, y,
 family=c("gaussian","binomial","poisson","multinomial","cox"), weights, offset=NULL,
 alpha = 1, nlambda = 100, lambda.min.ratio = ifelse(nobs<nvars,0.01,0.0001), lambda=NULL,
-standardize = TRUE, thresh = 1e-04,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, nvars),
+standardize = TRUE, thresh = 1e-06,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, nvars),
  exclude, penalty.factor = rep(1, nvars), maxit=100, HessianExact = FALSE, type.gaussian=ifelse(nvars<500,"covariance","naive"))
 }
 
@@ -63,8 +63,9 @@ standardize = TRUE, thresh = 1e-04,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, 
     the original scale. Default is is \code{standardize=TRUE}.
   If variables are in the same units already, you might not wish to standardize.}
   \item{thresh}{Convergence threshold for coordinate descent. Each inner
-  coordinate-descent loop continues until the relative change in any
-  coefficient is less than \code{thresh}. Defaults value is \code{1E-4}.}
+  coordinate-descent loop continues until the maximum change in the
+  objective after any coefficient update is less than \code{thresh}
+  times the null deviance. Defaults value is \code{1E-6}.}
   \item{dfmax}{Limit the maximum number of variables in the
     model. Useful for very large \code{nvars}, if a partial path is desired.}
   \item{pmax}{Limit the maximum number of variables ever to be nonzero}
@@ -120,7 +121,7 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
     format (\code{"dgCMatrix"}). For \code{"multnet"}, a list of \code{nc} such
     matrices, one for each class.}
   \item{lambda}{The actual sequence of \code{lambda} values used}
-  \item{dev.fraction}{The fraction of (null) deviance explained (for \code{"elnet"}, this
+  \item{dev.ratio}{The fraction of (null) deviance explained (for \code{"elnet"}, this
       is the R-square). The deviance calculations incorporate weights if
   present in the model. The deviance is defined to be -2*(loglike_sat -
   loglike), where loglike_sat is the log-likelihood for the saturated
@@ -134,6 +135,7 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
   \item{dfmat}{For \code{"multnet"} only. A matrix consisting of the
     number of nonzero coefficients per class}
   \item{dim}{dimension of coefficient matrix (ices)}
+  \item{nobs}{number of observations}
   \item{npasses}{total passes over the data summed over all lambda
     values}
   \item{offset}{a logical variable indicating whether an offset was included in the model}

@@ -1,8 +1,8 @@
 Package: glmnet
 Type: Package
 Title: Lasso and elastic-net regularized generalized linear models
-Version: 1.5.1
-Date: 2010-11-17
+Version: 1.5.2
+Date: 2011-01-24
 Author: Jerome Friedman, Trevor Hastie, Rob Tibshirani
 Maintainer: Trevor Hastie <hastie@stanford.edu>
 Depends: Matrix
@@ -14,6 +14,6 @@ Description: Extremely efficient procedures for fitting the entire
         below.
 License: GPL-2
 URL: http://www.jstatsoft.org/v33/i01/.
-Packaged: 2010-11-19 04:08:00 UTC; hastie
+Packaged: 2011-02-07 01:35:54 UTC; hastie
 Repository: CRAN
-Date/Publication: 2010-11-19 07:33:35
+Date/Publication: 2011-02-07 09:50:35
