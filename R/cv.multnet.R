@@ -17,6 +17,7 @@ cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,groupe
     nc = as.integer(length(ntab))
     y = diag(nc)[as.numeric(y), ]
     }
+  else nc=nc[2]
 
   if(!is.null(offset))offset=TRUE else is.offset=FALSE
   predmat=array(NA,c(nrow(y),nc,length(lambda)))

@@ -19,3 +19,24 @@ citEntry(entry = "Article",
         "URL http://www.jstatsoft.org/v33/i01/.")
 )
 
+citEntry(entry = "Article",
+  title        = "Regularization Paths for Cox's Proportional Hazards Model via Coordinate Descent",
+  author       = personList(as.person("Noah Simon"),
+                   as.person("Jerome Friedman"),
+                   as.person("Trevor Hastie"),
+                   as.person("Rob Tibshirani")),
+  journal      = "Journal of Statistical Software",
+  year         = "2011",
+  volume       = "39",
+  number       = "5",
+  pages        = "1--13",
+  url          = "http://www.jstatsoft.org/v39/i05/",
+
+  textVersion  =
+  paste("Noah Simon, Jerome Friedman, Trevor Hastie, Rob Tibshirani (2011).",
+        "Regularization Paths for Cox's Proportional Hazards Model via Coordinate Descent.",
+        "Journal of Statistical Software, 39(5), 1-13.",
+        "URL http://www.jstatsoft.org/v39/i05/."),
+  header       = "If coxnet is used, please also cite:"
+)
+
