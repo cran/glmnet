@@ -57,7 +57,7 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, ..., nfolds, foldid, grou
   \item{lambda}{the values of \code{lambda} used in the fits.}
   \item{cvm}{The mean cross-validated error - a vector of length
     \code{length(lambda)}.}
-  \item{cvsd}{estimate of standard error of \code{svm}.}
+  \item{cvsd}{estimate of standard error of \code{cvm}.}
   \item{cvup}{upper curve = \code{cvm+cvsd}.}
   \item{cvlo}{lower curve = \code{cvm-cvsd}.}
   \item{nzero}{number of non-zero coefficients at each \code{lambda}.}
@@ -71,9 +71,14 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, ..., nfolds, foldid, grou
 }
 \references{Friedman, J., Hastie, T. and Tibshirani, R. (2008)
   \emph{Regularization Paths for Generalized Linear Models via Coordinate
-    Descent, Journal of Statistical Software, Vol. 33, Issue 1, Feb 2010}\cr
-  \url{http://www-stat.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
-  \url{http://www.jstatsoft.org/v33/i01/}
+    Descent},   \url{http://www.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
+  \emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\cr
+  \url{http://www.jstatsoft.org/v33/i01/}\cr
+  Simon, N., Friedman, J., Hastie, T., Tibshirani, R. (2011)
+  \emph{Regularization Paths for Cox's Proportional Hazards Model via
+    Coordinate Descent, Journal of Statistical Software, Vol. 39(5)
+    1-13}\cr
+  \url{http://www.jstatsoft.org/v39/i05/}
 }
 \author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr 
 Noah Simon helped develop the 'coxnet' function.\cr

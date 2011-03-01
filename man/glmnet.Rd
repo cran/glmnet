@@ -13,7 +13,7 @@ glmnet(x, y,
 family=c("gaussian","binomial","poisson","multinomial","cox"), weights, offset=NULL,
 alpha = 1, nlambda = 100, lambda.min.ratio = ifelse(nobs<nvars,0.01,0.0001), lambda=NULL,
 standardize = TRUE, thresh = 1e-06,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, nvars),
- exclude, penalty.factor = rep(1, nvars), maxit=100, HessianExact = FALSE, type.gaussian=ifelse(nvars<500,"covariance","naive"))
+ exclude, penalty.factor = rep(1, nvars), maxit=100, type.gaussian=ifelse(nvars<500,"covariance","naive"))
 }
 
 \arguments{
@@ -80,10 +80,6 @@ standardize = TRUE, thresh = 1e-06,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, 
     variables listed in \code{exclude}).}
     \item{maxit}{Maximum number of outer-loop iterations for
       \code{"binomial"} or \code{"multinomial"} families. Default is 100.}
-    \item{HessianExact}{Only applies to \code{"binomial"} or
-	  \code{"multinomial"} families.
-	  If \code{FALSE} (the default), an upper-bound approximation is made to the
-    hessian, which is not recalculated at each outer loop.} 
   \item{type.gaussian}{Two algorithm types are supported for (only)
     \code{family="gaussian"}. The default when \code{nvar<500} is
   \code{type.gaussian="covariance"}, and saves all
@@ -143,9 +139,14 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
 }
 \references{Friedman, J., Hastie, T. and Tibshirani, R. (2008)
   \emph{Regularization Paths for Generalized Linear Models via Coordinate
-    Descent, Journal of Statistical Software, Vol. 33, Issue 1, Feb 2010}\cr
-  \url{http://www-stat.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
-  \url{http://www.jstatsoft.org/v33/i01/}
+    Descent},   \url{http://www.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
+  \emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\cr
+  \url{http://www.jstatsoft.org/v33/i01/}\cr
+  Simon, N., Friedman, J., Hastie, T., Tibshirani, R. (2011)
+  \emph{Regularization Paths for Cox's Proportional Hazards Model via
+    Coordinate Descent, Journal of Statistical Software, Vol. 39(5)
+    1-13}\cr
+  \url{http://www.jstatsoft.org/v39/i05/}
 }
 \author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr 
 Noah Simon helped develop the 'cox' feature.\cr

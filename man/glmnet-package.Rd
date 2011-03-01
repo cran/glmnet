@@ -32,7 +32,15 @@ Maintainer: Trevor Hastie  <hastie@stanford.edu>
 }
 \references{Friedman, J., Hastie, T. and Tibshirani, R. (2008)
   \emph{Regularization Paths for Generalized Linear Models via Coordinate
-  Descent}}
+    Descent},   \url{http://www.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
+  \emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\cr
+  \url{http://www.jstatsoft.org/v33/i01/}\cr
+  Simon, N., Friedman, J., Hastie, T., Tibshirani, R. (2011)
+  \emph{Regularization Paths for Cox's Proportional Hazards Model via
+    Coordinate Descent, Journal of Statistical Software, Vol. 39(5)
+    1-13}\cr
+  \url{http://www.jstatsoft.org/v39/i05/}
+}
 \keyword{models}
 \keyword{regression}
 \keyword{ package }
