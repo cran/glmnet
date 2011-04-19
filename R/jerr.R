@@ -2,7 +2,7 @@ jerr=function(n,maxit,pmax,family){
   if(n==0) list(n=0,fatal=FALSE,msg="")
   else {
     errlist=switch(family,
-              "gaussian"=jerr.elnet(n),
+              "gaussian"=jerr.elnet(n,maxit,pmax),
               "binomial"=jerr.lognet(n,maxit,pmax),
               "multinomial"=jerr.lognet(n,maxit,pmax),
               "poisson"=jerr.fishnet(n,maxit,pmax),

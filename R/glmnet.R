@@ -1,7 +1,8 @@
-glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"),weights,offset=NULL,alpha=1.0,nlambda=100,lambda.min.ratio=ifelse(nobs<nvars,1e-2,1e-4),lambda=NULL,standardize=TRUE,thresh=1e-6,dfmax=nvars+1,pmax=min(dfmax*1.2,nvars),exclude,penalty.factor=rep(1,nvars),maxit=100,type.gaussian=ifelse(nvars<500,"covariance","naive")){
+glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"),weights,offset=NULL,alpha=1.0,nlambda=100,lambda.min.ratio=ifelse(nobs<nvars,1e-2,1e-4),lambda=NULL,standardize=TRUE,thresh=1e-7,dfmax=nvars+1,pmax=min(dfmax*2,nvars),exclude,penalty.factor=rep(1,nvars),maxit=100000,type.gaussian=ifelse(nvars<500,"covariance","naive")){
 
 ### Prepare all the generic arguments, then hand off to family functions
   family=match.arg(family)
+  alpha=as.double(alpha)
   this.call=match.call()
   nlam=as.integer(nlambda)
   y=drop(y) # we dont like matrix responses unless we need them
@@ -42,7 +43,7 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   }
 kopt=as.integer(0) #This means to use the exact Hessian, rather than the upper bound
   fit=switch(family,
-    "gaussian"=elnet(x,is.sparse,ix,jx,y,weights,offset,type.gaussian,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames),
+    "gaussian"=elnet(x,is.sparse,ix,jx,y,weights,offset,type.gaussian,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit),
     "poisson"=fishnet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit),
     "binomial"=lognet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,kopt,family),
     "multinomial"=lognet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,kopt,family),
@@ -52,6 +53,6 @@ kopt=as.integer(0) #This means to use the exact Hessian, rather than the upper b
   if(is.null(lambda))fit$lambda=fix.lam(fit$lambda)##first lambda is infinity; changed to entry point
 fit$call=this.call
   fit$nobs=nobs
-  class(fit)=c("glmnet",class(fit))
+  class(fit)=c(class(fit),"glmnet")
   fit
 }

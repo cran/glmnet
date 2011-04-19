@@ -1,5 +1,6 @@
 \name{plot.glmnet}
 \alias{plot.glmnet}
+\alias{plot.multnet}
 \title{plot coefficients from a "glmnet" object}
 \description{
 Produces a coefficient profile plot of the coefficient paths for a
@@ -7,6 +8,7 @@ fitted \code{"glmnet"} object.
 }
 \usage{
 \method{plot}{glmnet}(x, xvar = c("norm", "lambda", "dev"), label = FALSE, ...)
+\method{plot}{multnet}(x, xvar = c("norm", "lambda", "dev"), label = FALSE, ...)
 }
 \arguments{
   \item{x}{fitted \code{"glmnet"} model}
