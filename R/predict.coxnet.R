@@ -1,5 +1,10 @@
 predict.coxnet=function(object,newx,s=NULL,type=c("link","response","coefficients","nonzero"),exact=FALSE,offset,...){
   type=match.arg(type)
+  ###coxnet has no intercept, so we treat it separately
+  if(missing(newx)){
+    if(!match(type,c("coefficients","nonzero"),FALSE))stop("You need to supply a value for 'newx'")
+  }
+
   nbeta=object$beta
    if(!is.null(s)){
     vnames=dimnames(nbeta)[[1]]

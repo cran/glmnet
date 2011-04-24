@@ -4,6 +4,11 @@ predict.multnet <-
             ...) 
 {
   type = match.arg(type)
+    ###multnet  is very different, so we treat it separately
+  if(missing(newx)){
+    if(!match(type,c("coefficients","nonzero"),FALSE))stop("You need to supply a value for 'newx'")
+  }
+
   a0 = object$a0
   rownames(a0) = rep("(Intercept)", nrow(a0))
   nbeta = object$beta

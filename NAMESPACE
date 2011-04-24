@@ -8,6 +8,7 @@ export(glmnet,
 
 S3method("print","glmnet")
 S3method("plot","glmnet")
+S3method("plot","multnet")
 S3method("predict","glmnet")
 S3method("coef","glmnet")
 S3method("coef","cv.glmnet")

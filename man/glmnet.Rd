@@ -12,8 +12,8 @@
 glmnet(x, y,
 family=c("gaussian","binomial","poisson","multinomial","cox"), weights, offset=NULL,
 alpha = 1, nlambda = 100, lambda.min.ratio = ifelse(nobs<nvars,0.01,0.0001), lambda=NULL,
-standardize = TRUE, thresh = 1e-06,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, nvars),
- exclude, penalty.factor = rep(1, nvars), maxit=100, type.gaussian=ifelse(nvars<500,"covariance","naive"))
+standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2, nvars),
+ exclude, penalty.factor = rep(1, nvars), maxit=100000, type.gaussian=ifelse(nvars<500,"covariance","naive"))
 }
 
 \arguments{
@@ -65,7 +65,7 @@ standardize = TRUE, thresh = 1e-06,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, 
   \item{thresh}{Convergence threshold for coordinate descent. Each inner
   coordinate-descent loop continues until the maximum change in the
   objective after any coefficient update is less than \code{thresh}
-  times the null deviance. Defaults value is \code{1E-6}.}
+  times the null deviance. Defaults value is \code{1E-7}.}
   \item{dfmax}{Limit the maximum number of variables in the
     model. Useful for very large \code{nvars}, if a partial path is desired.}
   \item{pmax}{Limit the maximum number of variables ever to be nonzero}
@@ -78,8 +78,8 @@ standardize = TRUE, thresh = 1e-06,  dfmax = nvars + 1, pmax = min(dfmax * 1.2, 
     no shrinkage, and that variable is always included in the
     model. Default is 1 for all variables (and implicitly infinity for
     variables listed in \code{exclude}).}
-    \item{maxit}{Maximum number of outer-loop iterations for
-      \code{"binomial"} or \code{"multinomial"} families. Default is 100.}
+    \item{maxit}{Maximum number of passes over the data for all lambda
+  values; default is 10^5.}
   \item{type.gaussian}{Two algorithm types are supported for (only)
     \code{family="gaussian"}. The default when \code{nvar<500} is
   \code{type.gaussian="covariance"}, and saves all
@@ -146,8 +146,13 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
   \emph{Regularization Paths for Cox's Proportional Hazards Model via
     Coordinate Descent, Journal of Statistical Software, Vol. 39(5)
     1-13}\cr
-  \url{http://www.jstatsoft.org/v39/i05/}
-}
+  \url{http://www.jstatsoft.org/v39/i05/}\cr
+  Tibshirani, Robert., Bien, J., Friedman, J.,Hastie, T.,Simon,
+  N.,Taylor, J. and Tibshirani, Ryan. (2010)
+  \emph{Strong Rules for Discarding Predictors in Lasso-type Problems},\cr
+  \url{http://www-stat.stanford.edu/~tibs/ftp/strong.pdf}\cr
+  \emph{Stanford Statistics Technical Report}
+  }
 \author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr 
 Noah Simon helped develop the 'cox' feature.\cr
 Maintainer: Trevor Hastie \email{hastie@stanford.edu}}

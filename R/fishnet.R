@@ -8,6 +8,7 @@ fishnet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx
     is.offset=FALSE}
   else{
     storage.mode(offset)="double"
+    
     is.offset=TRUE
   }
 fit=if(is.sparse).Fortran("spfishnet",

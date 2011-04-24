@@ -13,7 +13,7 @@ coefficients and more from a fitted \code{"glmnet"} object.
 }
 \usage{
 \method{predict}{glmnet}(object, newx, s = NULL,
-type=c("link","response","coefficients","class","nonzero"), exact = FALSE, offset, ...)
+type=c("link","response","coefficients","nonzero","class"), exact = FALSE, offset, ...)
 \method{coef}{glmnet}(object,s=NULL, exact=FALSE, ...)
 }
 \arguments{

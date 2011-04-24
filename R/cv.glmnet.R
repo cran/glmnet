@@ -26,7 +26,7 @@ cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,type.measure=c("mse","dev
     outlist[[i]]=glmnet(x[!which,,drop=FALSE],y_sub,lambda=lambda,offset=offset_sub,weights=weights[!which],...)
   }
   ###What to do depends on the type.measure and the model fit
-  fun=paste("cv",class(glmnet.object)[[2]],sep=".")
+  fun=paste("cv",class(glmnet.object)[[1]],sep=".")
   cvstuff=do.call(fun,list(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped))
   cvm=cvstuff$cvm
   cvsd=cvstuff$cvsd
