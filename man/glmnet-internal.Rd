@@ -30,6 +30,7 @@
 \alias{jerr.coxnet}
 \alias{plotCoef}
 \alias{zeromat}
+\alias{na.mean}
 \description{Internal glmnet functions}
 \usage{
 fix.lam(lam)
