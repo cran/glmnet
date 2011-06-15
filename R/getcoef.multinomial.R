@@ -6,7 +6,7 @@ getcoef.multinomial=function(fit,nvars,nx,vnames,nc,classnames){
   stepnames=paste("s",seq(lmu)-1,sep="")
   beta.list=as.list(seq(nc))
   names(beta.list)=classnames
-  a0=matrix(fit$a0[seq(lmu*nc)],nc,lmu,dimnames=list(classnames,stepnames))
+    a0=matrix(fit$a0[seq(lmu*nc)],nc,lmu,dimnames=list(classnames,stepnames))
       a0=scale(a0,TRUE,FALSE)
       attr(a0,"scaled:center")=NULL
       dfmat=a0

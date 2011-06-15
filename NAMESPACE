@@ -3,7 +3,7 @@ import("Matrix")
 export(glmnet,
        cv.glmnet,
        cv.elnet,cv.lognet,cv.multnet,cv.fishnet,cv.coxnet,getmin,auc,auc.mat,cvcompute,coxnet.deviance,
-       lambda.interp,response.coxnet,rmult,softmax,
+       lambda.interp,response.coxnet,rmult,softmax,na.mean,
        predict.elnet,predict.lognet,predict.fishnet,predict.multnet,predict.coxnet,nonzeroCoef,plotCoef,jerr,jerr.elnet,jerr.lognet,jerr.fishnet,jerr.coxnet,elnet,lognet,fishnet,coxnet,getcoef,getcoef.multinomial)
 
 S3method("print","glmnet")
