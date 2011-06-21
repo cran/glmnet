@@ -35,8 +35,10 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   }
   is.sparse=FALSE
   ix=jx=NULL
-  if(class(x)=="dgCMatrix"){##Sparse case
+  if(inherits(x,"sparseMatrix")){##Sparse case
     is.sparse=TRUE
+    x=as(x,"CsparseMatrix")
+    x=as(x,"dgCMatrix")
     ix=as.integer(x@p+1)
     jx=as.integer(x@i+1)
     x=as.double(x@x)

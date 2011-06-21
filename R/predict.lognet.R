@@ -10,7 +10,12 @@ nfit=NextMethod("predict")
            pp=exp(-nfit)
            1/(1+pp)
          },
-         class=ifelse(nfit>0,2,1),
+         class={
+           cnum=ifelse(nfit>0,2,1)
+           clet=object$classnames[cnum]
+           if(is.matrix(cnum))clet=array(clet,dim(cnum),dimnames(cnum))
+           clet
+         },
          nfit
          )
 }  

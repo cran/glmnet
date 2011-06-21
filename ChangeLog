@@ -1,3 +1,12 @@
+2011-8-15   Trevor Hastie <hastie@stanford.edu>
+	* lognet added a classnames component to the object
+	* predict.lognet(type="class") now returns a character vector/matrix
+2011-6-23   Trevor Hastie <hastie@stanford.edu>
+	* predict.glmnet : fixed bug with type="nonzero" 
+	* glmnet: Now x can inherit from "sparseMatrix" rather than the very specific "dgCMatrix", and this will
+	   trigger sparse mode for glmnet
+	
+
 2010-11-01  Trevor Hastie  <hastie@stanford.edu>
 
 	* glmnet.Rd (lambda.min) : changed value to 0.01 if nobs<nvars

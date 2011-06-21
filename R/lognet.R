@@ -87,7 +87,7 @@ if(fit$jerr!=0){
  }
  else  outlist=getcoef.multinomial(fit,nvars,nx,vnames,nc,classnames)
  dev=fit$dev[seq(fit$lmu)]
-outlist=c(outlist,list(dev.ratio=dev,nulldev=fit$nulldev,npasses=fit$nlp,jerr=fit$jerr,offset=is.offset))
+outlist=c(outlist,list(dev.ratio=dev,nulldev=fit$nulldev,npasses=fit$nlp,jerr=fit$jerr,offset=is.offset,classnames=classnames))
   class(outlist)=switch(family,
          "binomial"="lognet",
          "multinomial"="multnet"

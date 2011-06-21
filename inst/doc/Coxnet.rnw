@@ -30,7 +30,7 @@ of a failure time or right censoring time ($1$ for failure, $0$ for censoring)
 <<>>=
 library("glmnet")
 library("survival")
-load("VignetteExample.rdata")
+load(system.file("doc","VignetteExample.rdata",package="glmnet"))
 attach(patient.data)
 @
 

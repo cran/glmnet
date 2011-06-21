@@ -1,3 +1,3 @@
 .onLoad=function(libname,pkgname){
-  cat("Loaded glmnet",installed.packages()["glmnet","Version"],"\n")
+   packageStartupMessage("Loaded glmnet ", as.character(packageDescription("glmnet")[["Version"]]),"\n")
 }

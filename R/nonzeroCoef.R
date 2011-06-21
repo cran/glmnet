@@ -1,18 +1,31 @@
-nonzeroCoef=function(beta,bystep=FALSE){
-  ##beta should be in "dgCMatrix" format
-  if(nrow(beta)==1){#degenerate case
-    if(bystep)
-      apply(beta,2,function(x)if(abs(x)>0)1 else NULL)
-    else {if(any(abs(beta)>0))1 else NULL}
+nonzeroCoef = function (beta, bystep = FALSE) 
+{
+### bystep = FALSE means which variables were ever nonzero
+### bystep = TRUE means which variables are nonzero for each step
+  nr=nrow(beta)
+  if (nr == 1) {#degenerate case
+    if (bystep) 
+      apply(beta, 2, function(x) if (abs(x) > 0) 
+            1
+      else NULL)
+    else {
+      if (any(abs(beta) > 0)) 
+        1
+      else NULL
+    }
   }
-  else{
-    beta=t(beta)
-    which=diff(beta@p)
-    which=seq(which)[which>0]
-    if(bystep){
-      nzel=function(x,which)if(any(x))which[x]else NULL
-      beta=abs(as.matrix(beta[,which]))>0
-      apply(beta,1,nzel,which)
+  else {
+    beta=abs(beta)>0 # this is sparse
+    which=seq(nr)
+    ones=rep(1,ncol(beta))
+    nz=as.vector((beta%*%ones)>0)
+    which=which[nz]
+    if (bystep) {
+      beta=as.matrix(beta[which,])
+      nzel = function(x, which) if (any(x)) 
+        which[x]
+      else NULL
+      apply(beta, 2, nzel, which)
     }
     else which
   }
