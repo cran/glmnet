@@ -24,7 +24,7 @@ plotCoef=function(beta,norm,lambda,df,dev,label=FALSE,xvar=c("norm","lambda","de
   else matplot(index,t(beta),lty=1,xlab=xlab,ylab=ylab,...)
   atdf=pretty(index)
  prettydf=trunc(approx(x=index,y=df,xout=atdf,rule=2)$y)
- axis(3,at=atdf,label=prettydf,cex.axis=.5,tcl=NA)
+ axis(3,at=atdf,label=prettydf,tcl=NA)
  if(label){
    nnz=length(which)
    xpos=max(index)

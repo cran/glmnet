@@ -1,5 +1,6 @@
 getcoef=function(fit,nvars,nx,vnames){
   lmu=fit$lmu
+  if(lmu<1)stop("an empty model has been returned; something is wrong")
   nin=fit$nin[seq(lmu)]
   ninmax=max(nin)
   lam=fit$alm[seq(lmu)]
