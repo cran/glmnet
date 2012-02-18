@@ -43,7 +43,7 @@ predict.multnet <-
    dp = array(0, c(nclass, nlambda, npred), dimnames = dn)
   for (i in seq(nclass)) {
     fitk = cbind2(1, newx) %*% (nbeta[[i]])
-    dp[i, , ] = dp[i, , ] + as.matrix(t(fitk))
+    dp[i, , ] = dp[i, , ] + t(as.matrix(fitk))
   }
   if (object$offset) {
     if (missing(offset)) 
@@ -64,6 +64,6 @@ predict.multnet <-
                                                         1, 2))
   }, link = aperm(dp, c(3, 1, 2)), class = {
     dp = aperm(dp, c(3, 1, 2))
-    apply(dp, 3, softmax)
+    apply(dp, 3, glmnet_softmax)
   })
 }

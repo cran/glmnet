@@ -14,13 +14,13 @@ Compute the deviance sequence from the glmnet object
 \details{
   A glmnet object has components \code{dev.ratio} and \code{nulldev}.
   The former is the fraction of (null) deviance explained. The deviance calculations incorporate weights if
-  present in the model. The deviance is defined to be -2*(loglike_sat -
+  present in the model. The deviance is defined to be 2*(loglike_sat -
   loglike), where loglike_sat is the log-likelihood for the saturated
   model (a model with a free parameter per observation). 
   Null deviance  is defined to
-  be  -2*(loglike_sat -loglike(Null)); The NULL model refers to the
+  be  2*(loglike_sat -loglike(Null)); The NULL model refers to the
   intercept model, except for the Cox, where it is the 0 model. Hence
-  dev.fraction=1-deviance/nulldev, and  this
+  dev.ratio=1-deviance/nulldev, and  this
   \code{deviance} method returns (1-dev.ratio)*nulldev.
     }
 \value{(1-dev.ratio)*nulldev}

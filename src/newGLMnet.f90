@@ -1,5 +1,5 @@
 c
-c                          newGLMnet (6/1/11)
+c                          newGLMnet (2/17/12)
 c
 c
 c                 Elastic net with squared-error loss
@@ -513,7 +513,8 @@ c
 c   flog(nvec) = respective log-likelihood values
 c   jerr = error flag - see coxnet above
 c
-c              
+c
+c            
       subroutine elnet  (ka,parm,no,ni,x,y,w,jd,vp,ne,nx,nlam,flmin,ulam    609 
      *,thr,isd,maxit,  lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
       real x(no,ni),y(no),w(no),vp(ni),ca(nx,nlam)                          610
@@ -2107,8 +2108,8 @@ c
       real x(no,ni),y(no,nc),g(no,nc),w(no),vp(ni),ulam(nlam)              1427
       real a(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam)                   1428
       integer ju(ni),m(nx),kin(nlam)                                       1429
-      double precision, dimension (:,:), allocatable :: q                       
-      double precision, dimension (:), allocatable :: sxp,sxpl                  
+      real, dimension (:,:), allocatable :: q                                   
+      real, dimension (:), allocatable :: sxp,sxpl                              
       real, dimension (:), allocatable :: di,v,r,ga                             
       real, dimension (:,:), allocatable :: b,bs,xv                             
       integer, dimension (:), allocatable :: mm,is,ixx                          
@@ -2430,677 +2431,682 @@ c
 13412 continue                                                             1567
       if(jx.gt.0)goto 12992                                                1567
       if(ig.eq.0)goto 12992                                                1568
-      if(ix .ne. 0)goto 13431                                              1568
-      ga=0.0                                                               1569
-13440 do 13441 ic=1,nc                                                     1569
-      r=w*(y(:,ic)-q(:,ic)/sxp)                                            1570
-13450 do 13451 k=1,ni                                                      1570
-      if(ixx(k).eq.1)goto 13451                                            1570
-      if(ju(k).eq.0)goto 13451                                             1571
-      ga(k)=max(ga(k),abs(dot_product(r,x(:,k))))                          1572
-13451 continue                                                             1573
-13452 continue                                                             1573
-13441 continue                                                             1574
-13442 continue                                                             1574
-13460 do 13461 k=1,ni                                                      1574
-      if(ixx(k).eq.1)goto 13461                                            1574
-      if(ju(k).eq.0)goto 13461                                             1575
-      if(ga(k) .le. al1*vp(k))goto 13481                                   1575
-      ixx(k)=1                                                             1575
-      ix=1                                                                 1575
-13481 continue                                                             1576
-13461 continue                                                             1577
-13462 continue                                                             1577
-      if(ix.eq.1) go to 10680                                              1578
-      goto 12992                                                           1579
-13431 continue                                                             1580
-      goto 12991                                                           1581
-12992 continue                                                             1581
-      if(jx .le. 0)goto 13501                                              1581
-      jerr=-10000-ilm                                                      1581
-      goto 12912                                                           1581
-13501 continue                                                             1581
-      devi=0.0                                                             1582
-13510 do 13511 ic=1,nc                                                     1583
-      if(nin.gt.0) a(1:nin,ic,ilm)=b(m(1:nin),ic)                          1583
-      a0(ic,ilm)=b(0,ic)                                                   1584
-13520 do 13521 i=1,no                                                      1584
-      if(y(i,ic).le.0.0)goto 13521                                         1585
-      devi=devi-w(i)*y(i,ic)*log(q(i,ic)/sxp(i))                           1586
-13521 continue                                                             1587
-13522 continue                                                             1587
-13511 continue                                                             1588
-13512 continue                                                             1588
-      kin(ilm)=nin                                                         1588
-      alm(ilm)=al                                                          1588
-      lmu=ilm                                                              1589
-      dev(ilm)=(dev1-devi)/dev0                                            1589
-      if(ig.eq.0)goto 12912                                                1590
-      if(ilm.lt.mnl)goto 12911                                             1590
-      if(flmin.ge.1.0)goto 12911                                           1591
-      if(nintot(ni,nx,nc,a(1,1,ilm),m,nin,is).gt.ne)goto 12912             1592
-      if(dev(ilm).gt.devmax)goto 12912                                     1592
-      if(dev(ilm)-dev(ilm-1).lt.sml)goto 12912                             1593
-12911 continue                                                             1594
-12912 continue                                                             1594
-      g=log(q)                                                             1594
-13530 do 13531 i=1,no                                                      1594
-      g(i,:)=g(i,:)-sum(g(i,:))/nc                                         1594
-13531 continue                                                             1595
-13532 continue                                                             1595
-      deallocate(sxp,b,bs,v,r,xv,q,mm,is,ga,ixx)                           1596
-      return                                                               1597
-      end                                                                  1598
-      subroutine kazero(kk,n,y,g,q,az,jerr)                                1599
-      parameter(eps=1.0e-7)                                                1600
-      real y(n,kk),g(n,kk),q(n),az(kk)                                     1601
+      if(ix .ne. 0)goto 13431                                              1569
+13440 do 13441 k=1,ni                                                      1569
+      if(ixx(k).eq.1)goto 13441                                            1569
+      if(ju(k).eq.0)goto 13441                                             1569
+      ga(k)=0.0                                                            1569
+13441 continue                                                             1570
+13442 continue                                                             1570
+13450 do 13451 ic=1,nc                                                     1570
+      r=w*(y(:,ic)-q(:,ic)/sxp)                                            1571
+13460 do 13461 k=1,ni                                                      1571
+      if(ixx(k).eq.1)goto 13461                                            1571
+      if(ju(k).eq.0)goto 13461                                             1572
+      ga(k)=max(ga(k),abs(dot_product(r,x(:,k))))                          1573
+13461 continue                                                             1574
+13462 continue                                                             1574
+13451 continue                                                             1575
+13452 continue                                                             1575
+13470 do 13471 k=1,ni                                                      1575
+      if(ixx(k).eq.1)goto 13471                                            1575
+      if(ju(k).eq.0)goto 13471                                             1576
+      if(ga(k) .le. al1*vp(k))goto 13491                                   1576
+      ixx(k)=1                                                             1576
+      ix=1                                                                 1576
+13491 continue                                                             1577
+13471 continue                                                             1578
+13472 continue                                                             1578
+      if(ix.eq.1) go to 10680                                              1579
+      goto 12992                                                           1580
+13431 continue                                                             1581
+      goto 12991                                                           1582
+12992 continue                                                             1582
+      if(jx .le. 0)goto 13511                                              1582
+      jerr=-10000-ilm                                                      1582
+      goto 12912                                                           1582
+13511 continue                                                             1582
+      devi=0.0                                                             1583
+13520 do 13521 ic=1,nc                                                     1584
+      if(nin.gt.0) a(1:nin,ic,ilm)=b(m(1:nin),ic)                          1584
+      a0(ic,ilm)=b(0,ic)                                                   1585
+13530 do 13531 i=1,no                                                      1585
+      if(y(i,ic).le.0.0)goto 13531                                         1586
+      devi=devi-w(i)*y(i,ic)*log(q(i,ic)/sxp(i))                           1587
+13531 continue                                                             1588
+13532 continue                                                             1588
+13521 continue                                                             1589
+13522 continue                                                             1589
+      kin(ilm)=nin                                                         1589
+      alm(ilm)=al                                                          1589
+      lmu=ilm                                                              1590
+      dev(ilm)=(dev1-devi)/dev0                                            1590
+      if(ig.eq.0)goto 12912                                                1591
+      if(ilm.lt.mnl)goto 12911                                             1591
+      if(flmin.ge.1.0)goto 12911                                           1592
+      if(nintot(ni,nx,nc,a(1,1,ilm),m,nin,is).gt.ne)goto 12912             1593
+      if(dev(ilm).gt.devmax)goto 12912                                     1593
+      if(dev(ilm)-dev(ilm-1).lt.sml)goto 12912                             1594
+12911 continue                                                             1595
+12912 continue                                                             1595
+      g=log(q)                                                             1595
+13540 do 13541 i=1,no                                                      1595
+      g(i,:)=g(i,:)-sum(g(i,:))/nc                                         1595
+13541 continue                                                             1596
+13542 continue                                                             1596
+      deallocate(sxp,b,bs,v,r,xv,q,mm,is,ga,ixx)                           1597
+      return                                                               1598
+      end                                                                  1599
+      subroutine kazero(kk,n,y,g,q,az,jerr)                                1600
+      parameter(eps=1.0e-7)                                                1601
+      real y(n,kk),g(n,kk),q(n),az(kk)                                     1602
       real, dimension (:), allocatable :: s                                     
       real, dimension (:,:), allocatable :: e                                   
       allocate(e(1:n,1:kk),stat=jerr)                                           
-      allocate(s(1:n),stat=ierr)                                           1606
-      jerr=jerr+ierr                                                       1607
-      if(jerr.ne.0) return                                                 1608
-      az=0.0                                                               1608
-      e=exp(g)                                                             1608
-13540 do 13541 i=1,n                                                       1608
-      s(i)=sum(e(i,:))                                                     1608
-13541 continue                                                             1609
-13542 continue                                                             1609
-13550 continue                                                             1609
-13551 continue                                                             1609
-      dm=0.0                                                               1610
-13560 do 13561 k=1,kk                                                      1610
-      t=0.0                                                                1610
-      u=t                                                                  1611
-13570 do 13571 i=1,n                                                       1611
-      pik=e(i,k)/s(i)                                                      1612
-      t=t+q(i)*(y(i,k)-pik)                                                1612
-      u=u+q(i)*pik*(1.0-pik)                                               1613
-13571 continue                                                             1614
-13572 continue                                                             1614
-      d=t/u                                                                1614
-      az(k)=az(k)+d                                                        1614
-      ed=exp(d)                                                            1614
-      dm=max(dm,abs(d))                                                    1615
-13580 do 13581 i=1,n                                                       1615
-      z=e(i,k)                                                             1615
-      e(i,k)=z*ed                                                          1615
-      s(i)=s(i)-z+e(i,k)                                                   1615
-13581 continue                                                             1616
-13582 continue                                                             1616
-13561 continue                                                             1617
-13562 continue                                                             1617
-      if(dm.lt.eps)goto 13552                                              1617
-      goto 13551                                                           1618
-13552 continue                                                             1618
-      az=az-sum(az)/kk                                                     1619
-      deallocate(e,s)                                                      1620
-      return                                                               1621
-      end                                                                  1622
-      function elc(parm,n,a,m)                                             1623
-      real a(n)                                                            1623
-      integer m(n)                                                         1624
-      fn=n                                                                 1624
-      am=sum(a)/fn                                                         1625
-      if((parm .ne. 0.0) .and. (n .ne. 2))goto 13601                       1625
-      elc=am                                                               1625
-      return                                                               1625
-13601 continue                                                             1626
-13610 do 13611 i=1,n                                                       1626
-      m(i)=i                                                               1626
-13611 continue                                                             1626
-13612 continue                                                             1626
-      call psort7(a,m,1,n)                                                 1627
-      if(a(m(1)) .ne. a(m(n)))goto 13631                                   1627
-      elc=a(1)                                                             1627
-      return                                                               1627
-13631 continue                                                             1628
-      if(mod(n,2) .ne. 1)goto 13651                                        1628
-      ad=a(m(n/2+1))                                                       1628
-      goto 13661                                                           1629
-13651 continue                                                             1629
-      ad=0.5*(a(m(n/2+1))+a(m(n/2)))                                       1629
+      allocate(s(1:n),stat=ierr)                                           1607
+      jerr=jerr+ierr                                                       1608
+      if(jerr.ne.0) return                                                 1609
+      az=0.0                                                               1609
+      e=exp(g)                                                             1609
+13550 do 13551 i=1,n                                                       1609
+      s(i)=sum(e(i,:))                                                     1609
+13551 continue                                                             1610
+13552 continue                                                             1610
+13560 continue                                                             1610
+13561 continue                                                             1610
+      dm=0.0                                                               1611
+13570 do 13571 k=1,kk                                                      1611
+      t=0.0                                                                1611
+      u=t                                                                  1612
+13580 do 13581 i=1,n                                                       1612
+      pik=e(i,k)/s(i)                                                      1613
+      t=t+q(i)*(y(i,k)-pik)                                                1613
+      u=u+q(i)*pik*(1.0-pik)                                               1614
+13581 continue                                                             1615
+13582 continue                                                             1615
+      d=t/u                                                                1615
+      az(k)=az(k)+d                                                        1615
+      ed=exp(d)                                                            1615
+      dm=max(dm,abs(d))                                                    1616
+13590 do 13591 i=1,n                                                       1616
+      z=e(i,k)                                                             1616
+      e(i,k)=z*ed                                                          1616
+      s(i)=s(i)-z+e(i,k)                                                   1616
+13591 continue                                                             1617
+13592 continue                                                             1617
+13571 continue                                                             1618
+13572 continue                                                             1618
+      if(dm.lt.eps)goto 13562                                              1618
+      goto 13561                                                           1619
+13562 continue                                                             1619
+      az=az-sum(az)/kk                                                     1620
+      deallocate(e,s)                                                      1621
+      return                                                               1622
+      end                                                                  1623
+      function elc(parm,n,a,m)                                             1624
+      real a(n)                                                            1624
+      integer m(n)                                                         1625
+      fn=n                                                                 1625
+      am=sum(a)/fn                                                         1626
+      if((parm .ne. 0.0) .and. (n .ne. 2))goto 13611                       1626
+      elc=am                                                               1626
+      return                                                               1626
+13611 continue                                                             1627
+13620 do 13621 i=1,n                                                       1627
+      m(i)=i                                                               1627
+13621 continue                                                             1627
+13622 continue                                                             1627
+      call psort7(a,m,1,n)                                                 1628
+      if(a(m(1)) .ne. a(m(n)))goto 13641                                   1628
+      elc=a(1)                                                             1628
+      return                                                               1628
+13641 continue                                                             1629
+      if(mod(n,2) .ne. 1)goto 13661                                        1629
+      ad=a(m(n/2+1))                                                       1629
+      goto 13671                                                           1630
 13661 continue                                                             1630
-13641 continue                                                             1630
-      if(parm .ne. 1.0)goto 13681                                          1630
-      elc=ad                                                               1630
-      return                                                               1630
-13681 continue                                                             1631
-      b1=min(am,ad)                                                        1631
-      b2=max(am,ad)                                                        1631
-      k2=1                                                                 1632
-13690 continue                                                             1632
-13691 if(a(m(k2)).gt.b1)goto 13692                                         1632
-      k2=k2+1                                                              1632
-      goto 13691                                                           1632
-13692 continue                                                             1632
-      k1=k2-1                                                              1633
+      ad=0.5*(a(m(n/2+1))+a(m(n/2)))                                       1630
+13671 continue                                                             1631
+13651 continue                                                             1631
+      if(parm .ne. 1.0)goto 13691                                          1631
+      elc=ad                                                               1631
+      return                                                               1631
+13691 continue                                                             1632
+      b1=min(am,ad)                                                        1632
+      b2=max(am,ad)                                                        1632
+      k2=1                                                                 1633
 13700 continue                                                             1633
-13701 if(a(m(k2)).ge.b2)goto 13702                                         1633
+13701 if(a(m(k2)).gt.b1)goto 13702                                         1633
       k2=k2+1                                                              1633
-      goto 13701                                                           1634
-13702 continue                                                             1634
-      r=parm/((1.0-parm)*fn)                                               1634
-      is=0                                                                 1634
-      sm=n-2*(k1-1)                                                        1635
-13710 do 13711 k=k1,k2-1                                                   1635
-      sm=sm-2.0                                                            1635
-      s=r*sm+am                                                            1636
-      if(s .le. a(m(k)) .or. s .gt. a(m(k+1)))goto 13731                   1636
-      is=k                                                                 1636
-      goto 13712                                                           1636
-13731 continue                                                             1637
-13711 continue                                                             1638
-13712 continue                                                             1638
-      if(is .eq. 0)goto 13751                                              1638
-      elc=s                                                                1638
-      return                                                               1638
-13751 continue                                                             1638
-      r2=2.0*r                                                             1638
-      s1=a(m(k1))                                                          1638
-      am2=2.0*am                                                           1639
-      cri=r2*sum(abs(a-s1))+s1*(s1-am2)                                    1639
-      elc=s1                                                               1640
-13760 do 13761 k=k1+1,k2                                                   1640
-      s=a(m(k))                                                            1640
-      if(s.eq.s1)goto 13761                                                1641
-      c=r2*sum(abs(a-s))+s*(s-am2)                                         1642
-      if(c .ge. cri)goto 13781                                             1642
-      cri=c                                                                1642
-      elc=s                                                                1642
-13781 continue                                                             1642
-      s1=s                                                                 1643
-13761 continue                                                             1644
-13762 continue                                                             1644
-      return                                                               1645
-      end                                                                  1646
-      function nintot(ni,nx,nc,a,m,nin,is)                                 1647
-      real a(nx,nc)                                                        1647
-      integer m(nx),is(ni)                                                 1648
-      is=0                                                                 1648
-      nintot=0                                                             1649
-13790 do 13791 ic=1,nc                                                     1649
-13800 do 13801 j=1,nin                                                     1649
-      k=m(j)                                                               1649
-      if(is(k).ne.0)goto 13801                                             1650
-      if(a(j,ic).eq.0.0)goto 13801                                         1650
-      is(k)=k                                                              1650
-      nintot=nintot+1                                                      1651
-13801 continue                                                             1651
-13802 continue                                                             1651
-13791 continue                                                             1652
-13792 continue                                                             1652
-      return                                                               1653
-      end                                                                  1654
-      subroutine luncomp(ni,nx,nc,ca,ia,nin,a)                             1655
-      real ca(nx,nc),a(ni,nc)                                              1655
-      integer ia(nx)                                                       1656
-      a=0.0                                                                1657
-13810 do 13811 ic=1,nc                                                     1657
-      if(nin.gt.0) a(ia(1:nin),ic)=ca(1:nin,ic)                            1657
-13811 continue                                                             1658
-13812 continue                                                             1658
-      return                                                               1659
-      end                                                                  1660
-      subroutine lmodval(nt,x,nc,nx,a0,ca,ia,nin,ans)                      1661
-      real a0(nc),ca(nx,nc),x(nt,*),ans(nc,nt)                             1661
-      integer ia(nx)                                                       1662
-13820 do 13821 i=1,nt                                                      1662
-13830 do 13831 ic=1,nc                                                     1662
-      ans(ic,i)=a0(ic)                                                     1664
-      if(nin.gt.0) ans(ic,i)=ans(ic,i)+dot_product(ca(1:nin,ic),x(i,ia(1   1665 
+      goto 13701                                                           1633
+13702 continue                                                             1633
+      k1=k2-1                                                              1634
+13710 continue                                                             1634
+13711 if(a(m(k2)).ge.b2)goto 13712                                         1634
+      k2=k2+1                                                              1634
+      goto 13711                                                           1635
+13712 continue                                                             1635
+      r=parm/((1.0-parm)*fn)                                               1635
+      is=0                                                                 1635
+      sm=n-2*(k1-1)                                                        1636
+13720 do 13721 k=k1,k2-1                                                   1636
+      sm=sm-2.0                                                            1636
+      s=r*sm+am                                                            1637
+      if(s .le. a(m(k)) .or. s .gt. a(m(k+1)))goto 13741                   1637
+      is=k                                                                 1637
+      goto 13722                                                           1637
+13741 continue                                                             1638
+13721 continue                                                             1639
+13722 continue                                                             1639
+      if(is .eq. 0)goto 13761                                              1639
+      elc=s                                                                1639
+      return                                                               1639
+13761 continue                                                             1639
+      r2=2.0*r                                                             1639
+      s1=a(m(k1))                                                          1639
+      am2=2.0*am                                                           1640
+      cri=r2*sum(abs(a-s1))+s1*(s1-am2)                                    1640
+      elc=s1                                                               1641
+13770 do 13771 k=k1+1,k2                                                   1641
+      s=a(m(k))                                                            1641
+      if(s.eq.s1)goto 13771                                                1642
+      c=r2*sum(abs(a-s))+s*(s-am2)                                         1643
+      if(c .ge. cri)goto 13791                                             1643
+      cri=c                                                                1643
+      elc=s                                                                1643
+13791 continue                                                             1643
+      s1=s                                                                 1644
+13771 continue                                                             1645
+13772 continue                                                             1645
+      return                                                               1646
+      end                                                                  1647
+      function nintot(ni,nx,nc,a,m,nin,is)                                 1648
+      real a(nx,nc)                                                        1648
+      integer m(nx),is(ni)                                                 1649
+      is=0                                                                 1649
+      nintot=0                                                             1650
+13800 do 13801 ic=1,nc                                                     1650
+13810 do 13811 j=1,nin                                                     1650
+      k=m(j)                                                               1650
+      if(is(k).ne.0)goto 13811                                             1651
+      if(a(j,ic).eq.0.0)goto 13811                                         1651
+      is(k)=k                                                              1651
+      nintot=nintot+1                                                      1652
+13811 continue                                                             1652
+13812 continue                                                             1652
+13801 continue                                                             1653
+13802 continue                                                             1653
+      return                                                               1654
+      end                                                                  1655
+      subroutine luncomp(ni,nx,nc,ca,ia,nin,a)                             1656
+      real ca(nx,nc),a(ni,nc)                                              1656
+      integer ia(nx)                                                       1657
+      a=0.0                                                                1658
+13820 do 13821 ic=1,nc                                                     1658
+      if(nin.gt.0) a(ia(1:nin),ic)=ca(1:nin,ic)                            1658
+13821 continue                                                             1659
+13822 continue                                                             1659
+      return                                                               1660
+      end                                                                  1661
+      subroutine lmodval(nt,x,nc,nx,a0,ca,ia,nin,ans)                      1662
+      real a0(nc),ca(nx,nc),x(nt,*),ans(nc,nt)                             1662
+      integer ia(nx)                                                       1663
+13830 do 13831 i=1,nt                                                      1663
+13840 do 13841 ic=1,nc                                                     1663
+      ans(ic,i)=a0(ic)                                                     1665
+      if(nin.gt.0) ans(ic,i)=ans(ic,i)+dot_product(ca(1:nin,ic),x(i,ia(1   1666 
      *:nin)))
-13831 continue                                                             1665
-13832 continue                                                             1665
-13821 continue                                                             1666
-13822 continue                                                             1666
-      return                                                               1667
-      end                                                                  1668
-      subroutine splognet (parm,no,ni,nc,x,ix,jx,y,g,jd,vp,ne,nx,nlam,fl   1670 
+13841 continue                                                             1666
+13842 continue                                                             1666
+13831 continue                                                             1667
+13832 continue                                                             1667
+      return                                                               1668
+      end                                                                  1669
+      subroutine splognet (parm,no,ni,nc,x,ix,jx,y,g,jd,vp,ne,nx,nlam,fl   1671 
      *min,  ulam,thr,isd,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,je
      *rr)
-      real x(*),y(no,max(2,nc)),g(no,nc),vp(ni),ulam(nlam)                 1671
-      real ca(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam)                  1672
-      integer ix(*),jx(*),jd(*),ia(nx),nin(nlam)                           1673
+      real x(*),y(no,max(2,nc)),g(no,nc),vp(ni),ulam(nlam)                 1672
+      real ca(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam)                  1673
+      integer ix(*),jx(*),jd(*),ia(nx),nin(nlam)                           1674
       real, dimension (:), allocatable :: xm,xs,ww,vq                           
       integer, dimension (:), allocatable :: ju                                 
-      if(maxval(vp) .gt. 0.0)goto 13851                                    1677
-      jerr=10000                                                           1677
-      return                                                               1677
-13851 continue                                                             1678
-      allocate(ww(1:no),stat=jerr)                                         1679
-      allocate(ju(1:ni),stat=ierr)                                         1679
-      jerr=jerr+ierr                                                       1680
-      allocate(vq(1:ni),stat=ierr)                                         1680
+      if(maxval(vp) .gt. 0.0)goto 13861                                    1678
+      jerr=10000                                                           1678
+      return                                                               1678
+13861 continue                                                             1679
+      allocate(ww(1:no),stat=jerr)                                         1680
+      allocate(ju(1:ni),stat=ierr)                                         1680
       jerr=jerr+ierr                                                       1681
-      allocate(xm(1:ni),stat=ierr)                                         1681
+      allocate(vq(1:ni),stat=ierr)                                         1681
       jerr=jerr+ierr                                                       1682
-      allocate(xs(1:ni),stat=ierr)                                         1682
+      allocate(xm(1:ni),stat=ierr)                                         1682
       jerr=jerr+ierr                                                       1683
-      if(jerr.ne.0) return                                                 1684
-      call spchkvars(no,ni,x,ix,ju)                                        1685
-      if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0                                 1686
-      if(maxval(ju) .gt. 0)goto 13871                                      1686
-      jerr=7777                                                            1686
-      return                                                               1686
-13871 continue                                                             1687
-      vq=max(0.0,vp)                                                       1687
-      vq=vq*ni/sum(vq)                                                     1688
-13880 do 13881 i=1,no                                                      1688
-      ww(i)=sum(y(i,:))                                                    1688
-      y(i,:)=y(i,:)/ww(i)                                                  1688
+      allocate(xs(1:ni),stat=ierr)                                         1683
+      jerr=jerr+ierr                                                       1684
+      if(jerr.ne.0) return                                                 1685
+      call spchkvars(no,ni,x,ix,ju)                                        1686
+      if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0                                 1687
+      if(maxval(ju) .gt. 0)goto 13881                                      1687
+      jerr=7777                                                            1687
+      return                                                               1687
 13881 continue                                                             1688
-13882 continue                                                             1688
-      sw=sum(ww)                                                           1688
-      ww=ww/sw                                                             1689
-      call splstandard2(no,ni,x,ix,jx,ww,ju,isd,xm,xs)                     1690
-      if(nc .ne. 1)goto 13901                                              1691
-      call sprlognet2n(parm,no,ni,x,ix,jx,y(:,1),g(:,1),ww,ju,vq,ne,nx,n   1693 
+      vq=max(0.0,vp)                                                       1688
+      vq=vq*ni/sum(vq)                                                     1689
+13890 do 13891 i=1,no                                                      1689
+      ww(i)=sum(y(i,:))                                                    1689
+      y(i,:)=y(i,:)/ww(i)                                                  1689
+13891 continue                                                             1689
+13892 continue                                                             1689
+      sw=sum(ww)                                                           1689
+      ww=ww/sw                                                             1690
+      call splstandard2(no,ni,x,ix,jx,ww,ju,isd,xm,xs)                     1691
+      if(nc .ne. 1)goto 13911                                              1692
+      call sprlognet2n(parm,no,ni,x,ix,jx,y(:,1),g(:,1),ww,ju,vq,ne,nx,n   1694 
      *lam,flmin,  ulam,thr,isd,maxit,kopt,xm,xs,lmu,a0,ca,ia,nin,dev0,de
      *v,alm,nlp,jerr)
-      goto 13911                                                           1694
-13901 continue                                                             1695
-      call sprlognetn(parm,no,ni,nc,x,ix,jx,y,g,ww,ju,vq,ne,nx,nlam,flmi   1697 
+      goto 13921                                                           1695
+13911 continue                                                             1696
+      call sprlognetn(parm,no,ni,nc,x,ix,jx,y,g,ww,ju,vq,ne,nx,nlam,flmi   1698 
      *n,ulam,  thr,isd,maxit,kopt,xm,xs,lmu,a0,ca,ia,nin,dev0,dev,alm,nl
      *p,jerr)
-13911 continue                                                             1698
-13891 continue                                                             1698
-      if(jerr.gt.0) return                                                 1698
-      dev0=2.0*sw*dev0                                                     1699
-13920 do 13921 k=1,lmu                                                     1699
-      nk=nin(k)                                                            1700
-13930 do 13931 ic=1,nc                                                     1700
-      if(isd .le. 0)goto 13951                                             1700
-13960 do 13961 l=1,nk                                                      1700
-      ca(l,ic,k)=ca(l,ic,k)/xs(ia(l))                                      1700
-13961 continue                                                             1700
-13962 continue                                                             1700
-13951 continue                                                             1701
-      a0(ic,k)=a0(ic,k)-dot_product(ca(1:nk,ic,k),xm(ia(1:nk)))            1702
-13931 continue                                                             1703
-13932 continue                                                             1703
-13921 continue                                                             1704
-13922 continue                                                             1704
-      deallocate(ww,ju,vq,xm,xs)                                           1705
-      return                                                               1706
-      end                                                                  1707
-      subroutine splstandard2(no,ni,x,ix,jx,w,ju,isd,xm,xs)                1708
-      real x(*),w(no),xm(ni),xs(ni)                                        1708
-      integer ix(*),jx(*),ju(ni)                                           1709
-13970 do 13971 j=1,ni                                                      1709
-      if(ju(j).eq.0)goto 13971                                             1709
-      jb=ix(j)                                                             1709
-      je=ix(j+1)-1                                                         1710
-      xm(j)=dot_product(w(jx(jb:je)),x(jb:je))                             1711
-      if(isd.ne.0) xs(j)=sqrt(dot_product(w(jx(jb:je)),x(jb:je)**2)-xm(j   1712 
+13921 continue                                                             1699
+13901 continue                                                             1699
+      if(jerr.gt.0) return                                                 1699
+      dev0=2.0*sw*dev0                                                     1700
+13930 do 13931 k=1,lmu                                                     1700
+      nk=nin(k)                                                            1701
+13940 do 13941 ic=1,nc                                                     1701
+      if(isd .le. 0)goto 13961                                             1701
+13970 do 13971 l=1,nk                                                      1701
+      ca(l,ic,k)=ca(l,ic,k)/xs(ia(l))                                      1701
+13971 continue                                                             1701
+13972 continue                                                             1701
+13961 continue                                                             1702
+      a0(ic,k)=a0(ic,k)-dot_product(ca(1:nk,ic,k),xm(ia(1:nk)))            1703
+13941 continue                                                             1704
+13942 continue                                                             1704
+13931 continue                                                             1705
+13932 continue                                                             1705
+      deallocate(ww,ju,vq,xm,xs)                                           1706
+      return                                                               1707
+      end                                                                  1708
+      subroutine splstandard2(no,ni,x,ix,jx,w,ju,isd,xm,xs)                1709
+      real x(*),w(no),xm(ni),xs(ni)                                        1709
+      integer ix(*),jx(*),ju(ni)                                           1710
+13980 do 13981 j=1,ni                                                      1710
+      if(ju(j).eq.0)goto 13981                                             1710
+      jb=ix(j)                                                             1710
+      je=ix(j+1)-1                                                         1711
+      xm(j)=dot_product(w(jx(jb:je)),x(jb:je))                             1712
+      if(isd.ne.0) xs(j)=sqrt(dot_product(w(jx(jb:je)),x(jb:je)**2)-xm(j   1713 
      *)**2)
-13971 continue                                                             1713
-13972 continue                                                             1713
-      if(isd.eq.0) xs=1.0                                                  1714
-      return                                                               1715
-      end                                                                  1716
-      subroutine sprlognet2n (parm,no,ni,x,ix,jx,y,g,w,ju,vp,ne,nx,nlam,   1718 
+13981 continue                                                             1714
+13982 continue                                                             1714
+      if(isd.eq.0) xs=1.0                                                  1715
+      return                                                               1716
+      end                                                                  1717
+      subroutine sprlognet2n (parm,no,ni,x,ix,jx,y,g,w,ju,vp,ne,nx,nlam,   1719 
      *  flmin,ulam,shri,isd,maxit,kopt,xb,xs,lmu,a0,a,m,kin,dev0,dev,alm
      *,nlp,jerr)
-      parameter(sml=1.0e-5, eps=1.0e-6, pmin=1.0e-5,  big=9.9e30, mnlam=   1720 
+      parameter(sml=1.0e-5, eps=1.0e-6, pmin=1.0e-5,  big=9.9e30, mnlam=   1721 
      *5, devmax=0.999)
-      real x(*),y(no),g(no),w(no),vp(ni),ulam(nlam)                        1721
-      real a(nx,nlam),a0(nlam),dev(nlam),alm(nlam)                         1722
-      real xb(ni),xs(ni)                                                   1722
-      integer ix(*),jx(*),ju(ni),m(nx),kin(nlam)                           1723
+      real x(*),y(no),g(no),w(no),vp(ni),ulam(nlam)                        1722
+      real a(nx,nlam),a0(nlam),dev(nlam),alm(nlam)                         1723
+      real xb(ni),xs(ni)                                                   1723
+      integer ix(*),jx(*),ju(ni),m(nx),kin(nlam)                           1724
       real, dimension (:), allocatable :: xm,b,bs,v,r,sc,xv,q,ga                
       integer, dimension (:), allocatable :: mm,ixx                             
-      allocate(b(0:ni),stat=jerr)                                          1728
-      allocate(xm(0:ni),stat=ierr)                                         1728
-      jerr=jerr+ierr                                                       1729
-      allocate(xv(1:ni),stat=ierr)                                         1729
+      allocate(b(0:ni),stat=jerr)                                          1729
+      allocate(xm(0:ni),stat=ierr)                                         1729
       jerr=jerr+ierr                                                       1730
-      allocate(bs(0:ni),stat=ierr)                                         1730
+      allocate(xv(1:ni),stat=ierr)                                         1730
       jerr=jerr+ierr                                                       1731
-      allocate(ga(1:ni),stat=ierr)                                         1731
+      allocate(bs(0:ni),stat=ierr)                                         1731
       jerr=jerr+ierr                                                       1732
-      allocate(mm(1:ni),stat=ierr)                                         1732
+      allocate(ga(1:ni),stat=ierr)                                         1732
       jerr=jerr+ierr                                                       1733
-      allocate(ixx(1:ni),stat=ierr)                                        1733
+      allocate(mm(1:ni),stat=ierr)                                         1733
       jerr=jerr+ierr                                                       1734
-      allocate(q(1:no),stat=ierr)                                          1734
+      allocate(ixx(1:ni),stat=ierr)                                        1734
       jerr=jerr+ierr                                                       1735
-      allocate(r(1:no),stat=ierr)                                          1735
+      allocate(q(1:no),stat=ierr)                                          1735
       jerr=jerr+ierr                                                       1736
-      allocate(v(1:no),stat=ierr)                                          1736
+      allocate(r(1:no),stat=ierr)                                          1736
       jerr=jerr+ierr                                                       1737
-      allocate(sc(1:no),stat=ierr)                                         1737
+      allocate(v(1:no),stat=ierr)                                          1737
       jerr=jerr+ierr                                                       1738
-      if(jerr.ne.0) return                                                 1739
-      fmax=log(1.0/pmin-1.0)                                               1739
-      fmin=-fmax                                                           1739
-      vmin=(1.0+pmin)*pmin*(1.0-pmin)                                      1740
-      bta=parm                                                             1740
-      omb=1.0-bta                                                          1741
-      q0=dot_product(w,y)                                                  1741
-      if(q0 .gt. pmin)goto 13991                                           1741
-      jerr=8001                                                            1741
-      return                                                               1741
-13991 continue                                                             1742
-      if(q0 .lt. 1.0-pmin)goto 14011                                       1742
-      jerr=9001                                                            1742
+      allocate(sc(1:no),stat=ierr)                                         1738
+      jerr=jerr+ierr                                                       1739
+      if(jerr.ne.0) return                                                 1740
+      fmax=log(1.0/pmin-1.0)                                               1740
+      fmin=-fmax                                                           1740
+      vmin=(1.0+pmin)*pmin*(1.0-pmin)                                      1741
+      bta=parm                                                             1741
+      omb=1.0-bta                                                          1742
+      q0=dot_product(w,y)                                                  1742
+      if(q0 .gt. pmin)goto 14001                                           1742
+      jerr=8001                                                            1742
       return                                                               1742
-14011 continue                                                             1742
-      bz=log(q0/(1.0-q0))                                                  1743
-      if(nonzero(no,g) .ne. 0)goto 14031                                   1743
-      vi=q0*(1.0-q0)                                                       1743
-      b(0)=bz                                                              1743
-      v=vi*w                                                               1744
-      r=w*(y-q0)                                                           1744
-      q=q0                                                                 1744
-      xm(0)=vi                                                             1744
-      dev1=-(bz*q0+log(1.0-q0))                                            1745
-      goto 14041                                                           1746
-14031 continue                                                             1746
-      b(0)=azero(no,y,g,w,jerr)                                            1746
-      if(jerr.ne.0) return                                                 1747
-      q=1.0/(1.0+exp(-b(0)-g))                                             1747
-      v=w*q*(1.0-q)                                                        1747
-      r=w*(y-q)                                                            1747
-      xm(0)=sum(v)                                                         1748
-      dev1=-(b(0)*q0+dot_product(w,y*g+log(1.0-q)))                        1749
-14041 continue                                                             1750
-14021 continue                                                             1750
-      if(kopt .le. 0)goto 14061                                            1751
-      if(isd .le. 0)goto 14081                                             1751
-      xv=0.25                                                              1751
-      goto 14091                                                           1752
-14081 continue                                                             1753
-14100 do 14101 j=1,ni                                                      1753
-      if(ju(j).eq.0)goto 14101                                             1753
-      jb=ix(j)                                                             1753
-      je=ix(j+1)-1                                                         1754
-      xv(j)=0.25*(dot_product(w(jx(jb:je)),x(jb:je)**2)-xb(j)**2)          1755
-14101 continue                                                             1756
-14102 continue                                                             1756
-14091 continue                                                             1757
-14071 continue                                                             1757
-14061 continue                                                             1758
-      b(1:ni)=0.0                                                          1758
-      dev0=dev1                                                            1759
-14110 do 14111 i=1,no                                                      1759
-      if(y(i).gt.0.0) dev0=dev0+w(i)*y(i)*log(y(i))                        1760
-      if(y(i).lt.1.0) dev0=dev0+w(i)*(1.0-y(i))*log(1.0-y(i))              1761
-14111 continue                                                             1762
-14112 continue                                                             1762
-      if(flmin .ge. 1.0)goto 14131                                         1762
-      eqs=max(eps,flmin)                                                   1762
-      alf=eqs**(1.0/(nlam-1))                                              1762
-14131 continue                                                             1763
-      m=0                                                                  1763
-      mm=0                                                                 1763
-      nin=0                                                                1763
-      o=0.0                                                                1763
-      svr=o                                                                1763
-      mnl=min(mnlam,nlam)                                                  1763
-      bs=0.0                                                               1763
-      nlp=0                                                                1763
-      nin=nlp                                                              1764
-      shr=shri*dev0                                                        1764
-      al=0.0                                                               1764
-      ixx=0                                                                1765
-14140 do 14141 j=1,ni                                                      1765
-      if(ju(j).eq.0)goto 14141                                             1766
-      jb=ix(j)                                                             1766
-      je=ix(j+1)-1                                                         1766
-      jn=ix(j+1)-ix(j)                                                     1767
-      sc(1:jn)=r(jx(jb:je))+v(jx(jb:je))*o                                 1768
-      gj=dot_product(sc(1:jn),x(jb:je))                                    1769
-      ga(j)=abs((gj-svr*xb(j))/xs(j))                                      1770
-14141 continue                                                             1771
-14142 continue                                                             1771
-14150 do 14151 ilm=1,nlam                                                  1771
-      al0=al                                                               1772
-      if(flmin .lt. 1.0)goto 14171                                         1772
-      al=ulam(ilm)                                                         1772
-      goto 14161                                                           1773
-14171 if(ilm .le. 2)goto 14181                                             1773
-      al=al*alf                                                            1773
-      goto 14161                                                           1774
-14181 if(ilm .ne. 1)goto 14191                                             1774
-      al=big                                                               1774
-      goto 14201                                                           1775
-14191 continue                                                             1775
-      al0=0.0                                                              1776
-14210 do 14211 j=1,ni                                                      1776
-      if(ju(j).eq.0)goto 14211                                             1776
-      if(vp(j).gt.0.0) al0=max(al0,ga(j)/vp(j))                            1776
-14211 continue                                                             1777
-14212 continue                                                             1777
-      al0=al0/max(bta,1.0e-3)                                              1777
-      al=alf*al0                                                           1778
-14201 continue                                                             1779
-14161 continue                                                             1779
-      al2=al*omb                                                           1779
-      al1=al*bta                                                           1779
-      tlam=bta*(2.0*al-al0)                                                1780
-14220 do 14221 k=1,ni                                                      1780
-      if(ixx(k).eq.1)goto 14221                                            1780
-      if(ju(k).eq.0)goto 14221                                             1781
-      if(ga(k).gt.tlam*vp(k)) ixx(k)=1                                     1782
-14221 continue                                                             1783
-14222 continue                                                             1783
-10680 continue                                                             1784
-14230 continue                                                             1784
+14001 continue                                                             1743
+      if(q0 .lt. 1.0-pmin)goto 14021                                       1743
+      jerr=9001                                                            1743
+      return                                                               1743
+14021 continue                                                             1743
+      bz=log(q0/(1.0-q0))                                                  1744
+      if(nonzero(no,g) .ne. 0)goto 14041                                   1744
+      vi=q0*(1.0-q0)                                                       1744
+      b(0)=bz                                                              1744
+      v=vi*w                                                               1745
+      r=w*(y-q0)                                                           1745
+      q=q0                                                                 1745
+      xm(0)=vi                                                             1745
+      dev1=-(bz*q0+log(1.0-q0))                                            1746
+      goto 14051                                                           1747
+14041 continue                                                             1747
+      b(0)=azero(no,y,g,w,jerr)                                            1747
+      if(jerr.ne.0) return                                                 1748
+      q=1.0/(1.0+exp(-b(0)-g))                                             1748
+      v=w*q*(1.0-q)                                                        1748
+      r=w*(y-q)                                                            1748
+      xm(0)=sum(v)                                                         1749
+      dev1=-(b(0)*q0+dot_product(w,y*g+log(1.0-q)))                        1750
+14051 continue                                                             1751
+14031 continue                                                             1751
+      if(kopt .le. 0)goto 14071                                            1752
+      if(isd .le. 0)goto 14091                                             1752
+      xv=0.25                                                              1752
+      goto 14101                                                           1753
+14091 continue                                                             1754
+14110 do 14111 j=1,ni                                                      1754
+      if(ju(j).eq.0)goto 14111                                             1754
+      jb=ix(j)                                                             1754
+      je=ix(j+1)-1                                                         1755
+      xv(j)=0.25*(dot_product(w(jx(jb:je)),x(jb:je)**2)-xb(j)**2)          1756
+14111 continue                                                             1757
+14112 continue                                                             1757
+14101 continue                                                             1758
+14081 continue                                                             1758
+14071 continue                                                             1759
+      b(1:ni)=0.0                                                          1759
+      dev0=dev1                                                            1760
+14120 do 14121 i=1,no                                                      1760
+      if(y(i).gt.0.0) dev0=dev0+w(i)*y(i)*log(y(i))                        1761
+      if(y(i).lt.1.0) dev0=dev0+w(i)*(1.0-y(i))*log(1.0-y(i))              1762
+14121 continue                                                             1763
+14122 continue                                                             1763
+      if(flmin .ge. 1.0)goto 14141                                         1763
+      eqs=max(eps,flmin)                                                   1763
+      alf=eqs**(1.0/(nlam-1))                                              1763
+14141 continue                                                             1764
+      m=0                                                                  1764
+      mm=0                                                                 1764
+      nin=0                                                                1764
+      o=0.0                                                                1764
+      svr=o                                                                1764
+      mnl=min(mnlam,nlam)                                                  1764
+      bs=0.0                                                               1764
+      nlp=0                                                                1764
+      nin=nlp                                                              1765
+      shr=shri*dev0                                                        1765
+      al=0.0                                                               1765
+      ixx=0                                                                1766
+14150 do 14151 j=1,ni                                                      1766
+      if(ju(j).eq.0)goto 14151                                             1767
+      jb=ix(j)                                                             1767
+      je=ix(j+1)-1                                                         1767
+      jn=ix(j+1)-ix(j)                                                     1768
+      sc(1:jn)=r(jx(jb:je))+v(jx(jb:je))*o                                 1769
+      gj=dot_product(sc(1:jn),x(jb:je))                                    1770
+      ga(j)=abs((gj-svr*xb(j))/xs(j))                                      1771
+14151 continue                                                             1772
+14152 continue                                                             1772
+14160 do 14161 ilm=1,nlam                                                  1772
+      al0=al                                                               1773
+      if(flmin .lt. 1.0)goto 14181                                         1773
+      al=ulam(ilm)                                                         1773
+      goto 14171                                                           1774
+14181 if(ilm .le. 2)goto 14191                                             1774
+      al=al*alf                                                            1774
+      goto 14171                                                           1775
+14191 if(ilm .ne. 1)goto 14201                                             1775
+      al=big                                                               1775
+      goto 14211                                                           1776
+14201 continue                                                             1776
+      al0=0.0                                                              1777
+14220 do 14221 j=1,ni                                                      1777
+      if(ju(j).eq.0)goto 14221                                             1777
+      if(vp(j).gt.0.0) al0=max(al0,ga(j)/vp(j))                            1777
+14221 continue                                                             1778
+14222 continue                                                             1778
+      al0=al0/max(bta,1.0e-3)                                              1778
+      al=alf*al0                                                           1779
+14211 continue                                                             1780
+14171 continue                                                             1780
+      al2=al*omb                                                           1780
+      al1=al*bta                                                           1780
+      tlam=bta*(2.0*al-al0)                                                1781
+14230 do 14231 k=1,ni                                                      1781
+      if(ixx(k).eq.1)goto 14231                                            1781
+      if(ju(k).eq.0)goto 14231                                             1782
+      if(ga(k).gt.tlam*vp(k)) ixx(k)=1                                     1783
 14231 continue                                                             1784
-      bs(0)=b(0)                                                           1784
-      if(nin.gt.0) bs(m(1:nin))=b(m(1:nin))                                1785
-14240 do 14241 j=1,ni                                                      1785
-      if(ixx(j).eq.0)goto 14241                                            1786
-      jb=ix(j)                                                             1786
-      je=ix(j+1)-1                                                         1786
-      jn=ix(j+1)-ix(j)                                                     1787
-      sc(1:jn)=v(jx(jb:je))                                                1788
-      xm(j)=dot_product(sc(1:jn),x(jb:je))                                 1789
-      if(kopt .ne. 0)goto 14261                                            1790
-      xv(j)=dot_product(sc(1:jn),x(jb:je)**2)                              1791
-      xv(j)=(xv(j)-2.0*xb(j)*xm(j)+xm(0)*xb(j)**2)/xs(j)**2                1792
-14261 continue                                                             1793
-14241 continue                                                             1794
-14242 continue                                                             1794
-14270 continue                                                             1794
+14232 continue                                                             1784
+10680 continue                                                             1785
+14240 continue                                                             1785
+14241 continue                                                             1785
+      bs(0)=b(0)                                                           1785
+      if(nin.gt.0) bs(m(1:nin))=b(m(1:nin))                                1786
+14250 do 14251 j=1,ni                                                      1786
+      if(ixx(j).eq.0)goto 14251                                            1787
+      jb=ix(j)                                                             1787
+      je=ix(j+1)-1                                                         1787
+      jn=ix(j+1)-ix(j)                                                     1788
+      sc(1:jn)=v(jx(jb:je))                                                1789
+      xm(j)=dot_product(sc(1:jn),x(jb:je))                                 1790
+      if(kopt .ne. 0)goto 14271                                            1791
+      xv(j)=dot_product(sc(1:jn),x(jb:je)**2)                              1792
+      xv(j)=(xv(j)-2.0*xb(j)*xm(j)+xm(0)*xb(j)**2)/xs(j)**2                1793
 14271 continue                                                             1794
-      nlp=nlp+1                                                            1794
-      dlx=0.0                                                              1795
-14280 do 14281 k=1,ni                                                      1795
-      if(ixx(k).eq.0)goto 14281                                            1796
-      jb=ix(k)                                                             1796
-      je=ix(k+1)-1                                                         1796
-      jn=ix(k+1)-ix(k)                                                     1796
-      bk=b(k)                                                              1797
-      sc(1:jn)=r(jx(jb:je))+v(jx(jb:je))*o                                 1798
-      gk=dot_product(sc(1:jn),x(jb:je))                                    1799
-      gk=(gk-svr*xb(k))/xs(k)                                              1800
-      u=gk+xv(k)*b(k)                                                      1800
-      au=abs(u)-vp(k)*al1                                                  1801
-      if(au .gt. 0.0)goto 14301                                            1801
-      b(k)=0.0                                                             1801
-      goto 14311                                                           1802
-14301 continue                                                             1802
-      b(k)=sign(au,u)/(xv(k)+vp(k)*al2)                                    1802
+14251 continue                                                             1795
+14252 continue                                                             1795
+14280 continue                                                             1795
+14281 continue                                                             1795
+      nlp=nlp+1                                                            1795
+      dlx=0.0                                                              1796
+14290 do 14291 k=1,ni                                                      1796
+      if(ixx(k).eq.0)goto 14291                                            1797
+      jb=ix(k)                                                             1797
+      je=ix(k+1)-1                                                         1797
+      jn=ix(k+1)-ix(k)                                                     1797
+      bk=b(k)                                                              1798
+      sc(1:jn)=r(jx(jb:je))+v(jx(jb:je))*o                                 1799
+      gk=dot_product(sc(1:jn),x(jb:je))                                    1800
+      gk=(gk-svr*xb(k))/xs(k)                                              1801
+      u=gk+xv(k)*b(k)                                                      1801
+      au=abs(u)-vp(k)*al1                                                  1802
+      if(au .gt. 0.0)goto 14311                                            1802
+      b(k)=0.0                                                             1802
+      goto 14321                                                           1803
 14311 continue                                                             1803
-14291 continue                                                             1803
-      d=b(k)-bk                                                            1803
-      if(abs(d).le.0.0)goto 14281                                          1803
-      dlx=max(dlx,xv(k)*d**2)                                              1804
-      if(mm(k) .ne. 0)goto 14331                                           1804
-      nin=nin+1                                                            1804
-      if(nin.gt.nx)goto 14282                                              1805
-      mm(k)=nin                                                            1805
-      m(nin)=k                                                             1805
-      sc(1:jn)=v(jx(jb:je))                                                1806
-      xm(k)=dot_product(sc(1:jn),x(jb:je))                                 1807
-14331 continue                                                             1808
-      r(jx(jb:je))=r(jx(jb:je))-d*v(jx(jb:je))*x(jb:je)/xs(k)              1809
-      o=o+d*(xb(k)/xs(k))                                                  1810
-      svr=svr-d*(xm(k)-xb(k)*xm(0))/xs(k)                                  1811
-14281 continue                                                             1812
-14282 continue                                                             1812
-      if(nin.gt.nx)goto 14272                                              1813
-      d=svr/xm(0)                                                          1814
-      if(d .eq. 0.0)goto 14351                                             1814
-      b(0)=b(0)+d                                                          1814
-      dlx=max(dlx,xm(0)*d**2)                                              1814
-      r=r-d*v                                                              1814
-14351 continue                                                             1815
-      svr=svr-d*xm(0)                                                      1815
-      if(dlx.lt.shr)goto 14272                                             1816
-      if(nlp .le. maxit)goto 14371                                         1816
-      jerr=-ilm                                                            1816
-      return                                                               1816
-14371 continue                                                             1817
-14380 continue                                                             1817
-14381 continue                                                             1817
-      nlp=nlp+1                                                            1817
-      dlx=0.0                                                              1818
-14390 do 14391 l=1,nin                                                     1818
-      k=m(l)                                                               1818
-      jb=ix(k)                                                             1818
-      je=ix(k+1)-1                                                         1819
-      jn=ix(k+1)-ix(k)                                                     1819
-      bk=b(k)                                                              1820
-      sc(1:jn)=r(jx(jb:je))+v(jx(jb:je))*o                                 1821
-      gk=dot_product(sc(1:jn),x(jb:je))                                    1822
-      gk=(gk-svr*xb(k))/xs(k)                                              1823
-      u=gk+xv(k)*b(k)                                                      1823
-      au=abs(u)-vp(k)*al1                                                  1824
-      if(au .gt. 0.0)goto 14411                                            1824
-      b(k)=0.0                                                             1824
-      goto 14421                                                           1825
-14411 continue                                                             1825
-      b(k)=sign(au,u)/(xv(k)+vp(k)*al2)                                    1825
+      b(k)=sign(au,u)/(xv(k)+vp(k)*al2)                                    1803
+14321 continue                                                             1804
+14301 continue                                                             1804
+      d=b(k)-bk                                                            1804
+      if(abs(d).le.0.0)goto 14291                                          1804
+      dlx=max(dlx,xv(k)*d**2)                                              1805
+      if(mm(k) .ne. 0)goto 14341                                           1805
+      nin=nin+1                                                            1805
+      if(nin.gt.nx)goto 14292                                              1806
+      mm(k)=nin                                                            1806
+      m(nin)=k                                                             1806
+      sc(1:jn)=v(jx(jb:je))                                                1807
+      xm(k)=dot_product(sc(1:jn),x(jb:je))                                 1808
+14341 continue                                                             1809
+      r(jx(jb:je))=r(jx(jb:je))-d*v(jx(jb:je))*x(jb:je)/xs(k)              1810
+      o=o+d*(xb(k)/xs(k))                                                  1811
+      svr=svr-d*(xm(k)-xb(k)*xm(0))/xs(k)                                  1812
+14291 continue                                                             1813
+14292 continue                                                             1813
+      if(nin.gt.nx)goto 14282                                              1814
+      d=svr/xm(0)                                                          1815
+      if(d .eq. 0.0)goto 14361                                             1815
+      b(0)=b(0)+d                                                          1815
+      dlx=max(dlx,xm(0)*d**2)                                              1815
+      r=r-d*v                                                              1815
+14361 continue                                                             1816
+      svr=svr-d*xm(0)                                                      1816
+      if(dlx.lt.shr)goto 14282                                             1817
+      if(nlp .le. maxit)goto 14381                                         1817
+      jerr=-ilm                                                            1817
+      return                                                               1817
+14381 continue                                                             1818
+14390 continue                                                             1818
+14391 continue                                                             1818
+      nlp=nlp+1                                                            1818
+      dlx=0.0                                                              1819
+14400 do 14401 l=1,nin                                                     1819
+      k=m(l)                                                               1819
+      jb=ix(k)                                                             1819
+      je=ix(k+1)-1                                                         1820
+      jn=ix(k+1)-ix(k)                                                     1820
+      bk=b(k)                                                              1821
+      sc(1:jn)=r(jx(jb:je))+v(jx(jb:je))*o                                 1822
+      gk=dot_product(sc(1:jn),x(jb:je))                                    1823
+      gk=(gk-svr*xb(k))/xs(k)                                              1824
+      u=gk+xv(k)*b(k)                                                      1824
+      au=abs(u)-vp(k)*al1                                                  1825
+      if(au .gt. 0.0)goto 14421                                            1825
+      b(k)=0.0                                                             1825
+      goto 14431                                                           1826
 14421 continue                                                             1826
-14401 continue                                                             1826
-      d=b(k)-bk                                                            1826
-      if(abs(d).le.0.0)goto 14391                                          1826
-      dlx=max(dlx,xv(k)*d**2)                                              1827
-      r(jx(jb:je))=r(jx(jb:je))-d*v(jx(jb:je))*x(jb:je)/xs(k)              1828
-      o=o+d*(xb(k)/xs(k))                                                  1829
-      svr=svr-d*(xm(k)-xb(k)*xm(0))/xs(k)                                  1830
-14391 continue                                                             1831
-14392 continue                                                             1831
-      d=svr/xm(0)                                                          1832
-      if(d .eq. 0.0)goto 14441                                             1832
-      b(0)=b(0)+d                                                          1832
-      dlx=max(dlx,xm(0)*d**2)                                              1832
-      r=r-d*v                                                              1832
-14441 continue                                                             1833
-      svr=svr-d*xm(0)                                                      1833
-      if(dlx.lt.shr)goto 14382                                             1834
-      if(nlp .le. maxit)goto 14461                                         1834
-      jerr=-ilm                                                            1834
-      return                                                               1834
-14461 continue                                                             1835
-      goto 14381                                                           1836
-14382 continue                                                             1836
-      goto 14271                                                           1837
-14272 continue                                                             1837
-      if(nin.gt.nx)goto 14232                                              1838
-      sc=b(0)                                                              1838
-      b0=0.0                                                               1839
-14470 do 14471 j=1,nin                                                     1839
-      l=m(j)                                                               1839
-      jb=ix(l)                                                             1839
-      je=ix(l+1)-1                                                         1840
-      sc(jx(jb:je))=sc(jx(jb:je))+b(l)*x(jb:je)/xs(l)                      1841
-      b0=b0-b(l)*xb(l)/xs(l)                                               1842
-14471 continue                                                             1843
-14472 continue                                                             1843
-      sc=sc+b0                                                             1844
-14480 do 14481 i=1,no                                                      1844
-      fi=sc(i)+g(i)                                                        1845
-      if(fi .ge. fmin)goto 14501                                           1845
-      q(i)=0.0                                                             1845
-      goto 14491                                                           1845
-14501 if(fi .le. fmax)goto 14511                                           1845
-      q(i)=1.0                                                             1845
-      goto 14521                                                           1846
-14511 continue                                                             1846
-      q(i)=1.0/(1.0+exp(-fi))                                              1846
+      b(k)=sign(au,u)/(xv(k)+vp(k)*al2)                                    1826
+14431 continue                                                             1827
+14411 continue                                                             1827
+      d=b(k)-bk                                                            1827
+      if(abs(d).le.0.0)goto 14401                                          1827
+      dlx=max(dlx,xv(k)*d**2)                                              1828
+      r(jx(jb:je))=r(jx(jb:je))-d*v(jx(jb:je))*x(jb:je)/xs(k)              1829
+      o=o+d*(xb(k)/xs(k))                                                  1830
+      svr=svr-d*(xm(k)-xb(k)*xm(0))/xs(k)                                  1831
+14401 continue                                                             1832
+14402 continue                                                             1832
+      d=svr/xm(0)                                                          1833
+      if(d .eq. 0.0)goto 14451                                             1833
+      b(0)=b(0)+d                                                          1833
+      dlx=max(dlx,xm(0)*d**2)                                              1833
+      r=r-d*v                                                              1833
+14451 continue                                                             1834
+      svr=svr-d*xm(0)                                                      1834
+      if(dlx.lt.shr)goto 14392                                             1835
+      if(nlp .le. maxit)goto 14471                                         1835
+      jerr=-ilm                                                            1835
+      return                                                               1835
+14471 continue                                                             1836
+      goto 14391                                                           1837
+14392 continue                                                             1837
+      goto 14281                                                           1838
+14282 continue                                                             1838
+      if(nin.gt.nx)goto 14242                                              1839
+      sc=b(0)                                                              1839
+      b0=0.0                                                               1840
+14480 do 14481 j=1,nin                                                     1840
+      l=m(j)                                                               1840
+      jb=ix(l)                                                             1840
+      je=ix(l+1)-1                                                         1841
+      sc(jx(jb:je))=sc(jx(jb:je))+b(l)*x(jb:je)/xs(l)                      1842
+      b0=b0-b(l)*xb(l)/xs(l)                                               1843
+14481 continue                                                             1844
+14482 continue                                                             1844
+      sc=sc+b0                                                             1845
+14490 do 14491 i=1,no                                                      1845
+      fi=sc(i)+g(i)                                                        1846
+      if(fi .ge. fmin)goto 14511                                           1846
+      q(i)=0.0                                                             1846
+      goto 14501                                                           1846
+14511 if(fi .le. fmax)goto 14521                                           1846
+      q(i)=1.0                                                             1846
+      goto 14531                                                           1847
 14521 continue                                                             1847
-14491 continue                                                             1847
-14481 continue                                                             1848
-14482 continue                                                             1848
-      v=w*q*(1.0-q)                                                        1848
-      xm(0)=sum(v)                                                         1848
-      if(xm(0).lt.vmin)goto 14232                                          1849
-      r=w*(y-q)                                                            1849
-      svr=sum(r)                                                           1849
-      o=0.0                                                                1850
-      if(xm(0)*(b(0)-bs(0))**2 .ge. shr)goto 14541                         1850
-      kx=0                                                                 1851
-14550 do 14551 j=1,nin                                                     1851
-      k=m(j)                                                               1852
-      if(xv(k)*(b(k)-bs(k))**2.lt.shr)goto 14551                           1852
-      kx=1                                                                 1852
-      goto 14552                                                           1853
-14551 continue                                                             1854
-14552 continue                                                             1854
-      if(kx .ne. 0)goto 14571                                              1855
-14580 do 14581 j=1,ni                                                      1855
-      if(ixx(j).eq.1)goto 14581                                            1855
-      if(ju(j).eq.0)goto 14581                                             1856
-      jb=ix(j)                                                             1856
-      je=ix(j+1)-1                                                         1856
-      jn=ix(j+1)-ix(j)                                                     1857
-      sc(1:jn)=r(jx(jb:je))+v(jx(jb:je))*o                                 1858
-      gj=dot_product(sc(1:jn),x(jb:je))                                    1859
-      ga(j)=abs((gj-svr*xb(j))/xs(j))                                      1860
-      if(ga(j) .le. al1*vp(j))goto 14601                                   1860
-      ixx(j)=1                                                             1860
-      kx=1                                                                 1860
-14601 continue                                                             1861
-14581 continue                                                             1862
-14582 continue                                                             1862
-      if(kx.eq.1) go to 10680                                              1863
-      goto 14232                                                           1864
-14571 continue                                                             1865
-14541 continue                                                             1866
-      goto 14231                                                           1867
-14232 continue                                                             1867
-      if(nin .le. nx)goto 14621                                            1867
-      jerr=-10000-ilm                                                      1867
-      goto 14152                                                           1867
-14621 continue                                                             1868
-      if(nin.gt.0) a(1:nin,ilm)=b(m(1:nin))                                1868
-      kin(ilm)=nin                                                         1869
-      a0(ilm)=b(0)                                                         1869
-      alm(ilm)=al                                                          1869
-      lmu=ilm                                                              1870
-      devi=dev2(no,w,y,q,pmin)                                             1871
-      dev(ilm)=(dev1-devi)/dev0                                            1872
-      if(ilm.lt.mnl)goto 14151                                             1872
-      if(flmin.ge.1.0)goto 14151                                           1873
-      me=0                                                                 1873
-14630 do 14631 j=1,nin                                                     1873
-      if(a(j,ilm).ne.0.0) me=me+1                                          1873
-14631 continue                                                             1873
-14632 continue                                                             1873
-      if(me.gt.ne)goto 14152                                               1874
-      if(dev(ilm).gt.devmax)goto 14152                                     1874
-      if(dev(ilm)-dev(ilm-1).lt.sml)goto 14152                             1875
-      if(xm(0).lt.vmin)goto 14152                                          1876
-14151 continue                                                             1877
-14152 continue                                                             1877
-      g=log(q/(1.0-q))                                                     1878
-      deallocate(xm,b,bs,v,r,sc,xv,q,mm,ga,ixx)                            1879
-      return                                                               1880
-      end                                                                  1881
-      subroutine sprlognetn(parm,no,ni,nc,x,ix,jx,y,g,w,ju,vp,ne,nx,nlam   1883 
+      q(i)=1.0/(1.0+exp(-fi))                                              1847
+14531 continue                                                             1848
+14501 continue                                                             1848
+14491 continue                                                             1849
+14492 continue                                                             1849
+      v=w*q*(1.0-q)                                                        1849
+      xm(0)=sum(v)                                                         1849
+      if(xm(0).lt.vmin)goto 14242                                          1850
+      r=w*(y-q)                                                            1850
+      svr=sum(r)                                                           1850
+      o=0.0                                                                1851
+      if(xm(0)*(b(0)-bs(0))**2 .ge. shr)goto 14551                         1851
+      kx=0                                                                 1852
+14560 do 14561 j=1,nin                                                     1852
+      k=m(j)                                                               1853
+      if(xv(k)*(b(k)-bs(k))**2.lt.shr)goto 14561                           1853
+      kx=1                                                                 1853
+      goto 14562                                                           1854
+14561 continue                                                             1855
+14562 continue                                                             1855
+      if(kx .ne. 0)goto 14581                                              1856
+14590 do 14591 j=1,ni                                                      1856
+      if(ixx(j).eq.1)goto 14591                                            1856
+      if(ju(j).eq.0)goto 14591                                             1857
+      jb=ix(j)                                                             1857
+      je=ix(j+1)-1                                                         1857
+      jn=ix(j+1)-ix(j)                                                     1858
+      sc(1:jn)=r(jx(jb:je))+v(jx(jb:je))*o                                 1859
+      gj=dot_product(sc(1:jn),x(jb:je))                                    1860
+      ga(j)=abs((gj-svr*xb(j))/xs(j))                                      1861
+      if(ga(j) .le. al1*vp(j))goto 14611                                   1861
+      ixx(j)=1                                                             1861
+      kx=1                                                                 1861
+14611 continue                                                             1862
+14591 continue                                                             1863
+14592 continue                                                             1863
+      if(kx.eq.1) go to 10680                                              1864
+      goto 14242                                                           1865
+14581 continue                                                             1866
+14551 continue                                                             1867
+      goto 14241                                                           1868
+14242 continue                                                             1868
+      if(nin .le. nx)goto 14631                                            1868
+      jerr=-10000-ilm                                                      1868
+      goto 14162                                                           1868
+14631 continue                                                             1869
+      if(nin.gt.0) a(1:nin,ilm)=b(m(1:nin))                                1869
+      kin(ilm)=nin                                                         1870
+      a0(ilm)=b(0)                                                         1870
+      alm(ilm)=al                                                          1870
+      lmu=ilm                                                              1871
+      devi=dev2(no,w,y,q,pmin)                                             1872
+      dev(ilm)=(dev1-devi)/dev0                                            1873
+      if(ilm.lt.mnl)goto 14161                                             1873
+      if(flmin.ge.1.0)goto 14161                                           1874
+      me=0                                                                 1874
+14640 do 14641 j=1,nin                                                     1874
+      if(a(j,ilm).ne.0.0) me=me+1                                          1874
+14641 continue                                                             1874
+14642 continue                                                             1874
+      if(me.gt.ne)goto 14162                                               1875
+      if(dev(ilm).gt.devmax)goto 14162                                     1875
+      if(dev(ilm)-dev(ilm-1).lt.sml)goto 14162                             1876
+      if(xm(0).lt.vmin)goto 14162                                          1877
+14161 continue                                                             1878
+14162 continue                                                             1878
+      g=log(q/(1.0-q))                                                     1879
+      deallocate(xm,b,bs,v,r,sc,xv,q,mm,ga,ixx)                            1880
+      return                                                               1881
+      end                                                                  1882
+      subroutine sprlognetn(parm,no,ni,nc,x,ix,jx,y,g,w,ju,vp,ne,nx,nlam   1884 
      *,flmin,ulam,  shri,isd,maxit,kopt,xb,xs,lmu,a0,a,m,kin,dev0,dev,al
      *m,nlp,jerr)
-      parameter(sml=1.0e-5, eps=1.0e-6, pmin=1.0e-5,  big=9.9e30, mnlam=   1885 
+      parameter(sml=1.0e-5, eps=1.0e-6, pmin=1.0e-5,  big=9.9e30, mnlam=   1886 
      *5, devmax=0.999, exmx=250.0, exmn=-exmx)
-      real x(*),y(no,nc),g(no,nc),w(no),vp(ni),ulam(nlam),xb(ni),xs(ni)    1886
-      real a(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam)                   1887
-      integer ix(*),jx(*),ju(ni),m(nx),kin(nlam)                           1888
-      double precision, dimension (:,:), allocatable :: q                       
-      double precision, dimension (:), allocatable :: sxp,sxpl                  
+      real x(*),y(no,nc),g(no,nc),w(no),vp(ni),ulam(nlam),xb(ni),xs(ni)    1887
+      real a(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam)                   1888
+      integer ix(*),jx(*),ju(ni),m(nx),kin(nlam)                           1889
+      real, dimension (:,:), allocatable :: q                                   
+      real, dimension (:), allocatable :: sxp,sxpl                              
       real, dimension (:), allocatable :: sc,xm,v,r,ga                          
       real, dimension (:,:), allocatable :: b,bs,xv                             
       integer, dimension (:), allocatable :: mm,is,iy                           
@@ -3108,1776 +3114,1781 @@ c
       allocate(xv(1:ni,1:nc),stat=ierr); jerr=jerr+ierr                         
       allocate(bs(0:ni,1:nc),stat=ierr); jerr=jerr+ierr                         
       allocate(q(1:no,1:nc),stat=ierr); jerr=jerr+ierr                          
-      allocate(xm(0:ni),stat=ierr)                                         1899
-      jerr=jerr+ierr                                                       1900
-      allocate(r(1:no),stat=ierr)                                          1900
+      allocate(xm(0:ni),stat=ierr)                                         1900
       jerr=jerr+ierr                                                       1901
-      allocate(v(1:no),stat=ierr)                                          1901
+      allocate(r(1:no),stat=ierr)                                          1901
       jerr=jerr+ierr                                                       1902
-      allocate(mm(1:ni),stat=ierr)                                         1902
+      allocate(v(1:no),stat=ierr)                                          1902
       jerr=jerr+ierr                                                       1903
-      allocate(ga(1:ni),stat=ierr)                                         1903
+      allocate(mm(1:ni),stat=ierr)                                         1903
       jerr=jerr+ierr                                                       1904
-      allocate(iy(1:ni),stat=ierr)                                         1904
+      allocate(ga(1:ni),stat=ierr)                                         1904
       jerr=jerr+ierr                                                       1905
-      allocate(is(1:max(nc,ni)),stat=ierr)                                 1905
+      allocate(iy(1:ni),stat=ierr)                                         1905
       jerr=jerr+ierr                                                       1906
-      allocate(sxp(1:no),stat=ierr)                                        1906
+      allocate(is(1:max(nc,ni)),stat=ierr)                                 1906
       jerr=jerr+ierr                                                       1907
-      allocate(sxpl(1:no),stat=ierr)                                       1907
+      allocate(sxp(1:no),stat=ierr)                                        1907
       jerr=jerr+ierr                                                       1908
-      allocate(sc(1:no),stat=ierr)                                         1908
+      allocate(sxpl(1:no),stat=ierr)                                       1908
       jerr=jerr+ierr                                                       1909
-      if(jerr.ne.0) return                                                 1910
-      pmax=1.0-pmin                                                        1910
-      emin=pmin/pmax                                                       1910
-      emax=1.0/emin                                                        1911
-      pfm=(1.0+pmin)*pmin                                                  1911
-      pfx=(1.0-pmin)*pmax                                                  1911
-      vmin=pfm*pmax                                                        1912
-      bta=parm                                                             1912
-      omb=1.0-bta                                                          1912
-      dev1=0.0                                                             1912
-      dev0=0.0                                                             1913
-14640 do 14641 ic=1,nc                                                     1913
-      q0=dot_product(w,y(:,ic))                                            1914
-      if(q0 .gt. pmin)goto 14661                                           1914
-      jerr =8000+ic                                                        1914
-      return                                                               1914
-14661 continue                                                             1915
-      if(q0 .lt. 1.0-pmin)goto 14681                                       1915
-      jerr =9000+ic                                                        1915
+      allocate(sc(1:no),stat=ierr)                                         1909
+      jerr=jerr+ierr                                                       1910
+      if(jerr.ne.0) return                                                 1911
+      pmax=1.0-pmin                                                        1911
+      emin=pmin/pmax                                                       1911
+      emax=1.0/emin                                                        1912
+      pfm=(1.0+pmin)*pmin                                                  1912
+      pfx=(1.0-pmin)*pmax                                                  1912
+      vmin=pfm*pmax                                                        1913
+      bta=parm                                                             1913
+      omb=1.0-bta                                                          1913
+      dev1=0.0                                                             1913
+      dev0=0.0                                                             1914
+14650 do 14651 ic=1,nc                                                     1914
+      q0=dot_product(w,y(:,ic))                                            1915
+      if(q0 .gt. pmin)goto 14671                                           1915
+      jerr =8000+ic                                                        1915
       return                                                               1915
-14681 continue                                                             1916
-      b(1:ni,ic)=0.0                                                       1916
-      b(0,ic)=log(q0)                                                      1916
-      dev1=dev1-q0*b(0,ic)                                                 1917
-14641 continue                                                             1918
-14642 continue                                                             1918
-      iy=0                                                                 1918
-      al=0.0                                                               1919
-      if(nonzero(no*nc,g) .ne. 0)goto 14701                                1920
-      b(0,:)=b(0,:)-sum(b(0,:))/nc                                         1920
-      sxp=0.0                                                              1921
-14710 do 14711 ic=1,nc                                                     1921
-      q(:,ic)=exp(b(0,ic))                                                 1921
-      sxp=sxp+q(:,ic)                                                      1921
-14711 continue                                                             1922
-14712 continue                                                             1922
-      goto 14721                                                           1923
-14701 continue                                                             1923
-14730 do 14731 i=1,no                                                      1923
-      g(i,:)=g(i,:)-sum(g(i,:))/nc                                         1923
-14731 continue                                                             1923
-14732 continue                                                             1923
-      sxp=0.0                                                              1924
-      call kazero(nc,no,y,g,w,b(0,:),jerr)                                 1924
-      if(jerr.ne.0) return                                                 1925
-      dev1=0.0                                                             1926
-14740 do 14741 ic=1,nc                                                     1926
-      q(:,ic)=b(0,ic)+g(:,ic)                                              1927
-      dev1=dev1-dot_product(w,y(:,ic)*q(:,ic))                             1928
-      q(:,ic)=exp(q(:,ic))                                                 1928
-      sxp=sxp+q(:,ic)                                                      1929
-14741 continue                                                             1930
-14742 continue                                                             1930
-      sxpl=w*log(sxp)                                                      1930
-14750 do 14751 ic=1,nc                                                     1930
-      dev1=dev1+dot_product(y(:,ic),sxpl)                                  1930
+14671 continue                                                             1916
+      if(q0 .lt. 1.0-pmin)goto 14691                                       1916
+      jerr =9000+ic                                                        1916
+      return                                                               1916
+14691 continue                                                             1917
+      b(1:ni,ic)=0.0                                                       1917
+      b(0,ic)=log(q0)                                                      1917
+      dev1=dev1-q0*b(0,ic)                                                 1918
+14651 continue                                                             1919
+14652 continue                                                             1919
+      iy=0                                                                 1919
+      al=0.0                                                               1920
+      if(nonzero(no*nc,g) .ne. 0)goto 14711                                1921
+      b(0,:)=b(0,:)-sum(b(0,:))/nc                                         1921
+      sxp=0.0                                                              1922
+14720 do 14721 ic=1,nc                                                     1922
+      q(:,ic)=exp(b(0,ic))                                                 1922
+      sxp=sxp+q(:,ic)                                                      1922
+14721 continue                                                             1923
+14722 continue                                                             1923
+      goto 14731                                                           1924
+14711 continue                                                             1924
+14740 do 14741 i=1,no                                                      1924
+      g(i,:)=g(i,:)-sum(g(i,:))/nc                                         1924
+14741 continue                                                             1924
+14742 continue                                                             1924
+      sxp=0.0                                                              1925
+      call kazero(nc,no,y,g,w,b(0,:),jerr)                                 1925
+      if(jerr.ne.0) return                                                 1926
+      dev1=0.0                                                             1927
+14750 do 14751 ic=1,nc                                                     1927
+      q(:,ic)=b(0,ic)+g(:,ic)                                              1928
+      dev1=dev1-dot_product(w,y(:,ic)*q(:,ic))                             1929
+      q(:,ic)=exp(q(:,ic))                                                 1929
+      sxp=sxp+q(:,ic)                                                      1930
 14751 continue                                                             1931
 14752 continue                                                             1931
-14721 continue                                                             1932
-14691 continue                                                             1932
-14760 do 14761 ic=1,nc                                                     1932
-14770 do 14771 i=1,no                                                      1932
-      if(y(i,ic).gt.0.0) dev0=dev0+w(i)*y(i,ic)*log(y(i,ic))               1932
-14771 continue                                                             1932
-14772 continue                                                             1932
-14761 continue                                                             1933
-14762 continue                                                             1933
-      dev0=dev0+dev1                                                       1934
-      if(kopt .le. 0)goto 14791                                            1935
-      if(isd .le. 0)goto 14811                                             1935
-      xv=0.25                                                              1935
-      goto 14821                                                           1936
-14811 continue                                                             1937
-14830 do 14831 j=1,ni                                                      1937
-      if(ju(j).eq.0)goto 14831                                             1937
-      jb=ix(j)                                                             1937
-      je=ix(j+1)-1                                                         1938
-      xv(j,:)=0.25*(dot_product(w(jx(jb:je)),x(jb:je)**2)-xb(j)**2)        1939
-14831 continue                                                             1940
-14832 continue                                                             1940
-14821 continue                                                             1941
-14801 continue                                                             1941
-14791 continue                                                             1942
-      if(flmin .ge. 1.0)goto 14851                                         1942
-      eqs=max(eps,flmin)                                                   1942
-      alf=eqs**(1.0/(nlam-1))                                              1942
-14851 continue                                                             1943
-      m=0                                                                  1943
-      mm=0                                                                 1943
-      nin=0                                                                1943
-      nlp=0                                                                1943
-      mnl=min(mnlam,nlam)                                                  1943
-      bs=0.0                                                               1943
-      svr=0.0                                                              1943
-      o=0.0                                                                1944
-      shr=shri*dev0                                                        1944
-      ga=0.0                                                               1945
-14860 do 14861 ic=1,nc                                                     1945
-      v=q(:,ic)/sxp                                                        1945
-      r=w*(y(:,ic)-v)                                                      1945
-      v=w*v*(1.0-v)                                                        1946
-14870 do 14871 j=1,ni                                                      1946
-      if(ju(j).eq.0)goto 14871                                             1947
-      jb=ix(j)                                                             1947
-      je=ix(j+1)-1                                                         1947
-      jn=ix(j+1)-ix(j)                                                     1948
-      sc(1:jn)=r(jx(jb:je))+o*v(jx(jb:je))                                 1949
-      gj=dot_product(sc(1:jn),x(jb:je))                                    1950
-      ga(j)=max(ga(j),abs(gj-svr*xb(j))/xs(j))                             1951
-14871 continue                                                             1952
-14872 continue                                                             1952
-14861 continue                                                             1953
-14862 continue                                                             1953
-14880 do 14881 ilm=1,nlam                                                  1953
-      al0=al                                                               1954
-      if(flmin .lt. 1.0)goto 14901                                         1954
-      al=ulam(ilm)                                                         1954
-      goto 14891                                                           1955
-14901 if(ilm .le. 2)goto 14911                                             1955
-      al=al*alf                                                            1955
-      goto 14891                                                           1956
-14911 if(ilm .ne. 1)goto 14921                                             1956
-      al=big                                                               1956
-      goto 14931                                                           1957
-14921 continue                                                             1957
-      al0=0.0                                                              1958
-14940 do 14941 j=1,ni                                                      1958
-      if(ju(j).eq.0)goto 14941                                             1958
-      if(vp(j).gt.0.0) al0=max(al0,ga(j)/vp(j))                            1958
-14941 continue                                                             1959
-14942 continue                                                             1959
-      al0=al0/max(bta,1.0e-3)                                              1959
-      al=alf*al0                                                           1960
-14931 continue                                                             1961
-14891 continue                                                             1961
-      al2=al*omb                                                           1961
-      al1=al*bta                                                           1961
-      tlam=bta*(2.0*al-al0)                                                1962
-14950 do 14951 k=1,ni                                                      1962
-      if(iy(k).eq.1)goto 14951                                             1962
-      if(ju(k).eq.0)goto 14951                                             1963
-      if(ga(k).gt.tlam*vp(k)) iy(k)=1                                      1964
-14951 continue                                                             1965
-14952 continue                                                             1965
-10680 continue                                                             1966
-14960 continue                                                             1966
+      sxpl=w*log(sxp)                                                      1931
+14760 do 14761 ic=1,nc                                                     1931
+      dev1=dev1+dot_product(y(:,ic),sxpl)                                  1931
+14761 continue                                                             1932
+14762 continue                                                             1932
+14731 continue                                                             1933
+14701 continue                                                             1933
+14770 do 14771 ic=1,nc                                                     1933
+14780 do 14781 i=1,no                                                      1933
+      if(y(i,ic).gt.0.0) dev0=dev0+w(i)*y(i,ic)*log(y(i,ic))               1933
+14781 continue                                                             1933
+14782 continue                                                             1933
+14771 continue                                                             1934
+14772 continue                                                             1934
+      dev0=dev0+dev1                                                       1935
+      if(kopt .le. 0)goto 14801                                            1936
+      if(isd .le. 0)goto 14821                                             1936
+      xv=0.25                                                              1936
+      goto 14831                                                           1937
+14821 continue                                                             1938
+14840 do 14841 j=1,ni                                                      1938
+      if(ju(j).eq.0)goto 14841                                             1938
+      jb=ix(j)                                                             1938
+      je=ix(j+1)-1                                                         1939
+      xv(j,:)=0.25*(dot_product(w(jx(jb:je)),x(jb:je)**2)-xb(j)**2)        1940
+14841 continue                                                             1941
+14842 continue                                                             1941
+14831 continue                                                             1942
+14811 continue                                                             1942
+14801 continue                                                             1943
+      if(flmin .ge. 1.0)goto 14861                                         1943
+      eqs=max(eps,flmin)                                                   1943
+      alf=eqs**(1.0/(nlam-1))                                              1943
+14861 continue                                                             1944
+      m=0                                                                  1944
+      mm=0                                                                 1944
+      nin=0                                                                1944
+      nlp=0                                                                1944
+      mnl=min(mnlam,nlam)                                                  1944
+      bs=0.0                                                               1944
+      svr=0.0                                                              1944
+      o=0.0                                                                1945
+      shr=shri*dev0                                                        1945
+      ga=0.0                                                               1946
+14870 do 14871 ic=1,nc                                                     1946
+      v=q(:,ic)/sxp                                                        1946
+      r=w*(y(:,ic)-v)                                                      1946
+      v=w*v*(1.0-v)                                                        1947
+14880 do 14881 j=1,ni                                                      1947
+      if(ju(j).eq.0)goto 14881                                             1948
+      jb=ix(j)                                                             1948
+      je=ix(j+1)-1                                                         1948
+      jn=ix(j+1)-ix(j)                                                     1949
+      sc(1:jn)=r(jx(jb:je))+o*v(jx(jb:je))                                 1950
+      gj=dot_product(sc(1:jn),x(jb:je))                                    1951
+      ga(j)=max(ga(j),abs(gj-svr*xb(j))/xs(j))                             1952
+14881 continue                                                             1953
+14882 continue                                                             1953
+14871 continue                                                             1954
+14872 continue                                                             1954
+14890 do 14891 ilm=1,nlam                                                  1954
+      al0=al                                                               1955
+      if(flmin .lt. 1.0)goto 14911                                         1955
+      al=ulam(ilm)                                                         1955
+      goto 14901                                                           1956
+14911 if(ilm .le. 2)goto 14921                                             1956
+      al=al*alf                                                            1956
+      goto 14901                                                           1957
+14921 if(ilm .ne. 1)goto 14931                                             1957
+      al=big                                                               1957
+      goto 14941                                                           1958
+14931 continue                                                             1958
+      al0=0.0                                                              1959
+14950 do 14951 j=1,ni                                                      1959
+      if(ju(j).eq.0)goto 14951                                             1959
+      if(vp(j).gt.0.0) al0=max(al0,ga(j)/vp(j))                            1959
+14951 continue                                                             1960
+14952 continue                                                             1960
+      al0=al0/max(bta,1.0e-3)                                              1960
+      al=alf*al0                                                           1961
+14941 continue                                                             1962
+14901 continue                                                             1962
+      al2=al*omb                                                           1962
+      al1=al*bta                                                           1962
+      tlam=bta*(2.0*al-al0)                                                1963
+14960 do 14961 k=1,ni                                                      1963
+      if(iy(k).eq.1)goto 14961                                             1963
+      if(ju(k).eq.0)goto 14961                                             1964
+      if(ga(k).gt.tlam*vp(k)) iy(k)=1                                      1965
 14961 continue                                                             1966
-      ixx=0                                                                1966
-      jxx=ixx                                                              1966
-      ig=0                                                                 1967
-14970 do 14971 ic=1,nc                                                     1967
-      bs(0,ic)=b(0,ic)                                                     1968
-      if(nin.gt.0) bs(m(1:nin),ic)=b(m(1:nin),ic)                          1969
-      xm(0)=0.0                                                            1969
-      svr=0.0                                                              1969
-      o=0.0                                                                1970
-14980 do 14981 i=1,no                                                      1970
-      pic=q(i,ic)/sxp(i)                                                   1971
-      if(pic .ge. pfm)goto 15001                                           1971
-      pic=0.0                                                              1971
-      v(i)=0.0                                                             1971
-      goto 14991                                                           1972
-15001 if(pic .le. pfx)goto 15011                                           1972
-      pic=1.0                                                              1972
+14962 continue                                                             1966
+10680 continue                                                             1967
+14970 continue                                                             1967
+14971 continue                                                             1967
+      ixx=0                                                                1967
+      jxx=ixx                                                              1967
+      ig=0                                                                 1968
+14980 do 14981 ic=1,nc                                                     1968
+      bs(0,ic)=b(0,ic)                                                     1969
+      if(nin.gt.0) bs(m(1:nin),ic)=b(m(1:nin),ic)                          1970
+      xm(0)=0.0                                                            1970
+      svr=0.0                                                              1970
+      o=0.0                                                                1971
+14990 do 14991 i=1,no                                                      1971
+      pic=q(i,ic)/sxp(i)                                                   1972
+      if(pic .ge. pfm)goto 15011                                           1972
+      pic=0.0                                                              1972
       v(i)=0.0                                                             1972
-      goto 15021                                                           1973
-15011 continue                                                             1973
-      v(i)=w(i)*pic*(1.0-pic)                                              1973
-      xm(0)=xm(0)+v(i)                                                     1973
+      goto 15001                                                           1973
+15011 if(pic .le. pfx)goto 15021                                           1973
+      pic=1.0                                                              1973
+      v(i)=0.0                                                             1973
+      goto 15031                                                           1974
 15021 continue                                                             1974
-14991 continue                                                             1974
-      r(i)=w(i)*(y(i,ic)-pic)                                              1974
-      svr=svr+r(i)                                                         1975
-14981 continue                                                             1976
-14982 continue                                                             1976
-      if(xm(0).le.vmin)goto 14971                                          1976
-      ig=1                                                                 1977
-15030 do 15031 j=1,ni                                                      1977
-      if(iy(j).eq.0)goto 15031                                             1978
-      jb=ix(j)                                                             1978
-      je=ix(j+1)-1                                                         1979
-      xm(j)=dot_product(v(jx(jb:je)),x(jb:je))                             1980
-      if(kopt .ne. 0)goto 15051                                            1981
-      xv(j,ic)=dot_product(v(jx(jb:je)),x(jb:je)**2)                       1982
-      xv(j,ic)=(xv(j,ic)-2.0*xb(j)*xm(j)+xm(0)*xb(j)**2)/xs(j)**2          1983
-15051 continue                                                             1984
-15031 continue                                                             1985
-15032 continue                                                             1985
-15060 continue                                                             1985
+      v(i)=w(i)*pic*(1.0-pic)                                              1974
+      xm(0)=xm(0)+v(i)                                                     1974
+15031 continue                                                             1975
+15001 continue                                                             1975
+      r(i)=w(i)*(y(i,ic)-pic)                                              1975
+      svr=svr+r(i)                                                         1976
+14991 continue                                                             1977
+14992 continue                                                             1977
+      if(xm(0).le.vmin)goto 14981                                          1977
+      ig=1                                                                 1978
+15040 do 15041 j=1,ni                                                      1978
+      if(iy(j).eq.0)goto 15041                                             1979
+      jb=ix(j)                                                             1979
+      je=ix(j+1)-1                                                         1980
+      xm(j)=dot_product(v(jx(jb:je)),x(jb:je))                             1981
+      if(kopt .ne. 0)goto 15061                                            1982
+      xv(j,ic)=dot_product(v(jx(jb:je)),x(jb:je)**2)                       1983
+      xv(j,ic)=(xv(j,ic)-2.0*xb(j)*xm(j)+xm(0)*xb(j)**2)/xs(j)**2          1984
 15061 continue                                                             1985
-      nlp=nlp+1                                                            1985
-      dlx=0.0                                                              1986
-15070 do 15071 k=1,ni                                                      1986
-      if(iy(k).eq.0)goto 15071                                             1987
-      jb=ix(k)                                                             1987
-      je=ix(k+1)-1                                                         1987
-      jn=ix(k+1)-ix(k)                                                     1987
-      bk=b(k,ic)                                                           1988
-      sc(1:jn)=r(jx(jb:je))+o*v(jx(jb:je))                                 1989
-      gk=dot_product(sc(1:jn),x(jb:je))                                    1990
-      gk=(gk-svr*xb(k))/xs(k)                                              1991
-      u=gk+xv(k,ic)*b(k,ic)                                                1991
-      au=abs(u)-vp(k)*al1                                                  1992
-      if(au .gt. 0.0)goto 15091                                            1992
-      b(k,ic)=0.0                                                          1992
-      goto 15101                                                           1993
-15091 continue                                                             1993
-      b(k,ic)=sign(au,u)/(xv(k,ic)+vp(k)*al2)                              1993
+15041 continue                                                             1986
+15042 continue                                                             1986
+15070 continue                                                             1986
+15071 continue                                                             1986
+      nlp=nlp+1                                                            1986
+      dlx=0.0                                                              1987
+15080 do 15081 k=1,ni                                                      1987
+      if(iy(k).eq.0)goto 15081                                             1988
+      jb=ix(k)                                                             1988
+      je=ix(k+1)-1                                                         1988
+      jn=ix(k+1)-ix(k)                                                     1988
+      bk=b(k,ic)                                                           1989
+      sc(1:jn)=r(jx(jb:je))+o*v(jx(jb:je))                                 1990
+      gk=dot_product(sc(1:jn),x(jb:je))                                    1991
+      gk=(gk-svr*xb(k))/xs(k)                                              1992
+      u=gk+xv(k,ic)*b(k,ic)                                                1992
+      au=abs(u)-vp(k)*al1                                                  1993
+      if(au .gt. 0.0)goto 15101                                            1993
+      b(k,ic)=0.0                                                          1993
+      goto 15111                                                           1994
 15101 continue                                                             1994
-15081 continue                                                             1994
-      d=b(k,ic)-bk                                                         1994
-      if(abs(d).le.0.0)goto 15071                                          1995
-      dlx=max(dlx,xv(k,ic)*d**2)                                           1996
-      if(mm(k) .ne. 0)goto 15121                                           1996
-      nin=nin+1                                                            1997
-      if(nin .le. nx)goto 15141                                            1997
-      jxx=1                                                                1997
-      goto 15072                                                           1997
-15141 continue                                                             1998
-      mm(k)=nin                                                            1998
-      m(nin)=k                                                             1999
-      xm(k)=dot_product(v(jx(jb:je)),x(jb:je))                             2000
-15121 continue                                                             2001
-      r(jx(jb:je))=r(jx(jb:je))-d*v(jx(jb:je))*x(jb:je)/xs(k)              2002
-      o=o+d*(xb(k)/xs(k))                                                  2003
-      svr=svr-d*(xm(k)-xb(k)*xm(0))/xs(k)                                  2004
-15071 continue                                                             2005
-15072 continue                                                             2005
-      if(jxx.gt.0)goto 15062                                               2006
-      d=svr/xm(0)                                                          2007
-      if(d .eq. 0.0)goto 15161                                             2007
-      b(0,ic)=b(0,ic)+d                                                    2007
-      dlx=max(dlx,xm(0)*d**2)                                              2008
-      r=r-d*v                                                              2008
-      svr=svr-d*xm(0)                                                      2009
-15161 continue                                                             2010
-      if(dlx.lt.shr)goto 15062                                             2010
-      if(nlp .le. maxit)goto 15181                                         2010
-      jerr=-ilm                                                            2010
-      return                                                               2010
-15181 continue                                                             2011
-15190 continue                                                             2011
-15191 continue                                                             2011
-      nlp=nlp+1                                                            2011
-      dlx=0.0                                                              2012
-15200 do 15201 l=1,nin                                                     2012
-      k=m(l)                                                               2012
-      jb=ix(k)                                                             2012
-      je=ix(k+1)-1                                                         2013
-      jn=ix(k+1)-ix(k)                                                     2013
-      bk=b(k,ic)                                                           2014
-      sc(1:jn)=r(jx(jb:je))+o*v(jx(jb:je))                                 2015
-      gk=dot_product(sc(1:jn),x(jb:je))                                    2016
-      gk=(gk-svr*xb(k))/xs(k)                                              2017
-      u=gk+xv(k,ic)*b(k,ic)                                                2017
-      au=abs(u)-vp(k)*al1                                                  2018
-      if(au .gt. 0.0)goto 15221                                            2018
-      b(k,ic)=0.0                                                          2018
-      goto 15231                                                           2019
-15221 continue                                                             2019
-      b(k,ic)=sign(au,u)/(xv(k,ic)+vp(k)*al2)                              2019
+      b(k,ic)=sign(au,u)/(xv(k,ic)+vp(k)*al2)                              1994
+15111 continue                                                             1995
+15091 continue                                                             1995
+      d=b(k,ic)-bk                                                         1995
+      if(abs(d).le.0.0)goto 15081                                          1996
+      dlx=max(dlx,xv(k,ic)*d**2)                                           1997
+      if(mm(k) .ne. 0)goto 15131                                           1997
+      nin=nin+1                                                            1998
+      if(nin .le. nx)goto 15151                                            1998
+      jxx=1                                                                1998
+      goto 15082                                                           1998
+15151 continue                                                             1999
+      mm(k)=nin                                                            1999
+      m(nin)=k                                                             2000
+      xm(k)=dot_product(v(jx(jb:je)),x(jb:je))                             2001
+15131 continue                                                             2002
+      r(jx(jb:je))=r(jx(jb:je))-d*v(jx(jb:je))*x(jb:je)/xs(k)              2003
+      o=o+d*(xb(k)/xs(k))                                                  2004
+      svr=svr-d*(xm(k)-xb(k)*xm(0))/xs(k)                                  2005
+15081 continue                                                             2006
+15082 continue                                                             2006
+      if(jxx.gt.0)goto 15072                                               2007
+      d=svr/xm(0)                                                          2008
+      if(d .eq. 0.0)goto 15171                                             2008
+      b(0,ic)=b(0,ic)+d                                                    2008
+      dlx=max(dlx,xm(0)*d**2)                                              2009
+      r=r-d*v                                                              2009
+      svr=svr-d*xm(0)                                                      2010
+15171 continue                                                             2011
+      if(dlx.lt.shr)goto 15072                                             2011
+      if(nlp .le. maxit)goto 15191                                         2011
+      jerr=-ilm                                                            2011
+      return                                                               2011
+15191 continue                                                             2012
+15200 continue                                                             2012
+15201 continue                                                             2012
+      nlp=nlp+1                                                            2012
+      dlx=0.0                                                              2013
+15210 do 15211 l=1,nin                                                     2013
+      k=m(l)                                                               2013
+      jb=ix(k)                                                             2013
+      je=ix(k+1)-1                                                         2014
+      jn=ix(k+1)-ix(k)                                                     2014
+      bk=b(k,ic)                                                           2015
+      sc(1:jn)=r(jx(jb:je))+o*v(jx(jb:je))                                 2016
+      gk=dot_product(sc(1:jn),x(jb:je))                                    2017
+      gk=(gk-svr*xb(k))/xs(k)                                              2018
+      u=gk+xv(k,ic)*b(k,ic)                                                2018
+      au=abs(u)-vp(k)*al1                                                  2019
+      if(au .gt. 0.0)goto 15231                                            2019
+      b(k,ic)=0.0                                                          2019
+      goto 15241                                                           2020
 15231 continue                                                             2020
-15211 continue                                                             2020
-      d=b(k,ic)-bk                                                         2020
-      if(abs(d).le.0.0)goto 15201                                          2021
-      dlx=max(dlx,xv(k,ic)*d**2)                                           2022
-      r(jx(jb:je))=r(jx(jb:je))-d*v(jx(jb:je))*x(jb:je)/xs(k)              2023
-      o=o+d*(xb(k)/xs(k))                                                  2024
-      svr=svr-d*(xm(k)-xb(k)*xm(0))/xs(k)                                  2025
-15201 continue                                                             2026
-15202 continue                                                             2026
-      d=svr/xm(0)                                                          2027
-      if(d .eq. 0.0)goto 15251                                             2027
-      b(0,ic)=b(0,ic)+d                                                    2027
-      dlx=max(dlx,xm(0)*d**2)                                              2028
-      r=r-d*v                                                              2028
-      svr=svr-d*xm(0)                                                      2029
-15251 continue                                                             2030
-      if(dlx.lt.shr)goto 15192                                             2030
-      if(nlp .le. maxit)goto 15271                                         2030
-      jerr=-ilm                                                            2030
-      return                                                               2030
-15271 continue                                                             2031
-      goto 15191                                                           2032
-15192 continue                                                             2032
-      goto 15061                                                           2033
-15062 continue                                                             2033
-      if(jxx.gt.0)goto 14972                                               2034
-      if(xm(0)*(b(0,ic)-bs(0,ic))**2.gt.shr) ixx=1                         2035
-      if(ixx .ne. 0)goto 15291                                             2036
-15300 do 15301 j=1,nin                                                     2036
-      k=m(j)                                                               2037
-      if(xv(k,ic)*(b(k,ic)-bs(k,ic))**2 .le. shr)goto 15321                2037
-      ixx=1                                                                2037
-      goto 15302                                                           2037
-15321 continue                                                             2038
-15301 continue                                                             2039
-15302 continue                                                             2039
-15291 continue                                                             2040
-      sc=b(0,ic)+g(:,ic)                                                   2040
-      b0=0.0                                                               2041
-15330 do 15331 j=1,nin                                                     2041
-      l=m(j)                                                               2041
-      jb=ix(l)                                                             2041
-      je=ix(l+1)-1                                                         2042
-      sc(jx(jb:je))=sc(jx(jb:je))+b(l,ic)*x(jb:je)/xs(l)                   2043
-      b0=b0-b(l,ic)*xb(l)/xs(l)                                            2044
-15331 continue                                                             2045
-15332 continue                                                             2045
-      sc=min(max(exmn,sc+b0),exmx)                                         2046
-      sxp=sxp-q(:,ic)                                                      2047
-      q(:,ic)=min(max(emin*sxp,exp(dble(sc))),emax*sxp)                    2048
-      sxp=sxp+q(:,ic)                                                      2049
-14971 continue                                                             2050
-14972 continue                                                             2050
-      s=-sum(b(0,:))/nc                                                    2050
-      b(0,:)=b(0,:)+s                                                      2050
-      sc=s                                                                 2050
-      b0=0.0                                                               2051
-15340 do 15341 j=1,nin                                                     2051
-      l=m(j)                                                               2052
-      if(vp(l) .gt. 0.0)goto 15361                                         2052
-      s=sum(b(l,:))/nc                                                     2052
-      goto 15371                                                           2053
-15361 continue                                                             2053
-      s=elc(parm,nc,b(l,:),is)                                             2053
+      b(k,ic)=sign(au,u)/(xv(k,ic)+vp(k)*al2)                              2020
+15241 continue                                                             2021
+15221 continue                                                             2021
+      d=b(k,ic)-bk                                                         2021
+      if(abs(d).le.0.0)goto 15211                                          2022
+      dlx=max(dlx,xv(k,ic)*d**2)                                           2023
+      r(jx(jb:je))=r(jx(jb:je))-d*v(jx(jb:je))*x(jb:je)/xs(k)              2024
+      o=o+d*(xb(k)/xs(k))                                                  2025
+      svr=svr-d*(xm(k)-xb(k)*xm(0))/xs(k)                                  2026
+15211 continue                                                             2027
+15212 continue                                                             2027
+      d=svr/xm(0)                                                          2028
+      if(d .eq. 0.0)goto 15261                                             2028
+      b(0,ic)=b(0,ic)+d                                                    2028
+      dlx=max(dlx,xm(0)*d**2)                                              2029
+      r=r-d*v                                                              2029
+      svr=svr-d*xm(0)                                                      2030
+15261 continue                                                             2031
+      if(dlx.lt.shr)goto 15202                                             2031
+      if(nlp .le. maxit)goto 15281                                         2031
+      jerr=-ilm                                                            2031
+      return                                                               2031
+15281 continue                                                             2032
+      goto 15201                                                           2033
+15202 continue                                                             2033
+      goto 15071                                                           2034
+15072 continue                                                             2034
+      if(jxx.gt.0)goto 14982                                               2035
+      if(xm(0)*(b(0,ic)-bs(0,ic))**2.gt.shr) ixx=1                         2036
+      if(ixx .ne. 0)goto 15301                                             2037
+15310 do 15311 j=1,nin                                                     2037
+      k=m(j)                                                               2038
+      if(xv(k,ic)*(b(k,ic)-bs(k,ic))**2 .le. shr)goto 15331                2038
+      ixx=1                                                                2038
+      goto 15312                                                           2038
+15331 continue                                                             2039
+15311 continue                                                             2040
+15312 continue                                                             2040
+15301 continue                                                             2041
+      sc=b(0,ic)+g(:,ic)                                                   2041
+      b0=0.0                                                               2042
+15340 do 15341 j=1,nin                                                     2042
+      l=m(j)                                                               2042
+      jb=ix(l)                                                             2042
+      je=ix(l+1)-1                                                         2043
+      sc(jx(jb:je))=sc(jx(jb:je))+b(l,ic)*x(jb:je)/xs(l)                   2044
+      b0=b0-b(l,ic)*xb(l)/xs(l)                                            2045
+15341 continue                                                             2046
+15342 continue                                                             2046
+      sc=min(max(exmn,sc+b0),exmx)                                         2047
+      sxp=sxp-q(:,ic)                                                      2048
+      q(:,ic)=min(max(emin*sxp,exp(dble(sc))),emax*sxp)                    2049
+      sxp=sxp+q(:,ic)                                                      2050
+14981 continue                                                             2051
+14982 continue                                                             2051
+      s=-sum(b(0,:))/nc                                                    2051
+      b(0,:)=b(0,:)+s                                                      2051
+      sc=s                                                                 2051
+      b0=0.0                                                               2052
+15350 do 15351 j=1,nin                                                     2052
+      l=m(j)                                                               2053
+      if(vp(l) .gt. 0.0)goto 15371                                         2053
+      s=sum(b(l,:))/nc                                                     2053
+      goto 15381                                                           2054
 15371 continue                                                             2054
-15351 continue                                                             2054
-      b(l,:)=b(l,:)-s                                                      2055
-      jb=ix(l)                                                             2055
-      je=ix(l+1)-1                                                         2056
-      sc(jx(jb:je))=sc(jx(jb:je))-s*x(jb:je)/xs(l)                         2057
-      b0=b0+s*xb(l)/xs(l)                                                  2058
-15341 continue                                                             2059
-15342 continue                                                             2059
-      sc=sc+b0                                                             2059
-      sc=exp(sc)                                                           2059
-      sxp=sxp*sc                                                           2059
-15380 do 15381 ic=1,nc                                                     2059
-      q(:,ic)=q(:,ic)*sc                                                   2059
-15381 continue                                                             2060
-15382 continue                                                             2060
-      if(jxx.gt.0)goto 14962                                               2060
-      if(ig.eq.0)goto 14962                                                2061
-      if(ixx .ne. 0)goto 15401                                             2061
-      ga=0.0                                                               2062
-15410 do 15411 ic=1,nc                                                     2062
-      v=q(:,ic)/sxp                                                        2062
-      r=w*(y(:,ic)-v)                                                      2062
-      v=w*v*(1.0-v)                                                        2063
+      s=elc(parm,nc,b(l,:),is)                                             2054
+15381 continue                                                             2055
+15361 continue                                                             2055
+      b(l,:)=b(l,:)-s                                                      2056
+      jb=ix(l)                                                             2056
+      je=ix(l+1)-1                                                         2057
+      sc(jx(jb:je))=sc(jx(jb:je))-s*x(jb:je)/xs(l)                         2058
+      b0=b0+s*xb(l)/xs(l)                                                  2059
+15351 continue                                                             2060
+15352 continue                                                             2060
+      sc=sc+b0                                                             2060
+      sc=exp(sc)                                                           2060
+      sxp=sxp*sc                                                           2060
+15390 do 15391 ic=1,nc                                                     2060
+      q(:,ic)=q(:,ic)*sc                                                   2060
+15391 continue                                                             2061
+15392 continue                                                             2061
+      if(jxx.gt.0)goto 14972                                               2061
+      if(ig.eq.0)goto 14972                                                2062
+      if(ixx .ne. 0)goto 15411                                             2063
 15420 do 15421 j=1,ni                                                      2063
       if(iy(j).eq.1)goto 15421                                             2063
-      if(ju(j).eq.0)goto 15421                                             2064
-      jb=ix(j)                                                             2064
-      je=ix(j+1)-1                                                         2064
-      jn=ix(j+1)-ix(j)                                                     2065
-      sc(1:jn)=r(jx(jb:je))+o*v(jx(jb:je))                                 2066
-      gj=dot_product(sc(1:jn),x(jb:je))                                    2067
-      ga(j)=max(ga(j),abs(gj-svr*xb(j))/xs(j))                             2068
-15421 continue                                                             2069
-15422 continue                                                             2069
-15411 continue                                                             2070
-15412 continue                                                             2070
-15430 do 15431 k=1,ni                                                      2070
-      if(iy(k).eq.1)goto 15431                                             2070
-      if(ju(k).eq.0)goto 15431                                             2071
-      if(ga(k) .le. al1*vp(k))goto 15451                                   2071
-      iy(k)=1                                                              2071
-      ixx=1                                                                2071
-15451 continue                                                             2072
-15431 continue                                                             2073
-15432 continue                                                             2073
-      if(ixx.eq.1) go to 10680                                             2074
-      goto 14962                                                           2075
-15401 continue                                                             2076
-      goto 14961                                                           2077
-14962 continue                                                             2077
-      if(jxx .le. 0)goto 15471                                             2077
-      jerr=-10000-ilm                                                      2077
-      goto 14882                                                           2077
-15471 continue                                                             2077
-      devi=0.0                                                             2078
-15480 do 15481 ic=1,nc                                                     2079
-      if(nin.gt.0) a(1:nin,ic,ilm)=b(m(1:nin),ic)                          2079
-      a0(ic,ilm)=b(0,ic)                                                   2080
-15490 do 15491 i=1,no                                                      2080
-      if(y(i,ic).le.0.0)goto 15491                                         2081
-      devi=devi-w(i)*y(i,ic)*log(q(i,ic)/sxp(i))                           2082
-15491 continue                                                             2083
-15492 continue                                                             2083
-15481 continue                                                             2084
-15482 continue                                                             2084
-      kin(ilm)=nin                                                         2084
-      alm(ilm)=al                                                          2084
-      lmu=ilm                                                              2085
-      dev(ilm)=(dev1-devi)/dev0                                            2085
-      if(ig.eq.0)goto 14882                                                2086
-      if(ilm.lt.mnl)goto 14881                                             2086
-      if(flmin.ge.1.0)goto 14881                                           2087
-      if(nintot(ni,nx,nc,a(1,1,ilm),m,nin,is).gt.ne)goto 14882             2088
-      if(dev(ilm).gt.devmax)goto 14882                                     2088
-      if(dev(ilm)-dev(ilm-1).lt.sml)goto 14882                             2089
-14881 continue                                                             2090
-14882 continue                                                             2090
-      g=log(q)                                                             2090
-15500 do 15501 i=1,no                                                      2090
-      g(i,:)=g(i,:)-sum(g(i,:))/nc                                         2090
-15501 continue                                                             2091
-15502 continue                                                             2091
-      deallocate(sxp,b,bs,v,r,xv,q,mm,is,xm,sc,ga,iy)                      2092
-      return                                                               2093
-      end                                                                  2094
-      subroutine lcmodval(nc,nx,a0,ca,ia,nin,x,ix,jx,n,f)                  2095
-      real a0(nc),ca(nx,nc),x(*),f(nc,n)                                   2095
-      integer ia(*),ix(*),jx(*)                                            2096
-15510 do 15511 ic=1,nc                                                     2096
-      f(ic,:)=a0(ic)                                                       2096
-15511 continue                                                             2097
-15512 continue                                                             2097
-15520 do 15521 j=1,nin                                                     2097
-      k=ia(j)                                                              2097
-      kb=ix(k)                                                             2097
-      ke=ix(k+1)-1                                                         2098
+      if(ju(j).eq.0)goto 15421                                             2063
+      ga(j)=0.0                                                            2063
+15421 continue                                                             2064
+15422 continue                                                             2064
+15430 do 15431 ic=1,nc                                                     2064
+      v=q(:,ic)/sxp                                                        2064
+      r=w*(y(:,ic)-v)                                                      2064
+      v=w*v*(1.0-v)                                                        2065
+15440 do 15441 j=1,ni                                                      2065
+      if(iy(j).eq.1)goto 15441                                             2065
+      if(ju(j).eq.0)goto 15441                                             2066
+      jb=ix(j)                                                             2066
+      je=ix(j+1)-1                                                         2066
+      jn=ix(j+1)-ix(j)                                                     2067
+      sc(1:jn)=r(jx(jb:je))+o*v(jx(jb:je))                                 2068
+      gj=dot_product(sc(1:jn),x(jb:je))                                    2069
+      ga(j)=max(ga(j),abs(gj-svr*xb(j))/xs(j))                             2070
+15441 continue                                                             2071
+15442 continue                                                             2071
+15431 continue                                                             2072
+15432 continue                                                             2072
+15450 do 15451 k=1,ni                                                      2072
+      if(iy(k).eq.1)goto 15451                                             2072
+      if(ju(k).eq.0)goto 15451                                             2073
+      if(ga(k) .le. al1*vp(k))goto 15471                                   2073
+      iy(k)=1                                                              2073
+      ixx=1                                                                2073
+15471 continue                                                             2074
+15451 continue                                                             2075
+15452 continue                                                             2075
+      if(ixx.eq.1) go to 10680                                             2076
+      goto 14972                                                           2077
+15411 continue                                                             2078
+      goto 14971                                                           2079
+14972 continue                                                             2079
+      if(jxx .le. 0)goto 15491                                             2079
+      jerr=-10000-ilm                                                      2079
+      goto 14892                                                           2079
+15491 continue                                                             2079
+      devi=0.0                                                             2080
+15500 do 15501 ic=1,nc                                                     2081
+      if(nin.gt.0) a(1:nin,ic,ilm)=b(m(1:nin),ic)                          2081
+      a0(ic,ilm)=b(0,ic)                                                   2082
+15510 do 15511 i=1,no                                                      2082
+      if(y(i,ic).le.0.0)goto 15511                                         2083
+      devi=devi-w(i)*y(i,ic)*log(q(i,ic)/sxp(i))                           2084
+15511 continue                                                             2085
+15512 continue                                                             2085
+15501 continue                                                             2086
+15502 continue                                                             2086
+      kin(ilm)=nin                                                         2086
+      alm(ilm)=al                                                          2086
+      lmu=ilm                                                              2087
+      dev(ilm)=(dev1-devi)/dev0                                            2087
+      if(ig.eq.0)goto 14892                                                2088
+      if(ilm.lt.mnl)goto 14891                                             2088
+      if(flmin.ge.1.0)goto 14891                                           2089
+      if(nintot(ni,nx,nc,a(1,1,ilm),m,nin,is).gt.ne)goto 14892             2090
+      if(dev(ilm).gt.devmax)goto 14892                                     2090
+      if(dev(ilm)-dev(ilm-1).lt.sml)goto 14892                             2091
+14891 continue                                                             2092
+14892 continue                                                             2092
+      g=log(q)                                                             2092
+15520 do 15521 i=1,no                                                      2092
+      g(i,:)=g(i,:)-sum(g(i,:))/nc                                         2092
+15521 continue                                                             2093
+15522 continue                                                             2093
+      deallocate(sxp,b,bs,v,r,xv,q,mm,is,xm,sc,ga,iy)                      2094
+      return                                                               2095
+      end                                                                  2096
+      subroutine lcmodval(nc,nx,a0,ca,ia,nin,x,ix,jx,n,f)                  2097
+      real a0(nc),ca(nx,nc),x(*),f(nc,n)                                   2097
+      integer ia(*),ix(*),jx(*)                                            2098
 15530 do 15531 ic=1,nc                                                     2098
-      f(ic,jx(kb:ke))=f(ic,jx(kb:ke))+ca(j,ic)*x(kb:ke)                    2098
+      f(ic,:)=a0(ic)                                                       2098
 15531 continue                                                             2099
 15532 continue                                                             2099
-15521 continue                                                             2100
-15522 continue                                                             2100
-      return                                                               2101
-      end                                                                  2102
-      subroutine coxnet (parm,no,ni,x,y,d,g,w,jd,vp,ne,nx,nlam,flmin,ula   2104 
+15540 do 15541 j=1,nin                                                     2099
+      k=ia(j)                                                              2099
+      kb=ix(k)                                                             2099
+      ke=ix(k+1)-1                                                         2100
+15550 do 15551 ic=1,nc                                                     2100
+      f(ic,jx(kb:ke))=f(ic,jx(kb:ke))+ca(j,ic)*x(kb:ke)                    2100
+15551 continue                                                             2101
+15552 continue                                                             2101
+15541 continue                                                             2102
+15542 continue                                                             2102
+      return                                                               2103
+      end                                                                  2104
+      subroutine coxnet (parm,no,ni,x,y,d,g,w,jd,vp,ne,nx,nlam,flmin,ula   2106 
      *m,thr,  maxit,isd,lmu,ca,ia,nin,dev0,dev,alm,nlp,jerr)
-      real x(no,ni),y(no),d(no),g(no),w(no),vp(ni),ulam(nlam)              2105
-      real ca(nx,nlam),dev(nlam),alm(nlam)                                 2106
-      integer jd(*),ia(nx),nin(nlam)                                       2107
+      real x(no,ni),y(no),d(no),g(no),w(no),vp(ni),ulam(nlam)              2107
+      real ca(nx,nlam),dev(nlam),alm(nlam)                                 2108
+      integer jd(*),ia(nx),nin(nlam)                                       2109
       real, dimension (:), allocatable :: xs,ww,vq                              
       integer, dimension (:), allocatable :: ju                                 
-      if(maxval(vp) .gt. 0.0)goto 15551                                    2111
-      jerr=10000                                                           2111
-      return                                                               2111
-15551 continue                                                             2112
-      allocate(ww(1:no),stat=jerr)                                         2113
-      allocate(ju(1:ni),stat=ierr)                                         2113
-      jerr=jerr+ierr                                                       2114
-      allocate(vq(1:ni),stat=ierr)                                         2114
-      jerr=jerr+ierr                                                       2115
-      if(isd .le. 0)goto 15571                                             2115
-      allocate(xs(1:ni),stat=ierr)                                         2115
-      jerr=jerr+ierr                                                       2115
-15571 continue                                                             2116
-      if(jerr.ne.0) return                                                 2117
-      call chkvars(no,ni,x,ju)                                             2118
-      if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0                                 2119
-      if(maxval(ju) .gt. 0)goto 15591                                      2119
-      jerr=7777                                                            2119
-      return                                                               2119
-15591 continue                                                             2120
-      vq=max(0.0,vp)                                                       2120
-      vq=vq*ni/sum(vq)                                                     2121
-      ww=max(0.0,w)                                                        2121
-      sw=sum(ww)                                                           2122
-      if(sw .gt. 0.0)goto 15611                                            2122
-      jerr=9999                                                            2122
-      return                                                               2122
+      if(maxval(vp) .gt. 0.0)goto 15571                                    2113
+      jerr=10000                                                           2113
+      return                                                               2113
+15571 continue                                                             2114
+      allocate(ww(1:no),stat=jerr)                                         2115
+      allocate(ju(1:ni),stat=ierr)                                         2115
+      jerr=jerr+ierr                                                       2116
+      allocate(vq(1:ni),stat=ierr)                                         2116
+      jerr=jerr+ierr                                                       2117
+      if(isd .le. 0)goto 15591                                             2117
+      allocate(xs(1:ni),stat=ierr)                                         2117
+      jerr=jerr+ierr                                                       2117
+15591 continue                                                             2118
+      if(jerr.ne.0) return                                                 2119
+      call chkvars(no,ni,x,ju)                                             2120
+      if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0                                 2121
+      if(maxval(ju) .gt. 0)goto 15611                                      2121
+      jerr=7777                                                            2121
+      return                                                               2121
 15611 continue                                                             2122
-      ww=ww/sw                                                             2123
-      call cstandard(no,ni,x,ww,ju,isd,xs)                                 2124
-      call coxnet1(parm,no,ni,x,y,d,g,ww,ju,vq,ne,nx,nlam,flmin,ulam,thr   2126 
+      vq=max(0.0,vp)                                                       2122
+      vq=vq*ni/sum(vq)                                                     2123
+      ww=max(0.0,w)                                                        2123
+      sw=sum(ww)                                                           2124
+      if(sw .gt. 0.0)goto 15631                                            2124
+      jerr=9999                                                            2124
+      return                                                               2124
+15631 continue                                                             2124
+      ww=ww/sw                                                             2125
+      call cstandard(no,ni,x,ww,ju,isd,xs)                                 2126
+      call coxnet1(parm,no,ni,x,y,d,g,ww,ju,vq,ne,nx,nlam,flmin,ulam,thr   2128 
      *,  isd,maxit,lmu,ca,ia,nin,dev0,dev,alm,nlp,jerr)
-      if(jerr.gt.0) return                                                 2126
-      dev0=2.0*sw*dev0                                                     2127
-      if(isd .le. 0)goto 15631                                             2127
-15640 do 15641 k=1,lmu                                                     2127
-      nk=nin(k)                                                            2127
-      ca(1:nk,k)=ca(1:nk,k)/xs(ia(1:nk))                                   2127
-15641 continue                                                             2127
-15642 continue                                                             2127
-15631 continue                                                             2128
-      deallocate(ww,ju,vq)                                                 2128
-      if(isd.gt.0) deallocate(xs)                                          2129
-      return                                                               2130
-      end                                                                  2131
-      subroutine cstandard (no,ni,x,w,ju,isd,xs)                           2132
-      real x(no,ni),w(no),xs(ni)                                           2132
-      integer ju(ni)                                                       2133
-15650 do 15651 j=1,ni                                                      2133
-      if(ju(j).eq.0)goto 15651                                             2134
-      xm=dot_product(w,x(:,j))                                             2134
-      x(:,j)=x(:,j)-xm                                                     2135
-      if(isd .le. 0)goto 15671                                             2135
-      xs(j)=sqrt(dot_product(w,x(:,j)**2))                                 2135
-      x(:,j)=x(:,j)/xs(j)                                                  2135
-15671 continue                                                             2136
-15651 continue                                                             2137
-15652 continue                                                             2137
-      return                                                               2138
-      end                                                                  2139
-      subroutine coxnet1(parm,no,ni,x,y,d,g,q,ju,vp,ne,nx,nlam,flmin,ula   2141 
+      if(jerr.gt.0) return                                                 2128
+      dev0=2.0*sw*dev0                                                     2129
+      if(isd .le. 0)goto 15651                                             2129
+15660 do 15661 k=1,lmu                                                     2129
+      nk=nin(k)                                                            2129
+      ca(1:nk,k)=ca(1:nk,k)/xs(ia(1:nk))                                   2129
+15661 continue                                                             2129
+15662 continue                                                             2129
+15651 continue                                                             2130
+      deallocate(ww,ju,vq)                                                 2130
+      if(isd.gt.0) deallocate(xs)                                          2131
+      return                                                               2132
+      end                                                                  2133
+      subroutine cstandard (no,ni,x,w,ju,isd,xs)                           2134
+      real x(no,ni),w(no),xs(ni)                                           2134
+      integer ju(ni)                                                       2135
+15670 do 15671 j=1,ni                                                      2135
+      if(ju(j).eq.0)goto 15671                                             2136
+      xm=dot_product(w,x(:,j))                                             2136
+      x(:,j)=x(:,j)-xm                                                     2137
+      if(isd .le. 0)goto 15691                                             2137
+      xs(j)=sqrt(dot_product(w,x(:,j)**2))                                 2137
+      x(:,j)=x(:,j)/xs(j)                                                  2137
+15691 continue                                                             2138
+15671 continue                                                             2139
+15672 continue                                                             2139
+      return                                                               2140
+      end                                                                  2141
+      subroutine coxnet1(parm,no,ni,x,y,d,g,q,ju,vp,ne,nx,nlam,flmin,ula   2143 
      *m,cthri,  isd,maxit,lmu,ao,m,kin,dev0,dev,alm,nlp,jerr)
-      parameter(sml=0.001, eps=1.0e-6, big=9.9e35, mnlam=5, devmax=0.99)   2142
-      real x(no,ni),y(no),q(no),d(no),g(no),vp(ni),ulam(nlam)              2143
-      real ao(nx,nlam),dev(nlam),alm(nlam)                                 2144
-      integer ju(ni),m(nx),kin(nlam)                                       2145
+      parameter(sml=0.001, eps=1.0e-6, big=9.9e35, mnlam=5, devmax=0.99)   2144
+      real x(no,ni),y(no),q(no),d(no),g(no),vp(ni),ulam(nlam)              2145
+      real ao(nx,nlam),dev(nlam),alm(nlam)                                 2146
+      integer ju(ni),m(nx),kin(nlam)                                       2147
       real, dimension (:), allocatable :: w,dk,v,xs,wr,a,as,f,dq                
       real, dimension (:), allocatable :: e,uu,ga                               
       integer, dimension (:), allocatable :: jp,kp,mm,ixx                       
-      allocate(e(1:no),stat=jerr)                                          2151
-      allocate(uu(1:no),stat=ierr)                                         2151
-      jerr=jerr+ierr                                                       2152
-      allocate(f(1:no),stat=ierr)                                          2152
-      jerr=jerr+ierr                                                       2153
-      allocate(w(1:no),stat=ierr)                                          2153
+      allocate(e(1:no),stat=jerr)                                          2153
+      allocate(uu(1:no),stat=ierr)                                         2153
       jerr=jerr+ierr                                                       2154
-      allocate(v(1:ni),stat=ierr)                                          2154
+      allocate(f(1:no),stat=ierr)                                          2154
       jerr=jerr+ierr                                                       2155
-      allocate(a(1:ni),stat=ierr)                                          2155
+      allocate(w(1:no),stat=ierr)                                          2155
       jerr=jerr+ierr                                                       2156
-      allocate(as(1:ni),stat=ierr)                                         2156
+      allocate(v(1:ni),stat=ierr)                                          2156
       jerr=jerr+ierr                                                       2157
-      allocate(xs(1:ni),stat=ierr)                                         2157
+      allocate(a(1:ni),stat=ierr)                                          2157
       jerr=jerr+ierr                                                       2158
-      allocate(ga(1:ni),stat=ierr)                                         2158
+      allocate(as(1:ni),stat=ierr)                                         2158
       jerr=jerr+ierr                                                       2159
-      allocate(ixx(1:ni),stat=ierr)                                        2159
+      allocate(xs(1:ni),stat=ierr)                                         2159
       jerr=jerr+ierr                                                       2160
-      allocate(jp(1:no),stat=ierr)                                         2160
+      allocate(ga(1:ni),stat=ierr)                                         2160
       jerr=jerr+ierr                                                       2161
-      allocate(kp(1:no),stat=ierr)                                         2161
+      allocate(ixx(1:ni),stat=ierr)                                        2161
       jerr=jerr+ierr                                                       2162
-      allocate(dk(1:no),stat=ierr)                                         2162
+      allocate(jp(1:no),stat=ierr)                                         2162
       jerr=jerr+ierr                                                       2163
-      allocate(wr(1:no),stat=ierr)                                         2163
+      allocate(kp(1:no),stat=ierr)                                         2163
       jerr=jerr+ierr                                                       2164
-      allocate(dq(1:no),stat=ierr)                                         2164
+      allocate(dk(1:no),stat=ierr)                                         2164
       jerr=jerr+ierr                                                       2165
-      allocate(mm(1:ni),stat=ierr)                                         2165
+      allocate(wr(1:no),stat=ierr)                                         2165
       jerr=jerr+ierr                                                       2166
-      if(jerr.ne.0)go to 11790                                             2167
-      call groups(no,y,d,q,nk,kp,jp,t0,jerr)                               2168
-      if(jerr.ne.0) go to 11790                                            2168
-      alpha=parm                                                           2169
-      oma=1.0-alpha                                                        2169
-      nlm=0                                                                2169
-      ixx=0                                                                2169
-      al=0.0                                                               2170
-      dq=d*q                                                               2170
-      call died(no,nk,dq,kp,jp,dk)                                         2171
-      a=0.0                                                                2171
-      f(1)=0.0                                                             2171
-      fmax=log(huge(f(1))*0.1)                                             2172
-      if(nonzero(no,g) .eq. 0)goto 15691                                   2172
-      f=g-dot_product(q,g)                                                 2173
-      e=q*exp(sign(min(abs(f),fmax),f))                                    2174
-      goto 15701                                                           2175
-15691 continue                                                             2175
-      f=0.0                                                                2175
-      e=q                                                                  2175
-15701 continue                                                             2176
-15681 continue                                                             2176
-      r0=risk(no,ni,nk,dq,dk,f,e,kp,jp,uu)                                 2177
-      rr=-(dot_product(dk(1:nk),log(dk(1:nk)))+r0)                         2177
-      dev0=rr                                                              2178
-15710 do 15711 i=1,no                                                      2178
-      if((y(i) .ge. t0) .and. (q(i) .gt. 0.0))goto 15731                   2178
-      w(i)=0.0                                                             2178
-      wr(i)=w(i)                                                           2178
-15731 continue                                                             2178
-15711 continue                                                             2179
-15712 continue                                                             2179
-      call outer(no,nk,dq,dk,kp,jp,e,wr,w,jerr,uu)                         2180
-      if(jerr.ne.0) go to 11790                                            2181
-      if(flmin .ge. 1.0)goto 15751                                         2181
-      eqs=max(eps,flmin)                                                   2181
-      alf=eqs**(1.0/(nlam-1))                                              2181
-15751 continue                                                             2182
-      m=0                                                                  2182
-      mm=0                                                                 2182
-      nlp=0                                                                2182
-      nin=nlp                                                              2182
-      mnl=min(mnlam,nlam)                                                  2182
-      as=0.0                                                               2182
-      cthr=cthri*dev0                                                      2183
-15760 do 15761 j=1,ni                                                      2183
-      if(ju(j).eq.0)goto 15761                                             2183
-      ga(j)=abs(dot_product(wr,x(:,j)))                                    2183
-15761 continue                                                             2184
-15762 continue                                                             2184
-15770 do 15771 ilm=1,nlam                                                  2184
-      al0=al                                                               2185
-      if(flmin .lt. 1.0)goto 15791                                         2185
-      al=ulam(ilm)                                                         2185
-      goto 15781                                                           2186
-15791 if(ilm .le. 2)goto 15801                                             2186
-      al=al*alf                                                            2186
-      goto 15781                                                           2187
-15801 if(ilm .ne. 1)goto 15811                                             2187
-      al=big                                                               2187
-      goto 15821                                                           2188
-15811 continue                                                             2188
-      al0=0.0                                                              2189
-15830 do 15831 j=1,ni                                                      2189
-      if(ju(j).eq.0)goto 15831                                             2189
-      if(vp(j).gt.0.0) al0=max(al0,ga(j)/vp(j))                            2189
+      allocate(dq(1:no),stat=ierr)                                         2166
+      jerr=jerr+ierr                                                       2167
+      allocate(mm(1:ni),stat=ierr)                                         2167
+      jerr=jerr+ierr                                                       2168
+      if(jerr.ne.0)go to 11790                                             2169
+      call groups(no,y,d,q,nk,kp,jp,t0,jerr)                               2170
+      if(jerr.ne.0) go to 11790                                            2170
+      alpha=parm                                                           2171
+      oma=1.0-alpha                                                        2171
+      nlm=0                                                                2171
+      ixx=0                                                                2171
+      al=0.0                                                               2172
+      dq=d*q                                                               2172
+      call died(no,nk,dq,kp,jp,dk)                                         2173
+      a=0.0                                                                2173
+      f(1)=0.0                                                             2173
+      fmax=log(huge(f(1))*0.1)                                             2174
+      if(nonzero(no,g) .eq. 0)goto 15711                                   2174
+      f=g-dot_product(q,g)                                                 2175
+      e=q*exp(sign(min(abs(f),fmax),f))                                    2176
+      goto 15721                                                           2177
+15711 continue                                                             2177
+      f=0.0                                                                2177
+      e=q                                                                  2177
+15721 continue                                                             2178
+15701 continue                                                             2178
+      r0=risk(no,ni,nk,dq,dk,f,e,kp,jp,uu)                                 2179
+      rr=-(dot_product(dk(1:nk),log(dk(1:nk)))+r0)                         2179
+      dev0=rr                                                              2180
+15730 do 15731 i=1,no                                                      2180
+      if((y(i) .ge. t0) .and. (q(i) .gt. 0.0))goto 15751                   2180
+      w(i)=0.0                                                             2180
+      wr(i)=w(i)                                                           2180
+15751 continue                                                             2180
+15731 continue                                                             2181
+15732 continue                                                             2181
+      call outer(no,nk,dq,dk,kp,jp,e,wr,w,jerr,uu)                         2182
+      if(jerr.ne.0) go to 11790                                            2183
+      if(flmin .ge. 1.0)goto 15771                                         2183
+      eqs=max(eps,flmin)                                                   2183
+      alf=eqs**(1.0/(nlam-1))                                              2183
+15771 continue                                                             2184
+      m=0                                                                  2184
+      mm=0                                                                 2184
+      nlp=0                                                                2184
+      nin=nlp                                                              2184
+      mnl=min(mnlam,nlam)                                                  2184
+      as=0.0                                                               2184
+      cthr=cthri*dev0                                                      2185
+15780 do 15781 j=1,ni                                                      2185
+      if(ju(j).eq.0)goto 15781                                             2185
+      ga(j)=abs(dot_product(wr,x(:,j)))                                    2185
+15781 continue                                                             2186
+15782 continue                                                             2186
+15790 do 15791 ilm=1,nlam                                                  2186
+      al0=al                                                               2187
+      if(flmin .lt. 1.0)goto 15811                                         2187
+      al=ulam(ilm)                                                         2187
+      goto 15801                                                           2188
+15811 if(ilm .le. 2)goto 15821                                             2188
+      al=al*alf                                                            2188
+      goto 15801                                                           2189
+15821 if(ilm .ne. 1)goto 15831                                             2189
+      al=big                                                               2189
+      goto 15841                                                           2190
 15831 continue                                                             2190
-15832 continue                                                             2190
-      al0=al0/max(parm,1.0e-3)                                             2190
-      al=alf*al0                                                           2191
-15821 continue                                                             2192
-15781 continue                                                             2192
-      sa=alpha*al                                                          2192
-      omal=oma*al                                                          2192
-      tlam=alpha*(2.0*al-al0)                                              2193
-15840 do 15841 k=1,ni                                                      2193
-      if(ixx(k).eq.1)goto 15841                                            2193
-      if(ju(k).eq.0)goto 15841                                             2194
-      if(ga(k).gt.tlam*vp(k)) ixx(k)=1                                     2195
-15841 continue                                                             2196
-15842 continue                                                             2196
-10680 continue                                                             2197
-15850 continue                                                             2197
-15851 continue                                                             2197
-      if(nin.gt.0) as(m(1:nin))=a(m(1:nin))                                2198
-      call vars(no,ni,x,w,ixx,v)                                           2199
-15860 continue                                                             2199
-15861 continue                                                             2199
-      nlp=nlp+1                                                            2199
-      dli=0.0                                                              2200
-15870 do 15871 j=1,ni                                                      2200
-      if(ixx(j).eq.0)goto 15871                                            2201
-      u=a(j)*v(j)+dot_product(wr,x(:,j))                                   2202
-      if(abs(u) .gt. vp(j)*sa)goto 15891                                   2202
-      at=0.0                                                               2202
-      goto 15901                                                           2203
-15891 continue                                                             2203
-      at=sign(abs(u)-vp(j)*sa,u)/(v(j)+vp(j)*omal)                         2203
-15901 continue                                                             2204
-15881 continue                                                             2204
-      if(at .eq. a(j))goto 15921                                           2204
-      del=at-a(j)                                                          2204
-      a(j)=at                                                              2204
-      dli=max(dli,v(j)*del**2)                                             2205
-      wr=wr-del*w*x(:,j)                                                   2205
-      f=f+del*x(:,j)                                                       2206
-      if(mm(j) .ne. 0)goto 15941                                           2206
-      nin=nin+1                                                            2206
-      if(nin.gt.nx)goto 15872                                              2207
-      mm(j)=nin                                                            2207
-      m(nin)=j                                                             2208
-15941 continue                                                             2209
-15921 continue                                                             2210
-15871 continue                                                             2211
-15872 continue                                                             2211
-      if(nin.gt.nx)goto 15862                                              2211
-      if(dli.lt.cthr)goto 15862                                            2212
-      if(nlp .le. maxit)goto 15961                                         2212
-      jerr=-ilm                                                            2212
-      return                                                               2212
-15961 continue                                                             2213
-15970 continue                                                             2213
-15971 continue                                                             2213
-      nlp=nlp+1                                                            2213
-      dli=0.0                                                              2214
-15980 do 15981 l=1,nin                                                     2214
-      j=m(l)                                                               2215
-      u=a(j)*v(j)+dot_product(wr,x(:,j))                                   2216
-      if(abs(u) .gt. vp(j)*sa)goto 16001                                   2216
-      at=0.0                                                               2216
-      goto 16011                                                           2217
-16001 continue                                                             2217
-      at=sign(abs(u)-vp(j)*sa,u)/(v(j)+vp(j)*omal)                         2217
-16011 continue                                                             2218
-15991 continue                                                             2218
-      if(at .eq. a(j))goto 16031                                           2218
-      del=at-a(j)                                                          2218
-      a(j)=at                                                              2218
-      dli=max(dli,v(j)*del**2)                                             2219
-      wr=wr-del*w*x(:,j)                                                   2219
-      f=f+del*x(:,j)                                                       2220
-16031 continue                                                             2221
-15981 continue                                                             2222
-15982 continue                                                             2222
-      if(dli.lt.cthr)goto 15972                                            2222
-      if(nlp .le. maxit)goto 16051                                         2222
-      jerr=-ilm                                                            2222
-      return                                                               2222
+      al0=0.0                                                              2191
+15850 do 15851 j=1,ni                                                      2191
+      if(ju(j).eq.0)goto 15851                                             2191
+      if(vp(j).gt.0.0) al0=max(al0,ga(j)/vp(j))                            2191
+15851 continue                                                             2192
+15852 continue                                                             2192
+      al0=al0/max(parm,1.0e-3)                                             2192
+      al=alf*al0                                                           2193
+15841 continue                                                             2194
+15801 continue                                                             2194
+      sa=alpha*al                                                          2194
+      omal=oma*al                                                          2194
+      tlam=alpha*(2.0*al-al0)                                              2195
+15860 do 15861 k=1,ni                                                      2195
+      if(ixx(k).eq.1)goto 15861                                            2195
+      if(ju(k).eq.0)goto 15861                                             2196
+      if(ga(k).gt.tlam*vp(k)) ixx(k)=1                                     2197
+15861 continue                                                             2198
+15862 continue                                                             2198
+10680 continue                                                             2199
+15870 continue                                                             2199
+15871 continue                                                             2199
+      if(nin.gt.0) as(m(1:nin))=a(m(1:nin))                                2200
+      call vars(no,ni,x,w,ixx,v)                                           2201
+15880 continue                                                             2201
+15881 continue                                                             2201
+      nlp=nlp+1                                                            2201
+      dli=0.0                                                              2202
+15890 do 15891 j=1,ni                                                      2202
+      if(ixx(j).eq.0)goto 15891                                            2203
+      u=a(j)*v(j)+dot_product(wr,x(:,j))                                   2204
+      if(abs(u) .gt. vp(j)*sa)goto 15911                                   2204
+      at=0.0                                                               2204
+      goto 15921                                                           2205
+15911 continue                                                             2205
+      at=sign(abs(u)-vp(j)*sa,u)/(v(j)+vp(j)*omal)                         2205
+15921 continue                                                             2206
+15901 continue                                                             2206
+      if(at .eq. a(j))goto 15941                                           2206
+      del=at-a(j)                                                          2206
+      a(j)=at                                                              2206
+      dli=max(dli,v(j)*del**2)                                             2207
+      wr=wr-del*w*x(:,j)                                                   2207
+      f=f+del*x(:,j)                                                       2208
+      if(mm(j) .ne. 0)goto 15961                                           2208
+      nin=nin+1                                                            2208
+      if(nin.gt.nx)goto 15892                                              2209
+      mm(j)=nin                                                            2209
+      m(nin)=j                                                             2210
+15961 continue                                                             2211
+15941 continue                                                             2212
+15891 continue                                                             2213
+15892 continue                                                             2213
+      if(nin.gt.nx)goto 15882                                              2213
+      if(dli.lt.cthr)goto 15882                                            2214
+      if(nlp .le. maxit)goto 15981                                         2214
+      jerr=-ilm                                                            2214
+      return                                                               2214
+15981 continue                                                             2215
+15990 continue                                                             2215
+15991 continue                                                             2215
+      nlp=nlp+1                                                            2215
+      dli=0.0                                                              2216
+16000 do 16001 l=1,nin                                                     2216
+      j=m(l)                                                               2217
+      u=a(j)*v(j)+dot_product(wr,x(:,j))                                   2218
+      if(abs(u) .gt. vp(j)*sa)goto 16021                                   2218
+      at=0.0                                                               2218
+      goto 16031                                                           2219
+16021 continue                                                             2219
+      at=sign(abs(u)-vp(j)*sa,u)/(v(j)+vp(j)*omal)                         2219
+16031 continue                                                             2220
+16011 continue                                                             2220
+      if(at .eq. a(j))goto 16051                                           2220
+      del=at-a(j)                                                          2220
+      a(j)=at                                                              2220
+      dli=max(dli,v(j)*del**2)                                             2221
+      wr=wr-del*w*x(:,j)                                                   2221
+      f=f+del*x(:,j)                                                       2222
 16051 continue                                                             2223
-      goto 15971                                                           2224
-15972 continue                                                             2224
-      goto 15861                                                           2225
-15862 continue                                                             2225
-      if(nin.gt.nx)goto 15852                                              2226
-      e=q*exp(sign(min(abs(f),fmax),f))                                    2227
-      call outer(no,nk,dq,dk,kp,jp,e,wr,w,jerr,uu)                         2228
-      if(jerr .eq. 0)goto 16071                                            2228
-      jerr=jerr-ilm                                                        2228
-      go to 11790                                                          2228
-16071 continue                                                             2229
-      ix=0                                                                 2230
-16080 do 16081 j=1,nin                                                     2230
-      k=m(j)                                                               2231
-      if(v(k)*(a(k)-as(k))**2.lt.cthr)goto 16081                           2231
-      ix=1                                                                 2231
-      goto 16082                                                           2231
-16081 continue                                                             2232
-16082 continue                                                             2232
-      if(ix .ne. 0)goto 16101                                              2233
-16110 do 16111 k=1,ni                                                      2233
-      if(ixx(k).eq.1)goto 16111                                            2233
-      if(ju(k).eq.0)goto 16111                                             2234
-      ga(k)=abs(dot_product(wr,x(:,k)))                                    2235
-      if(ga(k) .le. sa*vp(k))goto 16131                                    2235
-      ixx(k)=1                                                             2235
-      ix=1                                                                 2235
-16131 continue                                                             2236
-16111 continue                                                             2237
-16112 continue                                                             2237
-      if(ix.eq.1) go to 10680                                              2238
-      goto 15852                                                           2239
-16101 continue                                                             2240
-      goto 15851                                                           2241
-15852 continue                                                             2241
-      if(nin .le. nx)goto 16151                                            2241
-      jerr=-10000-ilm                                                      2241
-      goto 15772                                                           2241
-16151 continue                                                             2242
-      if(nin.gt.0) ao(1:nin,ilm)=a(m(1:nin))                               2242
-      kin(ilm)=nin                                                         2243
-      alm(ilm)=al                                                          2243
-      lmu=ilm                                                              2244
-      dev(ilm)=(risk(no,ni,nk,dq,dk,f,e,kp,jp,uu)-r0)/rr                   2245
-      if(ilm.lt.mnl)goto 15771                                             2245
-      if(flmin.ge.1.0)goto 15771                                           2246
-      me=0                                                                 2246
-16160 do 16161 j=1,nin                                                     2246
-      if(ao(j,ilm).ne.0.0) me=me+1                                         2246
-16161 continue                                                             2246
-16162 continue                                                             2246
-      if(me.gt.ne)goto 15772                                               2247
-      if((dev(ilm)-dev(ilm-mnl+1))/dev(ilm).lt.sml)goto 15772              2248
-      if(dev(ilm).gt.devmax)goto 15772                                     2249
-15771 continue                                                             2250
-15772 continue                                                             2250
-      g=f                                                                  2251
-11790 continue                                                             2251
-      deallocate(e,uu,w,dk,v,xs,f,wr,a,as,jp,kp,dq,mm,ga,ixx)              2252
-      return                                                               2253
-      end                                                                  2254
-      subroutine cxmodval(ca,ia,nin,n,x,f)                                 2255
-      real ca(nin),x(n,*),f(n)                                             2255
-      integer ia(nin)                                                      2256
-      f=0.0                                                                2256
-      if(nin.le.0) return                                                  2257
-16170 do 16171 i=1,n                                                       2257
-      f(i)=f(i)+dot_product(ca(1:nin),x(i,ia(1:nin)))                      2257
-16171 continue                                                             2258
-16172 continue                                                             2258
-      return                                                               2259
-      end                                                                  2260
-      subroutine groups(no,y,d,q,nk,kp,jp,t0,jerr)                         2261
-      real y(no),d(no),q(no)                                               2261
-      integer jp(no),kp(*)                                                 2262
-16180 do 16181 j=1,no                                                      2262
-      jp(j)=j                                                              2262
-16181 continue                                                             2262
-16182 continue                                                             2262
-      call psort7(y,jp,1,no)                                               2263
-      nj=0                                                                 2263
-16190 do 16191 j=1,no                                                      2263
-      if(q(jp(j)).le.0.0)goto 16191                                        2263
-      nj=nj+1                                                              2263
-      jp(nj)=jp(j)                                                         2263
-16191 continue                                                             2264
-16192 continue                                                             2264
-      if(nj .ne. 0)goto 16211                                              2264
-      jerr=20000                                                           2264
-      return                                                               2264
-16211 continue                                                             2265
-      j=1                                                                  2265
-16220 continue                                                             2265
-16221 if(d(jp(j)).gt.0.0)goto 16222                                        2265
-      j=j+1                                                                2265
-      if(j.gt.nj)goto 16222                                                2265
-      goto 16221                                                           2266
-16222 continue                                                             2266
-      if(j .lt. nj-1)goto 16241                                            2266
-      jerr=30000                                                           2266
+16001 continue                                                             2224
+16002 continue                                                             2224
+      if(dli.lt.cthr)goto 15992                                            2224
+      if(nlp .le. maxit)goto 16071                                         2224
+      jerr=-ilm                                                            2224
+      return                                                               2224
+16071 continue                                                             2225
+      goto 15991                                                           2226
+15992 continue                                                             2226
+      goto 15881                                                           2227
+15882 continue                                                             2227
+      if(nin.gt.nx)goto 15872                                              2228
+      e=q*exp(sign(min(abs(f),fmax),f))                                    2229
+      call outer(no,nk,dq,dk,kp,jp,e,wr,w,jerr,uu)                         2230
+      if(jerr .eq. 0)goto 16091                                            2230
+      jerr=jerr-ilm                                                        2230
+      go to 11790                                                          2230
+16091 continue                                                             2231
+      ix=0                                                                 2232
+16100 do 16101 j=1,nin                                                     2232
+      k=m(j)                                                               2233
+      if(v(k)*(a(k)-as(k))**2.lt.cthr)goto 16101                           2233
+      ix=1                                                                 2233
+      goto 16102                                                           2233
+16101 continue                                                             2234
+16102 continue                                                             2234
+      if(ix .ne. 0)goto 16121                                              2235
+16130 do 16131 k=1,ni                                                      2235
+      if(ixx(k).eq.1)goto 16131                                            2235
+      if(ju(k).eq.0)goto 16131                                             2236
+      ga(k)=abs(dot_product(wr,x(:,k)))                                    2237
+      if(ga(k) .le. sa*vp(k))goto 16151                                    2237
+      ixx(k)=1                                                             2237
+      ix=1                                                                 2237
+16151 continue                                                             2238
+16131 continue                                                             2239
+16132 continue                                                             2239
+      if(ix.eq.1) go to 10680                                              2240
+      goto 15872                                                           2241
+16121 continue                                                             2242
+      goto 15871                                                           2243
+15872 continue                                                             2243
+      if(nin .le. nx)goto 16171                                            2243
+      jerr=-10000-ilm                                                      2243
+      goto 15792                                                           2243
+16171 continue                                                             2244
+      if(nin.gt.0) ao(1:nin,ilm)=a(m(1:nin))                               2244
+      kin(ilm)=nin                                                         2245
+      alm(ilm)=al                                                          2245
+      lmu=ilm                                                              2246
+      dev(ilm)=(risk(no,ni,nk,dq,dk,f,e,kp,jp,uu)-r0)/rr                   2247
+      if(ilm.lt.mnl)goto 15791                                             2247
+      if(flmin.ge.1.0)goto 15791                                           2248
+      me=0                                                                 2248
+16180 do 16181 j=1,nin                                                     2248
+      if(ao(j,ilm).ne.0.0) me=me+1                                         2248
+16181 continue                                                             2248
+16182 continue                                                             2248
+      if(me.gt.ne)goto 15792                                               2249
+      if((dev(ilm)-dev(ilm-mnl+1))/dev(ilm).lt.sml)goto 15792              2250
+      if(dev(ilm).gt.devmax)goto 15792                                     2251
+15791 continue                                                             2252
+15792 continue                                                             2252
+      g=f                                                                  2253
+11790 continue                                                             2253
+      deallocate(e,uu,w,dk,v,xs,f,wr,a,as,jp,kp,dq,mm,ga,ixx)              2254
+      return                                                               2255
+      end                                                                  2256
+      subroutine cxmodval(ca,ia,nin,n,x,f)                                 2257
+      real ca(nin),x(n,*),f(n)                                             2257
+      integer ia(nin)                                                      2258
+      f=0.0                                                                2258
+      if(nin.le.0) return                                                  2259
+16190 do 16191 i=1,n                                                       2259
+      f(i)=f(i)+dot_product(ca(1:nin),x(i,ia(1:nin)))                      2259
+16191 continue                                                             2260
+16192 continue                                                             2260
+      return                                                               2261
+      end                                                                  2262
+      subroutine groups(no,y,d,q,nk,kp,jp,t0,jerr)                         2263
+      real y(no),d(no),q(no)                                               2263
+      integer jp(no),kp(*)                                                 2264
+16200 do 16201 j=1,no                                                      2264
+      jp(j)=j                                                              2264
+16201 continue                                                             2264
+16202 continue                                                             2264
+      call psort7(y,jp,1,no)                                               2265
+      nj=0                                                                 2265
+16210 do 16211 j=1,no                                                      2265
+      if(q(jp(j)).le.0.0)goto 16211                                        2265
+      nj=nj+1                                                              2265
+      jp(nj)=jp(j)                                                         2265
+16211 continue                                                             2266
+16212 continue                                                             2266
+      if(nj .ne. 0)goto 16231                                              2266
+      jerr=20000                                                           2266
       return                                                               2266
-16241 continue                                                             2267
-      j0=j-1                                                               2267
-      nj=nj-j0                                                             2267
-16250 do 16251 j=1,nj                                                      2267
-      jp(j)=jp(j+j0)                                                       2267
-16251 continue                                                             2268
-16252 continue                                                             2268
-      jerr=0                                                               2268
-      nk=0                                                                 2268
-      t0=y(jp(1))                                                          2268
-      yk=t0                                                                2268
-      j=2                                                                  2269
-16260 continue                                                             2269
+16231 continue                                                             2267
+      j=1                                                                  2267
+16240 continue                                                             2267
+16241 if(d(jp(j)).gt.0.0)goto 16242                                        2267
+      j=j+1                                                                2267
+      if(j.gt.nj)goto 16242                                                2267
+      goto 16241                                                           2268
+16242 continue                                                             2268
+      if(j .lt. nj-1)goto 16261                                            2268
+      jerr=30000                                                           2268
+      return                                                               2268
 16261 continue                                                             2269
-16270 continue                                                             2270
-16271 if(d(jp(j)).gt.0.0.and.y(jp(j)).gt.yk)goto 16272                     2270
-      j=j+1                                                                2270
-      if(j.gt.nj)goto 16272                                                2270
-      goto 16271                                                           2271
-16272 continue                                                             2271
-      nk=nk+1                                                              2271
-      kp(nk)=j-1                                                           2271
-      if(j.gt.nj)goto 16262                                                2272
-      if(j .ne. nj)goto 16291                                              2272
-      nk=nk+1                                                              2272
-      kp(nk)=nj                                                            2272
-      goto 16262                                                           2272
-16291 continue                                                             2273
-      yk=y(jp(j))                                                          2273
-      j=j+1                                                                2274
-      goto 16261                                                           2275
-16262 continue                                                             2275
-      return                                                               2276
-      end                                                                  2277
-      subroutine outer(no,nk,d,dk,kp,jp,e,wr,w,jerr,u)                     2278
-      real d(no),dk(nk),wr(no),w(no)                                       2279
-      real e(no),u(no),b,c                                                 2279
-      integer kp(nk),jp(no)                                                2280
-      call usk(no,nk,kp,jp,e,u)                                            2281
-      b=dk(1)/u(1)                                                         2281
-      c=dk(1)/u(1)**2                                                      2281
-      jerr=0                                                               2282
-16300 do 16301 j=1,kp(1)                                                   2282
-      i=jp(j)                                                              2283
-      w(i)=e(i)*(b-e(i)*c)                                                 2283
-      if(w(i) .gt. 0.0)goto 16321                                          2283
-      jerr=-3                                                              2283
-      return                                                               2283
-16321 continue                                                             2284
-      wr(i)=d(i)-e(i)*b                                                    2285
-16301 continue                                                             2286
-16302 continue                                                             2286
-16330 do 16331 k=2,nk                                                      2286
-      j1=kp(k-1)+1                                                         2286
-      j2=kp(k)                                                             2287
-      b=b+dk(k)/u(k)                                                       2287
-      c=c+dk(k)/u(k)**2                                                    2288
-16340 do 16341 j=j1,j2                                                     2288
-      i=jp(j)                                                              2289
-      w(i)=e(i)*(b-e(i)*c)                                                 2289
-      if(w(i) .gt. 0.0)goto 16361                                          2289
-      jerr=-30000                                                          2289
-      return                                                               2289
-16361 continue                                                             2290
-      wr(i)=d(i)-e(i)*b                                                    2291
-16341 continue                                                             2292
-16342 continue                                                             2292
-16331 continue                                                             2293
-16332 continue                                                             2293
-      return                                                               2294
-      end                                                                  2295
-      subroutine vars(no,ni,x,w,ixx,v)                                     2296
-      real x(no,ni),w(no),v(ni)                                            2296
-      integer ixx(ni)                                                      2297
-16370 do 16371 j=1,ni                                                      2297
-      if(ixx(j).gt.0) v(j)=dot_product(w,x(:,j)**2)                        2297
-16371 continue                                                             2298
-16372 continue                                                             2298
-      return                                                               2299
-      end                                                                  2300
-      subroutine died(no,nk,d,kp,jp,dk)                                    2301
-      real d(no),dk(nk)                                                    2301
-      integer kp(nk),jp(no)                                                2302
-      dk(1)=sum(d(jp(1:kp(1))))                                            2303
-16380 do 16381 k=2,nk                                                      2303
-      dk(k)=sum(d(jp((kp(k-1)+1):kp(k))))                                  2303
-16381 continue                                                             2304
-16382 continue                                                             2304
-      return                                                               2305
-      end                                                                  2306
-      subroutine usk(no,nk,kp,jp,e,u)                                      2307
-      real e(no),u(nk),h                                                   2307
-      integer kp(nk),jp(no)                                                2308
-      h=0.0                                                                2309
-16390 do 16391 k=nk,1,-1                                                   2309
-      j2=kp(k)                                                             2310
-      j1=1                                                                 2310
-      if(k.gt.1) j1=kp(k-1)+1                                              2311
-16400 do 16401 j=j2,j1,-1                                                  2311
-      h=h+e(jp(j))                                                         2311
-16401 continue                                                             2312
-16402 continue                                                             2312
-      u(k)=h                                                               2313
-16391 continue                                                             2314
-16392 continue                                                             2314
-      return                                                               2315
-      end                                                                  2316
-      function risk(no,ni,nk,d,dk,f,e,kp,jp,u)                             2317
-      real d(no),dk(nk),f(no)                                              2318
-      integer kp(nk),jp(no)                                                2318
-      real e(no),u(nk),s                                                   2319
-      call usk(no,nk,kp,jp,e,u)                                            2319
-      u=log(u)                                                             2320
-      risk=dot_product(d,f)-dot_product(dk,u)                              2321
-      return                                                               2322
-      end                                                                  2323
-      subroutine loglike(no,ni,x,y,d,g,w,nlam,a,flog,jerr)                 2324
-      real x(no,ni),y(no),d(no),g(no),w(no),a(ni,nlam),flog(nlam)          2325
+      j0=j-1                                                               2269
+      nj=nj-j0                                                             2269
+16270 do 16271 j=1,nj                                                      2269
+      jp(j)=jp(j+j0)                                                       2269
+16271 continue                                                             2270
+16272 continue                                                             2270
+      jerr=0                                                               2270
+      nk=0                                                                 2270
+      t0=y(jp(1))                                                          2270
+      yk=t0                                                                2270
+      j=2                                                                  2271
+16280 continue                                                             2271
+16281 continue                                                             2271
+16290 continue                                                             2272
+16291 if(d(jp(j)).gt.0.0.and.y(jp(j)).gt.yk)goto 16292                     2272
+      j=j+1                                                                2272
+      if(j.gt.nj)goto 16292                                                2272
+      goto 16291                                                           2273
+16292 continue                                                             2273
+      nk=nk+1                                                              2273
+      kp(nk)=j-1                                                           2273
+      if(j.gt.nj)goto 16282                                                2274
+      if(j .ne. nj)goto 16311                                              2274
+      nk=nk+1                                                              2274
+      kp(nk)=nj                                                            2274
+      goto 16282                                                           2274
+16311 continue                                                             2275
+      yk=y(jp(j))                                                          2275
+      j=j+1                                                                2276
+      goto 16281                                                           2277
+16282 continue                                                             2277
+      return                                                               2278
+      end                                                                  2279
+      subroutine outer(no,nk,d,dk,kp,jp,e,wr,w,jerr,u)                     2280
+      real d(no),dk(nk),wr(no),w(no)                                       2281
+      real e(no),u(no),b,c                                                 2281
+      integer kp(nk),jp(no)                                                2282
+      call usk(no,nk,kp,jp,e,u)                                            2283
+      b=dk(1)/u(1)                                                         2283
+      c=dk(1)/u(1)**2                                                      2283
+      jerr=0                                                               2284
+16320 do 16321 j=1,kp(1)                                                   2284
+      i=jp(j)                                                              2285
+      w(i)=e(i)*(b-e(i)*c)                                                 2285
+      if(w(i) .gt. 0.0)goto 16341                                          2285
+      jerr=-3                                                              2285
+      return                                                               2285
+16341 continue                                                             2286
+      wr(i)=d(i)-e(i)*b                                                    2287
+16321 continue                                                             2288
+16322 continue                                                             2288
+16350 do 16351 k=2,nk                                                      2288
+      j1=kp(k-1)+1                                                         2288
+      j2=kp(k)                                                             2289
+      b=b+dk(k)/u(k)                                                       2289
+      c=c+dk(k)/u(k)**2                                                    2290
+16360 do 16361 j=j1,j2                                                     2290
+      i=jp(j)                                                              2291
+      w(i)=e(i)*(b-e(i)*c)                                                 2291
+      if(w(i) .gt. 0.0)goto 16381                                          2291
+      jerr=-30000                                                          2291
+      return                                                               2291
+16381 continue                                                             2292
+      wr(i)=d(i)-e(i)*b                                                    2293
+16361 continue                                                             2294
+16362 continue                                                             2294
+16351 continue                                                             2295
+16352 continue                                                             2295
+      return                                                               2296
+      end                                                                  2297
+      subroutine vars(no,ni,x,w,ixx,v)                                     2298
+      real x(no,ni),w(no),v(ni)                                            2298
+      integer ixx(ni)                                                      2299
+16390 do 16391 j=1,ni                                                      2299
+      if(ixx(j).gt.0) v(j)=dot_product(w,x(:,j)**2)                        2299
+16391 continue                                                             2300
+16392 continue                                                             2300
+      return                                                               2301
+      end                                                                  2302
+      subroutine died(no,nk,d,kp,jp,dk)                                    2303
+      real d(no),dk(nk)                                                    2303
+      integer kp(nk),jp(no)                                                2304
+      dk(1)=sum(d(jp(1:kp(1))))                                            2305
+16400 do 16401 k=2,nk                                                      2305
+      dk(k)=sum(d(jp((kp(k-1)+1):kp(k))))                                  2305
+16401 continue                                                             2306
+16402 continue                                                             2306
+      return                                                               2307
+      end                                                                  2308
+      subroutine usk(no,nk,kp,jp,e,u)                                      2309
+      real e(no),u(nk),h                                                   2309
+      integer kp(nk),jp(no)                                                2310
+      h=0.0                                                                2311
+16410 do 16411 k=nk,1,-1                                                   2311
+      j2=kp(k)                                                             2312
+      j1=1                                                                 2312
+      if(k.gt.1) j1=kp(k-1)+1                                              2313
+16420 do 16421 j=j2,j1,-1                                                  2313
+      h=h+e(jp(j))                                                         2313
+16421 continue                                                             2314
+16422 continue                                                             2314
+      u(k)=h                                                               2315
+16411 continue                                                             2316
+16412 continue                                                             2316
+      return                                                               2317
+      end                                                                  2318
+      function risk(no,ni,nk,d,dk,f,e,kp,jp,u)                             2319
+      real d(no),dk(nk),f(no)                                              2320
+      integer kp(nk),jp(no)                                                2320
+      real e(no),u(nk),s                                                   2321
+      call usk(no,nk,kp,jp,e,u)                                            2321
+      u=log(u)                                                             2322
+      risk=dot_product(d,f)-dot_product(dk,u)                              2323
+      return                                                               2324
+      end                                                                  2325
+      subroutine loglike(no,ni,x,y,d,g,w,nlam,a,flog,jerr)                 2326
+      real x(no,ni),y(no),d(no),g(no),w(no),a(ni,nlam),flog(nlam)          2327
       real, dimension (:), allocatable :: dk,f,xm,dq,q                          
       real, dimension (:), allocatable :: e,uu                                  
       integer, dimension (:), allocatable :: jp,kp                              
-      allocate(e(1:no),stat=jerr)                                          2331
-      allocate(q(1:no),stat=ierr)                                          2331
-      jerr=jerr+ierr                                                       2332
-      allocate(uu(1:no),stat=ierr)                                         2332
-      jerr=jerr+ierr                                                       2333
-      allocate(f(1:no),stat=ierr)                                          2333
+      allocate(e(1:no),stat=jerr)                                          2333
+      allocate(q(1:no),stat=ierr)                                          2333
       jerr=jerr+ierr                                                       2334
-      allocate(dk(1:no),stat=ierr)                                         2334
+      allocate(uu(1:no),stat=ierr)                                         2334
       jerr=jerr+ierr                                                       2335
-      allocate(jp(1:no),stat=ierr)                                         2335
+      allocate(f(1:no),stat=ierr)                                          2335
       jerr=jerr+ierr                                                       2336
-      allocate(kp(1:no),stat=ierr)                                         2336
+      allocate(dk(1:no),stat=ierr)                                         2336
       jerr=jerr+ierr                                                       2337
-      allocate(dq(1:no),stat=ierr)                                         2337
+      allocate(jp(1:no),stat=ierr)                                         2337
       jerr=jerr+ierr                                                       2338
-      allocate(xm(1:ni),stat=ierr)                                         2338
+      allocate(kp(1:no),stat=ierr)                                         2338
       jerr=jerr+ierr                                                       2339
-      if(jerr.ne.0) go to 11790                                            2340
-      q=max(0.0,w)                                                         2340
-      sw=sum(q)                                                            2341
-      if(sw .gt. 0.0)goto 16421                                            2341
-      jerr=9999                                                            2341
-      go to 11790                                                          2341
-16421 continue                                                             2342
-      call groups(no,y,d,q,nk,kp,jp,t0,jerr)                               2343
-      if(jerr.ne.0) go to 11790                                            2343
-      fmax=log(huge(e(1))*0.1)                                             2344
-      dq=d*q                                                               2344
-      call died(no,nk,dq,kp,jp,dk)                                         2344
-      gm=dot_product(q,g)/sw                                               2345
-16430 do 16431 j=1,ni                                                      2345
-      xm(j)=dot_product(q,x(:,j))/sw                                       2345
-16431 continue                                                             2346
-16432 continue                                                             2346
-16440 do 16441 lam=1,nlam                                                  2347
-16450 do 16451 i=1,no                                                      2347
-      f(i)=g(i)-gm+dot_product(a(:,lam),(x(i,:)-xm))                       2348
-      e(i)=q(i)*exp(sign(min(abs(f(i)),fmax),f(i)))                        2349
-16451 continue                                                             2350
-16452 continue                                                             2350
-      flog(lam)=risk(no,ni,nk,dq,dk,f,e,kp,jp,uu)                          2351
-16441 continue                                                             2352
-16442 continue                                                             2352
-11790 continue                                                             2352
-      deallocate(e,uu,dk,f,jp,kp,dq)                                       2353
-      return                                                               2354
-      end                                                                  2355
-      subroutine fishnet (parm,no,ni,x,y,g,w,jd,vp,ne,nx,nlam,flmin,ulam   2357 
+      allocate(dq(1:no),stat=ierr)                                         2339
+      jerr=jerr+ierr                                                       2340
+      allocate(xm(1:ni),stat=ierr)                                         2340
+      jerr=jerr+ierr                                                       2341
+      if(jerr.ne.0) go to 11790                                            2342
+      q=max(0.0,w)                                                         2342
+      sw=sum(q)                                                            2343
+      if(sw .gt. 0.0)goto 16441                                            2343
+      jerr=9999                                                            2343
+      go to 11790                                                          2343
+16441 continue                                                             2344
+      call groups(no,y,d,q,nk,kp,jp,t0,jerr)                               2345
+      if(jerr.ne.0) go to 11790                                            2345
+      fmax=log(huge(e(1))*0.1)                                             2346
+      dq=d*q                                                               2346
+      call died(no,nk,dq,kp,jp,dk)                                         2346
+      gm=dot_product(q,g)/sw                                               2347
+16450 do 16451 j=1,ni                                                      2347
+      xm(j)=dot_product(q,x(:,j))/sw                                       2347
+16451 continue                                                             2348
+16452 continue                                                             2348
+16460 do 16461 lam=1,nlam                                                  2349
+16470 do 16471 i=1,no                                                      2349
+      f(i)=g(i)-gm+dot_product(a(:,lam),(x(i,:)-xm))                       2350
+      e(i)=q(i)*exp(sign(min(abs(f(i)),fmax),f(i)))                        2351
+16471 continue                                                             2352
+16472 continue                                                             2352
+      flog(lam)=risk(no,ni,nk,dq,dk,f,e,kp,jp,uu)                          2353
+16461 continue                                                             2354
+16462 continue                                                             2354
+11790 continue                                                             2354
+      deallocate(e,uu,dk,f,jp,kp,dq)                                       2355
+      return                                                               2356
+      end                                                                  2357
+      subroutine fishnet (parm,no,ni,x,y,g,w,jd,vp,ne,nx,nlam,flmin,ulam   2359 
      *,thr,  isd,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr)
-      real x(no,ni),y(no),g(no),w(no),vp(ni),ulam(nlam)                    2358
-      real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam)                        2359
-      integer jd(*),ia(nx),nin(nlam)                                       2360
+      real x(no,ni),y(no),g(no),w(no),vp(ni),ulam(nlam)                    2360
+      real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam)                        2361
+      integer jd(*),ia(nx),nin(nlam)                                       2362
       real, dimension (:), allocatable :: xm,xs,ww,vq                           
       integer, dimension (:), allocatable :: ju                                 
-      if(maxval(vp) .gt. 0.0)goto 16471                                    2364
-      jerr=10000                                                           2364
-      return                                                               2364
-16471 continue                                                             2365
-      if(minval(y) .ge. 0.0)goto 16491                                     2365
-      jerr=8888                                                            2365
-      return                                                               2365
-16491 continue                                                             2366
-      allocate(ww(1:no),stat=jerr)                                         2367
-      allocate(ju(1:ni),stat=ierr)                                         2367
-      jerr=jerr+ierr                                                       2368
-      allocate(vq(1:ni),stat=ierr)                                         2368
-      jerr=jerr+ierr                                                       2369
-      allocate(xm(1:ni),stat=ierr)                                         2369
+      if(maxval(vp) .gt. 0.0)goto 16491                                    2366
+      jerr=10000                                                           2366
+      return                                                               2366
+16491 continue                                                             2367
+      if(minval(y) .ge. 0.0)goto 16511                                     2367
+      jerr=8888                                                            2367
+      return                                                               2367
+16511 continue                                                             2368
+      allocate(ww(1:no),stat=jerr)                                         2369
+      allocate(ju(1:ni),stat=ierr)                                         2369
       jerr=jerr+ierr                                                       2370
-      if(isd .le. 0)goto 16511                                             2370
-      allocate(xs(1:ni),stat=ierr)                                         2370
-      jerr=jerr+ierr                                                       2370
-16511 continue                                                             2371
-      if(jerr.ne.0) return                                                 2372
-      call chkvars(no,ni,x,ju)                                             2373
-      if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0                                 2374
-      if(maxval(ju) .gt. 0)goto 16531                                      2374
-      jerr=7777                                                            2374
-      go to 11790                                                          2374
-16531 continue                                                             2375
-      vq=max(0.0,vp)                                                       2375
-      vq=vq*ni/sum(vq)                                                     2376
-      ww=max(0.0,w)                                                        2376
-      sw=sum(ww)                                                           2376
-      if(sw .gt. 0.0)goto 16551                                            2376
-      jerr=9999                                                            2376
+      allocate(vq(1:ni),stat=ierr)                                         2370
+      jerr=jerr+ierr                                                       2371
+      allocate(xm(1:ni),stat=ierr)                                         2371
+      jerr=jerr+ierr                                                       2372
+      if(isd .le. 0)goto 16531                                             2372
+      allocate(xs(1:ni),stat=ierr)                                         2372
+      jerr=jerr+ierr                                                       2372
+16531 continue                                                             2373
+      if(jerr.ne.0) return                                                 2374
+      call chkvars(no,ni,x,ju)                                             2375
+      if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0                                 2376
+      if(maxval(ju) .gt. 0)goto 16551                                      2376
+      jerr=7777                                                            2376
       go to 11790                                                          2376
 16551 continue                                                             2377
-      ww=ww/sw                                                             2378
-      call lstandard1(no,ni,x,ww,ju,isd,xm,xs)                             2379
-      call fishnet1(parm,no,ni,x,y,g,ww,ju,vq,ne,nx,nlam,flmin,ulam,thr,   2381 
+      vq=max(0.0,vp)                                                       2377
+      vq=vq*ni/sum(vq)                                                     2378
+      ww=max(0.0,w)                                                        2378
+      sw=sum(ww)                                                           2378
+      if(sw .gt. 0.0)goto 16571                                            2378
+      jerr=9999                                                            2378
+      go to 11790                                                          2378
+16571 continue                                                             2379
+      ww=ww/sw                                                             2380
+      call lstandard1(no,ni,x,ww,ju,isd,xm,xs)                             2381
+      call fishnet1(parm,no,ni,x,y,g,ww,ju,vq,ne,nx,nlam,flmin,ulam,thr,   2383 
      *  isd,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr)
-      if(jerr.gt.0) go to 11790                                            2381
-      dev0=2.0*sw*dev0                                                     2382
-16560 do 16561 k=1,lmu                                                     2382
-      nk=nin(k)                                                            2383
-      if(isd.gt.0) ca(1:nk,k)=ca(1:nk,k)/xs(ia(1:nk))                      2384
-      a0(k)=a0(k)-dot_product(ca(1:nk,k),xm(ia(1:nk)))                     2385
-16561 continue                                                             2386
-16562 continue                                                             2386
-11790 continue                                                             2386
-      deallocate(ww,ju,vq,xm)                                              2386
-      if(isd.gt.0) deallocate(xs)                                          2387
-      return                                                               2388
-      end                                                                  2389
-      subroutine fishnet1(parm,no,ni,x,y,g,q,ju,vp,ne,nx,nlam,flmin,ulam   2391 
+      if(jerr.gt.0) go to 11790                                            2383
+      dev0=2.0*sw*dev0                                                     2384
+16580 do 16581 k=1,lmu                                                     2384
+      nk=nin(k)                                                            2385
+      if(isd.gt.0) ca(1:nk,k)=ca(1:nk,k)/xs(ia(1:nk))                      2386
+      a0(k)=a0(k)-dot_product(ca(1:nk,k),xm(ia(1:nk)))                     2387
+16581 continue                                                             2388
+16582 continue                                                             2388
+11790 continue                                                             2388
+      deallocate(ww,ju,vq,xm)                                              2388
+      if(isd.gt.0) deallocate(xs)                                          2389
+      return                                                               2390
+      end                                                                  2391
+      subroutine fishnet1(parm,no,ni,x,y,g,q,ju,vp,ne,nx,nlam,flmin,ulam   2393 
      *,shri,  isd,maxit,lmu,a0,ca,m,kin,dev0,dev,alm,nlp,jerr)
-      parameter(sml=1.0e-4, eps=1.0e-6, big=9.9e35, mnlam=5, devmax=0.99   2392 
+      parameter(sml=1.0e-4, eps=1.0e-6, big=9.9e35, mnlam=5, devmax=0.99   2394 
      *9)
-      real x(no,ni),y(no),g(no),q(no),vp(ni),ulam(nlam)                    2393
-      real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam)                        2394
-      integer ju(ni),m(nx),kin(nlam)                                       2395
+      real x(no,ni),y(no),g(no),q(no),vp(ni),ulam(nlam)                    2395
+      real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam)                        2396
+      integer ju(ni),m(nx),kin(nlam)                                       2397
       real, dimension (:), allocatable :: t,w,wr,v,a,f,as,ga                    
       integer, dimension (:), allocatable :: mm,ixx                             
-      allocate(a(1:ni),stat=jerr)                                          2400
-      allocate(as(1:ni),stat=ierr)                                         2400
-      jerr=jerr+ierr                                                       2401
-      allocate(t(1:no),stat=ierr)                                          2401
-      jerr=jerr+ierr                                                       2402
-      allocate(mm(1:ni),stat=ierr)                                         2402
+      allocate(a(1:ni),stat=jerr)                                          2402
+      allocate(as(1:ni),stat=ierr)                                         2402
       jerr=jerr+ierr                                                       2403
-      allocate(ga(1:ni),stat=ierr)                                         2403
+      allocate(t(1:no),stat=ierr)                                          2403
       jerr=jerr+ierr                                                       2404
-      allocate(ixx(1:ni),stat=ierr)                                        2404
+      allocate(mm(1:ni),stat=ierr)                                         2404
       jerr=jerr+ierr                                                       2405
-      allocate(wr(1:no),stat=ierr)                                         2405
+      allocate(ga(1:ni),stat=ierr)                                         2405
       jerr=jerr+ierr                                                       2406
-      allocate(v(1:ni),stat=ierr)                                          2406
+      allocate(ixx(1:ni),stat=ierr)                                        2406
       jerr=jerr+ierr                                                       2407
-      allocate(w(1:no),stat=ierr)                                          2407
+      allocate(wr(1:no),stat=ierr)                                         2407
       jerr=jerr+ierr                                                       2408
-      allocate(f(1:no),stat=ierr)                                          2408
+      allocate(v(1:ni),stat=ierr)                                          2408
       jerr=jerr+ierr                                                       2409
-      if(jerr.ne.0) return                                                 2410
-      bta=parm                                                             2410
-      omb=1.0-bta                                                          2411
-      t=q*y                                                                2411
-      yb=sum(t)                                                            2411
-      fmax=log(huge(bta)*0.1)                                              2412
-      if(nonzero(no,g) .ne. 0)goto 16581                                   2412
-      w=q*yb                                                               2412
-      az=log(yb)                                                           2412
-      f=az                                                                 2412
-      dv0=yb*(log(yb)-1.0)                                                 2412
-      goto 16591                                                           2413
-16581 continue                                                             2413
-      w=q*exp(sign(min(abs(g),fmax),g))                                    2413
-      v0=sum(w)                                                            2413
-      eaz=yb/v0                                                            2414
-      w=eaz*w                                                              2414
-      az=log(eaz)                                                          2414
-      f=az+g                                                               2415
-      dv0=dot_product(t,g)-yb*(1.0-az)                                     2416
-16591 continue                                                             2417
-16571 continue                                                             2417
-      a=0.0                                                                2417
-      as=0.0                                                               2417
-      wr=t-w                                                               2417
-      v0=yb                                                                2417
-      dvr=-yb                                                              2418
-16600 do 16601 i=1,no                                                      2418
-      if(t(i).gt.0.0) dvr=dvr+t(i)*log(y(i))                               2418
-16601 continue                                                             2418
-16602 continue                                                             2418
-      dvr=dvr-dv0                                                          2418
-      dev0=dvr                                                             2419
-      if(flmin .ge. 1.0)goto 16621                                         2419
-      eqs=max(eps,flmin)                                                   2419
-      alf=eqs**(1.0/(nlam-1))                                              2419
+      allocate(w(1:no),stat=ierr)                                          2409
+      jerr=jerr+ierr                                                       2410
+      allocate(f(1:no),stat=ierr)                                          2410
+      jerr=jerr+ierr                                                       2411
+      if(jerr.ne.0) return                                                 2412
+      bta=parm                                                             2412
+      omb=1.0-bta                                                          2413
+      t=q*y                                                                2413
+      yb=sum(t)                                                            2413
+      fmax=log(huge(bta)*0.1)                                              2414
+      if(nonzero(no,g) .ne. 0)goto 16601                                   2414
+      w=q*yb                                                               2414
+      az=log(yb)                                                           2414
+      f=az                                                                 2414
+      dv0=yb*(log(yb)-1.0)                                                 2414
+      goto 16611                                                           2415
+16601 continue                                                             2415
+      w=q*exp(sign(min(abs(g),fmax),g))                                    2415
+      v0=sum(w)                                                            2415
+      eaz=yb/v0                                                            2416
+      w=eaz*w                                                              2416
+      az=log(eaz)                                                          2416
+      f=az+g                                                               2417
+      dv0=dot_product(t,g)-yb*(1.0-az)                                     2418
+16611 continue                                                             2419
+16591 continue                                                             2419
+      a=0.0                                                                2419
+      as=0.0                                                               2419
+      wr=t-w                                                               2419
+      v0=yb                                                                2419
+      dvr=-yb                                                              2420
+16620 do 16621 i=1,no                                                      2420
+      if(t(i).gt.0.0) dvr=dvr+t(i)*log(y(i))                               2420
 16621 continue                                                             2420
-      m=0                                                                  2420
-      mm=0                                                                 2420
-      nlp=0                                                                2420
-      nin=nlp                                                              2420
-      mnl=min(mnlam,nlam)                                                  2420
-      shr=shri*dev0                                                        2420
-      ixx=0                                                                2420
-      al=0.0                                                               2421
-16630 do 16631 j=1,ni                                                      2421
-      if(ju(j).eq.0)goto 16631                                             2421
-      ga(j)=abs(dot_product(wr,x(:,j)))                                    2421
-16631 continue                                                             2422
-16632 continue                                                             2422
-16640 do 16641 ilm=1,nlam                                                  2422
-      al0=al                                                               2423
-      if(flmin .lt. 1.0)goto 16661                                         2423
-      al=ulam(ilm)                                                         2423
-      goto 16651                                                           2424
-16661 if(ilm .le. 2)goto 16671                                             2424
-      al=al*alf                                                            2424
-      goto 16651                                                           2425
-16671 if(ilm .ne. 1)goto 16681                                             2425
-      al=big                                                               2425
-      goto 16691                                                           2426
-16681 continue                                                             2426
-      al0=0.0                                                              2427
-16700 do 16701 j=1,ni                                                      2427
-      if(ju(j).eq.0)goto 16701                                             2427
-      if(vp(j).gt.0.0) al0=max(al0,ga(j)/vp(j))                            2427
+16622 continue                                                             2420
+      dvr=dvr-dv0                                                          2420
+      dev0=dvr                                                             2421
+      if(flmin .ge. 1.0)goto 16641                                         2421
+      eqs=max(eps,flmin)                                                   2421
+      alf=eqs**(1.0/(nlam-1))                                              2421
+16641 continue                                                             2422
+      m=0                                                                  2422
+      mm=0                                                                 2422
+      nlp=0                                                                2422
+      nin=nlp                                                              2422
+      mnl=min(mnlam,nlam)                                                  2422
+      shr=shri*dev0                                                        2422
+      ixx=0                                                                2422
+      al=0.0                                                               2423
+16650 do 16651 j=1,ni                                                      2423
+      if(ju(j).eq.0)goto 16651                                             2423
+      ga(j)=abs(dot_product(wr,x(:,j)))                                    2423
+16651 continue                                                             2424
+16652 continue                                                             2424
+16660 do 16661 ilm=1,nlam                                                  2424
+      al0=al                                                               2425
+      if(flmin .lt. 1.0)goto 16681                                         2425
+      al=ulam(ilm)                                                         2425
+      goto 16671                                                           2426
+16681 if(ilm .le. 2)goto 16691                                             2426
+      al=al*alf                                                            2426
+      goto 16671                                                           2427
+16691 if(ilm .ne. 1)goto 16701                                             2427
+      al=big                                                               2427
+      goto 16711                                                           2428
 16701 continue                                                             2428
-16702 continue                                                             2428
-      al0=al0/max(bta,1.0e-3)                                              2428
-      al=alf*al0                                                           2429
-16691 continue                                                             2430
-16651 continue                                                             2430
-      al2=al*omb                                                           2430
-      al1=al*bta                                                           2430
-      tlam=bta*(2.0*al-al0)                                                2431
-16710 do 16711 k=1,ni                                                      2431
-      if(ixx(k).eq.1)goto 16711                                            2431
-      if(ju(k).eq.0)goto 16711                                             2432
-      if(ga(k).gt.tlam*vp(k)) ixx(k)=1                                     2433
-16711 continue                                                             2434
-16712 continue                                                             2434
-10680 continue                                                             2435
-16720 continue                                                             2435
-16721 continue                                                             2435
-      az0=az                                                               2436
-      if(nin.gt.0) as(m(1:nin))=a(m(1:nin))                                2437
-16730 do 16731 j=1,ni                                                      2437
-      if(ixx(j).ne.0) v(j)=dot_product(w,x(:,j)**2)                        2437
-16731 continue                                                             2438
-16732 continue                                                             2438
-16740 continue                                                             2438
-16741 continue                                                             2438
-      nlp=nlp+1                                                            2438
-      dlx=0.0                                                              2439
-16750 do 16751 k=1,ni                                                      2439
-      if(ixx(k).eq.0)goto 16751                                            2439
-      ak=a(k)                                                              2440
-      u=dot_product(wr,x(:,k))+v(k)*ak                                     2440
-      au=abs(u)-vp(k)*al1                                                  2441
-      if(au .gt. 0.0)goto 16771                                            2441
-      a(k)=0.0                                                             2441
-      goto 16781                                                           2442
-16771 continue                                                             2442
-      a(k)=sign(au,u)/(v(k)+vp(k)*al2)                                     2442
-16781 continue                                                             2443
-16761 continue                                                             2443
-      if(a(k).eq.ak)goto 16751                                             2443
-      d=a(k)-ak                                                            2443
-      dlx=max(dlx,v(k)*d**2)                                               2444
-      wr=wr-d*w*x(:,k)                                                     2444
-      f=f+d*x(:,k)                                                         2445
-      if(mm(k) .ne. 0)goto 16801                                           2445
-      nin=nin+1                                                            2445
-      if(nin.gt.nx)goto 16752                                              2446
-      mm(k)=nin                                                            2446
-      m(nin)=k                                                             2447
-16801 continue                                                             2448
-16751 continue                                                             2449
-16752 continue                                                             2449
-      if(nin.gt.nx)goto 16742                                              2449
-      d=sum(wr)/v0                                                         2450
-      az=az+d                                                              2450
-      dlx=max(dlx,v0*d**2)                                                 2450
-      wr=wr-d*w                                                            2450
-      f=f+d                                                                2451
-      if(dlx.lt.shr)goto 16742                                             2451
-      if(nlp .le. maxit)goto 16821                                         2451
-      jerr=-ilm                                                            2451
-      return                                                               2451
-16821 continue                                                             2452
-16830 continue                                                             2452
-16831 continue                                                             2452
-      nlp=nlp+1                                                            2452
-      dlx=0.0                                                              2453
-16840 do 16841 l=1,nin                                                     2453
-      k=m(l)                                                               2453
-      ak=a(k)                                                              2454
-      u=dot_product(wr,x(:,k))+v(k)*ak                                     2454
-      au=abs(u)-vp(k)*al1                                                  2455
-      if(au .gt. 0.0)goto 16861                                            2455
-      a(k)=0.0                                                             2455
-      goto 16871                                                           2456
-16861 continue                                                             2456
-      a(k)=sign(au,u)/(v(k)+vp(k)*al2)                                     2456
-16871 continue                                                             2457
-16851 continue                                                             2457
-      if(a(k).eq.ak)goto 16841                                             2457
-      d=a(k)-ak                                                            2457
-      dlx=max(dlx,v(k)*d**2)                                               2458
-      wr=wr-d*w*x(:,k)                                                     2458
-      f=f+d*x(:,k)                                                         2460
-16841 continue                                                             2460
-16842 continue                                                             2460
-      d=sum(wr)/v0                                                         2460
-      az=az+d                                                              2460
-      dlx=max(dlx,v0*d**2)                                                 2460
-      wr=wr-d*w                                                            2460
-      f=f+d                                                                2461
-      if(dlx.lt.shr)goto 16832                                             2461
-      if(nlp .le. maxit)goto 16891                                         2461
-      jerr=-ilm                                                            2461
-      return                                                               2461
-16891 continue                                                             2462
-      goto 16831                                                           2463
-16832 continue                                                             2463
-      goto 16741                                                           2464
-16742 continue                                                             2464
-      if(nin.gt.nx)goto 16722                                              2465
-      w=q*exp(sign(min(abs(f),fmax),f))                                    2465
-      v0=sum(w)                                                            2465
-      wr=t-w                                                               2466
-      if(v0*(az-az0)**2 .ge. shr)goto 16911                                2466
-      ix=0                                                                 2467
-16920 do 16921 j=1,nin                                                     2467
-      k=m(j)                                                               2468
-      if(v(k)*(a(k)-as(k))**2.lt.shr)goto 16921                            2468
-      ix=1                                                                 2468
-      goto 16922                                                           2469
-16921 continue                                                             2470
-16922 continue                                                             2470
-      if(ix .ne. 0)goto 16941                                              2471
-16950 do 16951 k=1,ni                                                      2471
-      if(ixx(k).eq.1)goto 16951                                            2471
-      if(ju(k).eq.0)goto 16951                                             2472
-      ga(k)=abs(dot_product(wr,x(:,k)))                                    2473
-      if(ga(k) .le. al1*vp(k))goto 16971                                   2473
-      ixx(k)=1                                                             2473
-      ix=1                                                                 2473
-16971 continue                                                             2474
-16951 continue                                                             2475
-16952 continue                                                             2475
-      if(ix.eq.1) go to 10680                                              2476
-      goto 16722                                                           2477
-16941 continue                                                             2478
-16911 continue                                                             2479
-      goto 16721                                                           2480
-16722 continue                                                             2480
-      if(nin .le. nx)goto 16991                                            2480
-      jerr=-10000-ilm                                                      2480
-      goto 16642                                                           2480
-16991 continue                                                             2481
-      if(nin.gt.0) ca(1:nin,ilm)=a(m(1:nin))                               2481
-      kin(ilm)=nin                                                         2482
-      a0(ilm)=az                                                           2482
-      alm(ilm)=al                                                          2482
-      lmu=ilm                                                              2483
-      dev(ilm)=(dot_product(t,f)-v0-dv0)/dvr                               2484
-      if(ilm.lt.mnl)goto 16641                                             2484
-      if(flmin.ge.1.0)goto 16641                                           2485
-      me=0                                                                 2485
-17000 do 17001 j=1,nin                                                     2485
-      if(ca(j,ilm).ne.0.0) me=me+1                                         2485
-17001 continue                                                             2485
-17002 continue                                                             2485
-      if(me.gt.ne)goto 16642                                               2486
-      if((dev(ilm)-dev(ilm-mnl+1))/dev(ilm).lt.sml)goto 16642              2487
-      if(dev(ilm).gt.devmax)goto 16642                                     2488
-16641 continue                                                             2489
-16642 continue                                                             2489
-      g=f                                                                  2490
-11790 continue                                                             2490
-      deallocate(t,w,wr,v,a,f,as,mm,ga,ixx)                                2491
-      return                                                               2492
-      end                                                                  2493
-      function nonzero(n,v)                                                2494
-      real v(n)                                                            2495
-      nonzero=0                                                            2495
-17010 do 17011 i=1,n                                                       2495
-      if(v(i) .eq. 0.0)goto 17031                                          2495
-      nonzero=1                                                            2495
-      return                                                               2495
-17031 continue                                                             2495
-17011 continue                                                             2496
-17012 continue                                                             2496
+      al0=0.0                                                              2429
+16720 do 16721 j=1,ni                                                      2429
+      if(ju(j).eq.0)goto 16721                                             2429
+      if(vp(j).gt.0.0) al0=max(al0,ga(j)/vp(j))                            2429
+16721 continue                                                             2430
+16722 continue                                                             2430
+      al0=al0/max(bta,1.0e-3)                                              2430
+      al=alf*al0                                                           2431
+16711 continue                                                             2432
+16671 continue                                                             2432
+      al2=al*omb                                                           2432
+      al1=al*bta                                                           2432
+      tlam=bta*(2.0*al-al0)                                                2433
+16730 do 16731 k=1,ni                                                      2433
+      if(ixx(k).eq.1)goto 16731                                            2433
+      if(ju(k).eq.0)goto 16731                                             2434
+      if(ga(k).gt.tlam*vp(k)) ixx(k)=1                                     2435
+16731 continue                                                             2436
+16732 continue                                                             2436
+10680 continue                                                             2437
+16740 continue                                                             2437
+16741 continue                                                             2437
+      az0=az                                                               2438
+      if(nin.gt.0) as(m(1:nin))=a(m(1:nin))                                2439
+16750 do 16751 j=1,ni                                                      2439
+      if(ixx(j).ne.0) v(j)=dot_product(w,x(:,j)**2)                        2439
+16751 continue                                                             2440
+16752 continue                                                             2440
+16760 continue                                                             2440
+16761 continue                                                             2440
+      nlp=nlp+1                                                            2440
+      dlx=0.0                                                              2441
+16770 do 16771 k=1,ni                                                      2441
+      if(ixx(k).eq.0)goto 16771                                            2441
+      ak=a(k)                                                              2442
+      u=dot_product(wr,x(:,k))+v(k)*ak                                     2442
+      au=abs(u)-vp(k)*al1                                                  2443
+      if(au .gt. 0.0)goto 16791                                            2443
+      a(k)=0.0                                                             2443
+      goto 16801                                                           2444
+16791 continue                                                             2444
+      a(k)=sign(au,u)/(v(k)+vp(k)*al2)                                     2444
+16801 continue                                                             2445
+16781 continue                                                             2445
+      if(a(k).eq.ak)goto 16771                                             2445
+      d=a(k)-ak                                                            2445
+      dlx=max(dlx,v(k)*d**2)                                               2446
+      wr=wr-d*w*x(:,k)                                                     2446
+      f=f+d*x(:,k)                                                         2447
+      if(mm(k) .ne. 0)goto 16821                                           2447
+      nin=nin+1                                                            2447
+      if(nin.gt.nx)goto 16772                                              2448
+      mm(k)=nin                                                            2448
+      m(nin)=k                                                             2449
+16821 continue                                                             2450
+16771 continue                                                             2451
+16772 continue                                                             2451
+      if(nin.gt.nx)goto 16762                                              2451
+      d=sum(wr)/v0                                                         2452
+      az=az+d                                                              2452
+      dlx=max(dlx,v0*d**2)                                                 2452
+      wr=wr-d*w                                                            2452
+      f=f+d                                                                2453
+      if(dlx.lt.shr)goto 16762                                             2453
+      if(nlp .le. maxit)goto 16841                                         2453
+      jerr=-ilm                                                            2453
+      return                                                               2453
+16841 continue                                                             2454
+16850 continue                                                             2454
+16851 continue                                                             2454
+      nlp=nlp+1                                                            2454
+      dlx=0.0                                                              2455
+16860 do 16861 l=1,nin                                                     2455
+      k=m(l)                                                               2455
+      ak=a(k)                                                              2456
+      u=dot_product(wr,x(:,k))+v(k)*ak                                     2456
+      au=abs(u)-vp(k)*al1                                                  2457
+      if(au .gt. 0.0)goto 16881                                            2457
+      a(k)=0.0                                                             2457
+      goto 16891                                                           2458
+16881 continue                                                             2458
+      a(k)=sign(au,u)/(v(k)+vp(k)*al2)                                     2458
+16891 continue                                                             2459
+16871 continue                                                             2459
+      if(a(k).eq.ak)goto 16861                                             2459
+      d=a(k)-ak                                                            2459
+      dlx=max(dlx,v(k)*d**2)                                               2460
+      wr=wr-d*w*x(:,k)                                                     2460
+      f=f+d*x(:,k)                                                         2462
+16861 continue                                                             2462
+16862 continue                                                             2462
+      d=sum(wr)/v0                                                         2462
+      az=az+d                                                              2462
+      dlx=max(dlx,v0*d**2)                                                 2462
+      wr=wr-d*w                                                            2462
+      f=f+d                                                                2463
+      if(dlx.lt.shr)goto 16852                                             2463
+      if(nlp .le. maxit)goto 16911                                         2463
+      jerr=-ilm                                                            2463
+      return                                                               2463
+16911 continue                                                             2464
+      goto 16851                                                           2465
+16852 continue                                                             2465
+      goto 16761                                                           2466
+16762 continue                                                             2466
+      if(nin.gt.nx)goto 16742                                              2467
+      w=q*exp(sign(min(abs(f),fmax),f))                                    2467
+      v0=sum(w)                                                            2467
+      wr=t-w                                                               2468
+      if(v0*(az-az0)**2 .ge. shr)goto 16931                                2468
+      ix=0                                                                 2469
+16940 do 16941 j=1,nin                                                     2469
+      k=m(j)                                                               2470
+      if(v(k)*(a(k)-as(k))**2.lt.shr)goto 16941                            2470
+      ix=1                                                                 2470
+      goto 16942                                                           2471
+16941 continue                                                             2472
+16942 continue                                                             2472
+      if(ix .ne. 0)goto 16961                                              2473
+16970 do 16971 k=1,ni                                                      2473
+      if(ixx(k).eq.1)goto 16971                                            2473
+      if(ju(k).eq.0)goto 16971                                             2474
+      ga(k)=abs(dot_product(wr,x(:,k)))                                    2475
+      if(ga(k) .le. al1*vp(k))goto 16991                                   2475
+      ixx(k)=1                                                             2475
+      ix=1                                                                 2475
+16991 continue                                                             2476
+16971 continue                                                             2477
+16972 continue                                                             2477
+      if(ix.eq.1) go to 10680                                              2478
+      goto 16742                                                           2479
+16961 continue                                                             2480
+16931 continue                                                             2481
+      goto 16741                                                           2482
+16742 continue                                                             2482
+      if(nin .le. nx)goto 17011                                            2482
+      jerr=-10000-ilm                                                      2482
+      goto 16662                                                           2482
+17011 continue                                                             2483
+      if(nin.gt.0) ca(1:nin,ilm)=a(m(1:nin))                               2483
+      kin(ilm)=nin                                                         2484
+      a0(ilm)=az                                                           2484
+      alm(ilm)=al                                                          2484
+      lmu=ilm                                                              2485
+      dev(ilm)=(dot_product(t,f)-v0-dv0)/dvr                               2486
+      if(ilm.lt.mnl)goto 16661                                             2486
+      if(flmin.ge.1.0)goto 16661                                           2487
+      me=0                                                                 2487
+17020 do 17021 j=1,nin                                                     2487
+      if(ca(j,ilm).ne.0.0) me=me+1                                         2487
+17021 continue                                                             2487
+17022 continue                                                             2487
+      if(me.gt.ne)goto 16662                                               2488
+      if((dev(ilm)-dev(ilm-mnl+1))/dev(ilm).lt.sml)goto 16662              2489
+      if(dev(ilm).gt.devmax)goto 16662                                     2490
+16661 continue                                                             2491
+16662 continue                                                             2491
+      g=f                                                                  2492
+11790 continue                                                             2492
+      deallocate(t,w,wr,v,a,f,as,mm,ga,ixx)                                2493
+      return                                                               2494
+      end                                                                  2495
+      function nonzero(n,v)                                                2496
+      real v(n)                                                            2497
+      nonzero=0                                                            2497
+17030 do 17031 i=1,n                                                       2497
+      if(v(i) .eq. 0.0)goto 17051                                          2497
+      nonzero=1                                                            2497
       return                                                               2497
-      end                                                                  2498
-      subroutine solns(ni,nx,lmu,a,ia,nin,b)                               2499
-      real a(nx,lmu),b(ni,lmu)                                             2499
-      integer ia(nx),nin(lmu)                                              2500
-17040 do 17041 lam=1,lmu                                                   2500
-      call uncomp(ni,a(:,lam),ia,nin(lam),b(:,lam))                        2500
-17041 continue                                                             2501
-17042 continue                                                             2501
-      return                                                               2502
-      end                                                                  2503
-      subroutine lsolns(ni,nx,nc,lmu,a,ia,nin,b)                           2504
-      real a(nx,nc,lmu),b(ni,nc,lmu)                                       2504
-      integer ia(nx),nin(lmu)                                              2505
-17050 do 17051 lam=1,lmu                                                   2505
-      call luncomp(ni,nx,nc,a(1,1,lam),ia,nin(lam),b(1,1,lam))             2505
-17051 continue                                                             2506
-17052 continue                                                             2506
-      return                                                               2507
-      end                                                                  2508
-      subroutine deviance(no,ni,x,y,g,q,nlam,a0,a,flog,jerr)               2509
-      real x(no,ni),y(no),g(no),q(no),a(ni,nlam),a0(nlam),flog(nlam)       2510
+17051 continue                                                             2497
+17031 continue                                                             2498
+17032 continue                                                             2498
+      return                                                               2499
+      end                                                                  2500
+      subroutine solns(ni,nx,lmu,a,ia,nin,b)                               2501
+      real a(nx,lmu),b(ni,lmu)                                             2501
+      integer ia(nx),nin(lmu)                                              2502
+17060 do 17061 lam=1,lmu                                                   2502
+      call uncomp(ni,a(:,lam),ia,nin(lam),b(:,lam))                        2502
+17061 continue                                                             2503
+17062 continue                                                             2503
+      return                                                               2504
+      end                                                                  2505
+      subroutine lsolns(ni,nx,nc,lmu,a,ia,nin,b)                           2506
+      real a(nx,nc,lmu),b(ni,nc,lmu)                                       2506
+      integer ia(nx),nin(lmu)                                              2507
+17070 do 17071 lam=1,lmu                                                   2507
+      call luncomp(ni,nx,nc,a(1,1,lam),ia,nin(lam),b(1,1,lam))             2507
+17071 continue                                                             2508
+17072 continue                                                             2508
+      return                                                               2509
+      end                                                                  2510
+      subroutine deviance(no,ni,x,y,g,q,nlam,a0,a,flog,jerr)               2511
+      real x(no,ni),y(no),g(no),q(no),a(ni,nlam),a0(nlam),flog(nlam)       2512
       real, dimension (:), allocatable :: w                                     
-      if(minval(y) .ge. 0.0)goto 17071                                     2513
-      jerr=8888                                                            2513
-      return                                                               2513
-17071 continue                                                             2514
-      allocate(w(1:no),stat=jerr)                                          2514
-      if(jerr.ne.0) return                                                 2515
-      w=max(0.0,q)                                                         2515
-      sw=sum(w)                                                            2515
-      if(sw .gt. 0.0)goto 17091                                            2515
-      jerr=9999                                                            2515
-      go to 11790                                                          2515
+      if(minval(y) .ge. 0.0)goto 17091                                     2515
+      jerr=8888                                                            2515
+      return                                                               2515
 17091 continue                                                             2516
-      yb=dot_product(w,y)/sw                                               2516
-      fmax=log(huge(y(1))*0.1)                                             2517
-17100 do 17101 lam=1,nlam                                                  2517
-      s=0.0                                                                2518
-17110 do 17111 i=1,no                                                      2518
-      if(w(i).le.0.0)goto 17111                                            2519
-      f=g(i)+a0(lam)+dot_product(a(:,lam),x(i,:))                          2520
-      s=s+w(i)*(y(i)*f-exp(sign(min(abs(f),fmax),f)))                      2521
-17111 continue                                                             2522
-17112 continue                                                             2522
-      flog(lam)=2.0*(sw*yb*(log(yb)-1.0)-s)                                2523
-17101 continue                                                             2524
-17102 continue                                                             2524
-11790 continue                                                             2524
-      deallocate(w)                                                        2525
-      return                                                               2526
-      end                                                                  2527
-      subroutine spfishnet (parm,no,ni,x,ix,jx,y,g,w,jd,vp,ne,nx,nlam,fl   2529 
+      allocate(w(1:no),stat=jerr)                                          2516
+      if(jerr.ne.0) return                                                 2517
+      w=max(0.0,q)                                                         2517
+      sw=sum(w)                                                            2517
+      if(sw .gt. 0.0)goto 17111                                            2517
+      jerr=9999                                                            2517
+      go to 11790                                                          2517
+17111 continue                                                             2518
+      yb=dot_product(w,y)/sw                                               2518
+      fmax=log(huge(y(1))*0.1)                                             2519
+17120 do 17121 lam=1,nlam                                                  2519
+      s=0.0                                                                2520
+17130 do 17131 i=1,no                                                      2520
+      if(w(i).le.0.0)goto 17131                                            2521
+      f=g(i)+a0(lam)+dot_product(a(:,lam),x(i,:))                          2522
+      s=s+w(i)*(y(i)*f-exp(sign(min(abs(f),fmax),f)))                      2523
+17131 continue                                                             2524
+17132 continue                                                             2524
+      flog(lam)=2.0*(sw*yb*(log(yb)-1.0)-s)                                2525
+17121 continue                                                             2526
+17122 continue                                                             2526
+11790 continue                                                             2526
+      deallocate(w)                                                        2527
+      return                                                               2528
+      end                                                                  2529
+      subroutine spfishnet (parm,no,ni,x,ix,jx,y,g,w,jd,vp,ne,nx,nlam,fl   2531 
      *min,ulam,thr,  isd,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr)
-      real x(*),y(no),g(no),w(no),vp(ni),ulam(nlam)                        2530
-      real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam)                        2531
-      integer ix(*),jx(*),jd(*),ia(nx),nin(nlam)                           2532
+      real x(*),y(no),g(no),w(no),vp(ni),ulam(nlam)                        2532
+      real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam)                        2533
+      integer ix(*),jx(*),jd(*),ia(nx),nin(nlam)                           2534
       real, dimension (:), allocatable :: xm,xs,ww,vq                           
       integer, dimension (:), allocatable :: ju                                 
-      if(maxval(vp) .gt. 0.0)goto 17131                                    2536
-      jerr=10000                                                           2536
-      return                                                               2536
-17131 continue                                                             2537
-      if(minval(y) .ge. 0.0)goto 17151                                     2537
-      jerr=8888                                                            2537
-      return                                                               2537
-17151 continue                                                             2538
-      allocate(ww(1:no),stat=jerr)                                         2539
-      allocate(ju(1:ni),stat=ierr)                                         2539
-      jerr=jerr+ierr                                                       2540
-      allocate(vq(1:ni),stat=ierr)                                         2540
-      jerr=jerr+ierr                                                       2541
-      allocate(xm(1:ni),stat=ierr)                                         2541
+      if(maxval(vp) .gt. 0.0)goto 17151                                    2538
+      jerr=10000                                                           2538
+      return                                                               2538
+17151 continue                                                             2539
+      if(minval(y) .ge. 0.0)goto 17171                                     2539
+      jerr=8888                                                            2539
+      return                                                               2539
+17171 continue                                                             2540
+      allocate(ww(1:no),stat=jerr)                                         2541
+      allocate(ju(1:ni),stat=ierr)                                         2541
       jerr=jerr+ierr                                                       2542
-      allocate(xs(1:ni),stat=ierr)                                         2542
+      allocate(vq(1:ni),stat=ierr)                                         2542
       jerr=jerr+ierr                                                       2543
-      if(jerr.ne.0) return                                                 2544
-      call spchkvars(no,ni,x,ix,ju)                                        2545
-      if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0                                 2546
-      if(maxval(ju) .gt. 0)goto 17171                                      2546
-      jerr=7777                                                            2546
-      go to 11790                                                          2546
-17171 continue                                                             2547
-      vq=max(0.0,vp)                                                       2547
-      vq=vq*ni/sum(vq)                                                     2548
-      ww=max(0.0,w)                                                        2548
-      sw=sum(ww)                                                           2548
-      if(sw .gt. 0.0)goto 17191                                            2548
-      jerr=9999                                                            2548
+      allocate(xm(1:ni),stat=ierr)                                         2543
+      jerr=jerr+ierr                                                       2544
+      allocate(xs(1:ni),stat=ierr)                                         2544
+      jerr=jerr+ierr                                                       2545
+      if(jerr.ne.0) return                                                 2546
+      call spchkvars(no,ni,x,ix,ju)                                        2547
+      if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0                                 2548
+      if(maxval(ju) .gt. 0)goto 17191                                      2548
+      jerr=7777                                                            2548
       go to 11790                                                          2548
 17191 continue                                                             2549
-      ww=ww/sw                                                             2550
-      call splstandard2(no,ni,x,ix,jx,ww,ju,isd,xm,xs)                     2551
-      call spfishnet1(parm,no,ni,x,ix,jx,y,g,ww,ju,vq,ne,nx,nlam,flmin,u   2553 
+      vq=max(0.0,vp)                                                       2549
+      vq=vq*ni/sum(vq)                                                     2550
+      ww=max(0.0,w)                                                        2550
+      sw=sum(ww)                                                           2550
+      if(sw .gt. 0.0)goto 17211                                            2550
+      jerr=9999                                                            2550
+      go to 11790                                                          2550
+17211 continue                                                             2551
+      ww=ww/sw                                                             2552
+      call splstandard2(no,ni,x,ix,jx,ww,ju,isd,xm,xs)                     2553
+      call spfishnet1(parm,no,ni,x,ix,jx,y,g,ww,ju,vq,ne,nx,nlam,flmin,u   2555 
      *lam,thr,  isd,maxit,xm,xs,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr)
-      if(jerr.gt.0) go to 11790                                            2553
-      dev0=2.0*sw*dev0                                                     2554
-17200 do 17201 k=1,lmu                                                     2554
-      nk=nin(k)                                                            2555
-      if(isd.gt.0) ca(1:nk,k)=ca(1:nk,k)/xs(ia(1:nk))                      2556
-      a0(k)=a0(k)-dot_product(ca(1:nk,k),xm(ia(1:nk)))                     2557
-17201 continue                                                             2558
-17202 continue                                                             2558
-11790 continue                                                             2558
-      deallocate(ww,ju,vq,xm,xs)                                           2559
-      return                                                               2560
-      end                                                                  2561
-      subroutine spfishnet1(parm,no,ni,x,ix,jx,y,g,q,ju,vp,ne,nx,nlam,fl   2563 
+      if(jerr.gt.0) go to 11790                                            2555
+      dev0=2.0*sw*dev0                                                     2556
+17220 do 17221 k=1,lmu                                                     2556
+      nk=nin(k)                                                            2557
+      if(isd.gt.0) ca(1:nk,k)=ca(1:nk,k)/xs(ia(1:nk))                      2558
+      a0(k)=a0(k)-dot_product(ca(1:nk,k),xm(ia(1:nk)))                     2559
+17221 continue                                                             2560
+17222 continue                                                             2560
+11790 continue                                                             2560
+      deallocate(ww,ju,vq,xm,xs)                                           2561
+      return                                                               2562
+      end                                                                  2563
+      subroutine spfishnet1(parm,no,ni,x,ix,jx,y,g,q,ju,vp,ne,nx,nlam,fl   2565 
      *min,ulam,  shri,isd,maxit,xb,xs,lmu,a0,ca,m,kin,dev0,dev,alm,nlp,j
      *err)
-      parameter(sml=1.0e-4, eps=1.0e-6, big=9.9e35, mnlam=5, devmax=0.99   2564 
+      parameter(sml=1.0e-4, eps=1.0e-6, big=9.9e35, mnlam=5, devmax=0.99   2566 
      *9)
-      real x(*),y(no),g(no),q(no),vp(ni),ulam(nlam),xb(ni),xs(ni)          2565
-      real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam)                        2566
-      integer ix(*),jx(*),ju(ni),m(nx),kin(nlam)                           2567
+      real x(*),y(no),g(no),q(no),vp(ni),ulam(nlam),xb(ni),xs(ni)          2567
+      real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam)                        2568
+      integer ix(*),jx(*),ju(ni),m(nx),kin(nlam)                           2569
       real, dimension (:), allocatable :: qy,t,w,wr,v,a,as,xm,ga                
       integer, dimension (:), allocatable :: mm,ixx                             
-      allocate(a(1:ni),stat=jerr)                                          2572
-      allocate(as(1:ni),stat=ierr)                                         2572
-      jerr=jerr+ierr                                                       2573
-      allocate(t(1:no),stat=ierr)                                          2573
-      jerr=jerr+ierr                                                       2574
-      allocate(mm(1:ni),stat=ierr)                                         2574
+      allocate(a(1:ni),stat=jerr)                                          2574
+      allocate(as(1:ni),stat=ierr)                                         2574
       jerr=jerr+ierr                                                       2575
-      allocate(ga(1:ni),stat=ierr)                                         2575
+      allocate(t(1:no),stat=ierr)                                          2575
       jerr=jerr+ierr                                                       2576
-      allocate(ixx(1:ni),stat=ierr)                                        2576
+      allocate(mm(1:ni),stat=ierr)                                         2576
       jerr=jerr+ierr                                                       2577
-      allocate(wr(1:no),stat=ierr)                                         2577
+      allocate(ga(1:ni),stat=ierr)                                         2577
       jerr=jerr+ierr                                                       2578
-      allocate(v(1:ni),stat=ierr)                                          2578
+      allocate(ixx(1:ni),stat=ierr)                                        2578
       jerr=jerr+ierr                                                       2579
-      allocate(xm(1:ni),stat=ierr)                                         2579
+      allocate(wr(1:no),stat=ierr)                                         2579
       jerr=jerr+ierr                                                       2580
-      allocate(w(1:no),stat=ierr)                                          2580
+      allocate(v(1:ni),stat=ierr)                                          2580
       jerr=jerr+ierr                                                       2581
-      allocate(qy(1:no),stat=ierr)                                         2581
+      allocate(xm(1:ni),stat=ierr)                                         2581
       jerr=jerr+ierr                                                       2582
-      if(jerr.ne.0) return                                                 2583
-      bta=parm                                                             2583
-      omb=1.0-bta                                                          2583
-      fmax=log(huge(bta)*0.1)                                              2584
-      qy=q*y                                                               2584
-      yb=sum(qy)                                                           2585
-      if(nonzero(no,g) .ne. 0)goto 17221                                   2585
-      w=q*yb                                                               2585
-      az=log(yb)                                                           2585
-      uu=az                                                                2586
-      xm=yb*xb                                                             2586
-      t=0.0                                                                2586
-      dv0=yb*(log(yb)-1.0)                                                 2587
-      goto 17231                                                           2588
-17221 continue                                                             2588
-      w=q*exp(sign(min(abs(g),fmax),g))                                    2588
-      ww=sum(w)                                                            2588
-      eaz=yb/ww                                                            2589
-      w=eaz*w                                                              2589
-      az=log(eaz)                                                          2589
-      uu=az                                                                2589
-      t=g                                                                  2589
-      dv0=dot_product(qy,g)-yb*(1.0-az)                                    2590
-17240 do 17241 j=1,ni                                                      2590
-      if(ju(j).eq.0)goto 17241                                             2590
-      jb=ix(j)                                                             2590
-      je=ix(j+1)-1                                                         2591
-      xm(j)=dot_product(w(jx(jb:je)),x(jb:je))                             2592
-17241 continue                                                             2593
-17242 continue                                                             2593
-17231 continue                                                             2594
-17211 continue                                                             2594
-      tt=yb*uu                                                             2594
-      ww=yb                                                                2594
-      wr=qy-q*(yb*(1.0-uu))                                                2594
-      a=0.0                                                                2594
-      as=0.0                                                               2595
-      dvr=-yb                                                              2596
-17250 do 17251 i=1,no                                                      2596
-      if(qy(i).gt.0.0) dvr=dvr+qy(i)*log(y(i))                             2596
+      allocate(w(1:no),stat=ierr)                                          2582
+      jerr=jerr+ierr                                                       2583
+      allocate(qy(1:no),stat=ierr)                                         2583
+      jerr=jerr+ierr                                                       2584
+      if(jerr.ne.0) return                                                 2585
+      bta=parm                                                             2585
+      omb=1.0-bta                                                          2585
+      fmax=log(huge(bta)*0.1)                                              2586
+      qy=q*y                                                               2586
+      yb=sum(qy)                                                           2587
+      if(nonzero(no,g) .ne. 0)goto 17241                                   2587
+      w=q*yb                                                               2587
+      az=log(yb)                                                           2587
+      uu=az                                                                2588
+      xm=yb*xb                                                             2588
+      t=0.0                                                                2588
+      dv0=yb*(log(yb)-1.0)                                                 2589
+      goto 17251                                                           2590
+17241 continue                                                             2590
+      w=q*exp(sign(min(abs(g),fmax),g))                                    2590
+      ww=sum(w)                                                            2590
+      eaz=yb/ww                                                            2591
+      w=eaz*w                                                              2591
+      az=log(eaz)                                                          2591
+      uu=az                                                                2591
+      t=g                                                                  2591
+      dv0=dot_product(qy,g)-yb*(1.0-az)                                    2592
+17260 do 17261 j=1,ni                                                      2592
+      if(ju(j).eq.0)goto 17261                                             2592
+      jb=ix(j)                                                             2592
+      je=ix(j+1)-1                                                         2593
+      xm(j)=dot_product(w(jx(jb:je)),x(jb:je))                             2594
+17261 continue                                                             2595
+17262 continue                                                             2595
 17251 continue                                                             2596
-17252 continue                                                             2596
-      dvr=dvr-dv0                                                          2596
-      dev0=dvr                                                             2597
-      if(flmin .ge. 1.0)goto 17271                                         2597
-      eqs=max(eps,flmin)                                                   2597
-      alf=eqs**(1.0/(nlam-1))                                              2597
+17231 continue                                                             2596
+      tt=yb*uu                                                             2596
+      ww=yb                                                                2596
+      wr=qy-q*(yb*(1.0-uu))                                                2596
+      a=0.0                                                                2596
+      as=0.0                                                               2597
+      dvr=-yb                                                              2598
+17270 do 17271 i=1,no                                                      2598
+      if(qy(i).gt.0.0) dvr=dvr+qy(i)*log(y(i))                             2598
 17271 continue                                                             2598
-      m=0                                                                  2598
-      mm=0                                                                 2598
-      nlp=0                                                                2598
-      nin=nlp                                                              2598
-      mnl=min(mnlam,nlam)                                                  2598
-      shr=shri*dev0                                                        2598
-      al=0.0                                                               2598
-      ixx=0                                                                2599
-17280 do 17281 j=1,ni                                                      2599
-      if(ju(j).eq.0)goto 17281                                             2600
-      jb=ix(j)                                                             2600
-      je=ix(j+1)-1                                                         2601
-      ga(j)=abs(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(j)-ww*xb(j)   2603 
+17272 continue                                                             2598
+      dvr=dvr-dv0                                                          2598
+      dev0=dvr                                                             2599
+      if(flmin .ge. 1.0)goto 17291                                         2599
+      eqs=max(eps,flmin)                                                   2599
+      alf=eqs**(1.0/(nlam-1))                                              2599
+17291 continue                                                             2600
+      m=0                                                                  2600
+      mm=0                                                                 2600
+      nlp=0                                                                2600
+      nin=nlp                                                              2600
+      mnl=min(mnlam,nlam)                                                  2600
+      shr=shri*dev0                                                        2600
+      al=0.0                                                               2600
+      ixx=0                                                                2601
+17300 do 17301 j=1,ni                                                      2601
+      if(ju(j).eq.0)goto 17301                                             2602
+      jb=ix(j)                                                             2602
+      je=ix(j+1)-1                                                         2603
+      ga(j)=abs(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(j)-ww*xb(j)   2605 
      *)-xb(j)*tt)/xs(j)
-17281 continue                                                             2604
-17282 continue                                                             2604
-17290 do 17291 ilm=1,nlam                                                  2604
-      al0=al                                                               2605
-      if(flmin .lt. 1.0)goto 17311                                         2605
-      al=ulam(ilm)                                                         2605
-      goto 17301                                                           2606
-17311 if(ilm .le. 2)goto 17321                                             2606
-      al=al*alf                                                            2606
-      goto 17301                                                           2607
-17321 if(ilm .ne. 1)goto 17331                                             2607
-      al=big                                                               2607
-      goto 17341                                                           2608
-17331 continue                                                             2608
-      al0=0.0                                                              2609
-17350 do 17351 j=1,ni                                                      2609
-      if(ju(j).eq.0)goto 17351                                             2609
-      if(vp(j).gt.0.0) al0=max(al0,ga(j)/vp(j))                            2609
+17301 continue                                                             2606
+17302 continue                                                             2606
+17310 do 17311 ilm=1,nlam                                                  2606
+      al0=al                                                               2607
+      if(flmin .lt. 1.0)goto 17331                                         2607
+      al=ulam(ilm)                                                         2607
+      goto 17321                                                           2608
+17331 if(ilm .le. 2)goto 17341                                             2608
+      al=al*alf                                                            2608
+      goto 17321                                                           2609
+17341 if(ilm .ne. 1)goto 17351                                             2609
+      al=big                                                               2609
+      goto 17361                                                           2610
 17351 continue                                                             2610
-17352 continue                                                             2610
-      al0=al0/max(bta,1.0e-3)                                              2610
-      al=alf*al0                                                           2611
-17341 continue                                                             2612
-17301 continue                                                             2612
-      al2=al*omb                                                           2612
-      al1=al*bta                                                           2612
-      tlam=bta*(2.0*al-al0)                                                2613
-17360 do 17361 k=1,ni                                                      2613
-      if(ixx(k).eq.1)goto 17361                                            2613
-      if(ju(k).eq.0)goto 17361                                             2614
-      if(ga(k).gt.tlam*vp(k)) ixx(k)=1                                     2615
-17361 continue                                                             2616
-17362 continue                                                             2616
-10680 continue                                                             2617
-17370 continue                                                             2617
-17371 continue                                                             2617
-      az0=az                                                               2618
-      if(nin.gt.0) as(m(1:nin))=a(m(1:nin))                                2619
-17380 do 17381 j=1,ni                                                      2619
-      if(ixx(j).eq.0)goto 17381                                            2619
-      jb=ix(j)                                                             2619
-      je=ix(j+1)-1                                                         2620
-      xm(j)=dot_product(w(jx(jb:je)),x(jb:je))                             2621
-      v(j)=(dot_product(w(jx(jb:je)),x(jb:je)**2)  -2.0*xb(j)*xm(j)+ww*x   2623 
+      al0=0.0                                                              2611
+17370 do 17371 j=1,ni                                                      2611
+      if(ju(j).eq.0)goto 17371                                             2611
+      if(vp(j).gt.0.0) al0=max(al0,ga(j)/vp(j))                            2611
+17371 continue                                                             2612
+17372 continue                                                             2612
+      al0=al0/max(bta,1.0e-3)                                              2612
+      al=alf*al0                                                           2613
+17361 continue                                                             2614
+17321 continue                                                             2614
+      al2=al*omb                                                           2614
+      al1=al*bta                                                           2614
+      tlam=bta*(2.0*al-al0)                                                2615
+17380 do 17381 k=1,ni                                                      2615
+      if(ixx(k).eq.1)goto 17381                                            2615
+      if(ju(k).eq.0)goto 17381                                             2616
+      if(ga(k).gt.tlam*vp(k)) ixx(k)=1                                     2617
+17381 continue                                                             2618
+17382 continue                                                             2618
+10680 continue                                                             2619
+17390 continue                                                             2619
+17391 continue                                                             2619
+      az0=az                                                               2620
+      if(nin.gt.0) as(m(1:nin))=a(m(1:nin))                                2621
+17400 do 17401 j=1,ni                                                      2621
+      if(ixx(j).eq.0)goto 17401                                            2621
+      jb=ix(j)                                                             2621
+      je=ix(j+1)-1                                                         2622
+      xm(j)=dot_product(w(jx(jb:je)),x(jb:je))                             2623
+      v(j)=(dot_product(w(jx(jb:je)),x(jb:je)**2)  -2.0*xb(j)*xm(j)+ww*x   2625 
      *b(j)**2)/xs(j)**2
-17381 continue                                                             2624
-17382 continue                                                             2624
-17390 continue                                                             2624
-17391 continue                                                             2624
-      nlp=nlp+1                                                            2625
-      dlx=0.0                                                              2626
-17400 do 17401 k=1,ni                                                      2626
-      if(ixx(k).eq.0)goto 17401                                            2626
-      jb=ix(k)                                                             2626
-      je=ix(k+1)-1                                                         2626
-      ak=a(k)                                                              2627
-      u=(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(k)-ww*xb(k))-xb(k)   2629 
+17401 continue                                                             2626
+17402 continue                                                             2626
+17410 continue                                                             2626
+17411 continue                                                             2626
+      nlp=nlp+1                                                            2627
+      dlx=0.0                                                              2628
+17420 do 17421 k=1,ni                                                      2628
+      if(ixx(k).eq.0)goto 17421                                            2628
+      jb=ix(k)                                                             2628
+      je=ix(k+1)-1                                                         2628
+      ak=a(k)                                                              2629
+      u=(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(k)-ww*xb(k))-xb(k)   2631 
      **tt)/xs(k)+v(k)*ak
-      au=abs(u)-vp(k)*al1                                                  2630
-      if(au .gt. 0.0)goto 17421                                            2630
-      a(k)=0.0                                                             2630
-      goto 17431                                                           2631
-17421 continue                                                             2631
-      a(k)=sign(au,u)/(v(k)+vp(k)*al2)                                     2631
-17431 continue                                                             2632
-17411 continue                                                             2632
-      if(a(k).eq.ak)goto 17401                                             2633
-      if(mm(k) .ne. 0)goto 17451                                           2633
-      nin=nin+1                                                            2633
-      if(nin.gt.nx)goto 17402                                              2634
-      mm(k)=nin                                                            2634
-      m(nin)=k                                                             2635
-17451 continue                                                             2636
-      d=a(k)-ak                                                            2636
-      dlx=max(dlx,v(k)*d**2)                                               2636
-      dv=d/xs(k)                                                           2637
-      wr(jx(jb:je))=wr(jx(jb:je))-dv*w(jx(jb:je))*x(jb:je)                 2638
-      t(jx(jb:je))=t(jx(jb:je))+dv*x(jb:je)                                2639
-      uu=uu-dv*xb(k)                                                       2639
-      tt=tt-dv*xm(k)                                                       2640
-17401 continue                                                             2641
-17402 continue                                                             2641
-      if(nin.gt.nx)goto 17392                                              2641
-      d=tt/ww-uu                                                           2642
-      az=az+d                                                              2642
-      dlx=max(dlx,ww*d**2)                                                 2642
-      uu=uu+d                                                              2643
-      if(dlx.lt.shr)goto 17392                                             2643
-      if(nlp .le. maxit)goto 17471                                         2643
-      jerr=-ilm                                                            2643
-      return                                                               2643
-17471 continue                                                             2644
-17480 continue                                                             2644
-17481 continue                                                             2644
-      nlp=nlp+1                                                            2644
-      dlx=0.0                                                              2645
-17490 do 17491 l=1,nin                                                     2645
-      k=m(l)                                                               2646
-      jb=ix(k)                                                             2646
-      je=ix(k+1)-1                                                         2646
-      ak=a(k)                                                              2647
-      u=(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(k)-ww*xb(k))-xb(k)   2649 
+      au=abs(u)-vp(k)*al1                                                  2632
+      if(au .gt. 0.0)goto 17441                                            2632
+      a(k)=0.0                                                             2632
+      goto 17451                                                           2633
+17441 continue                                                             2633
+      a(k)=sign(au,u)/(v(k)+vp(k)*al2)                                     2633
+17451 continue                                                             2634
+17431 continue                                                             2634
+      if(a(k).eq.ak)goto 17421                                             2635
+      if(mm(k) .ne. 0)goto 17471                                           2635
+      nin=nin+1                                                            2635
+      if(nin.gt.nx)goto 17422                                              2636
+      mm(k)=nin                                                            2636
+      m(nin)=k                                                             2637
+17471 continue                                                             2638
+      d=a(k)-ak                                                            2638
+      dlx=max(dlx,v(k)*d**2)                                               2638
+      dv=d/xs(k)                                                           2639
+      wr(jx(jb:je))=wr(jx(jb:je))-dv*w(jx(jb:je))*x(jb:je)                 2640
+      t(jx(jb:je))=t(jx(jb:je))+dv*x(jb:je)                                2641
+      uu=uu-dv*xb(k)                                                       2641
+      tt=tt-dv*xm(k)                                                       2642
+17421 continue                                                             2643
+17422 continue                                                             2643
+      if(nin.gt.nx)goto 17412                                              2643
+      d=tt/ww-uu                                                           2644
+      az=az+d                                                              2644
+      dlx=max(dlx,ww*d**2)                                                 2644
+      uu=uu+d                                                              2645
+      if(dlx.lt.shr)goto 17412                                             2645
+      if(nlp .le. maxit)goto 17491                                         2645
+      jerr=-ilm                                                            2645
+      return                                                               2645
+17491 continue                                                             2646
+17500 continue                                                             2646
+17501 continue                                                             2646
+      nlp=nlp+1                                                            2646
+      dlx=0.0                                                              2647
+17510 do 17511 l=1,nin                                                     2647
+      k=m(l)                                                               2648
+      jb=ix(k)                                                             2648
+      je=ix(k+1)-1                                                         2648
+      ak=a(k)                                                              2649
+      u=(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(k)-ww*xb(k))-xb(k)   2651 
      **tt)/xs(k)+v(k)*ak
-      au=abs(u)-vp(k)*al1                                                  2650
-      if(au .gt. 0.0)goto 17511                                            2650
-      a(k)=0.0                                                             2650
-      goto 17521                                                           2651
-17511 continue                                                             2651
-      a(k)=sign(au,u)/(v(k)+vp(k)*al2)                                     2651
-17521 continue                                                             2652
-17501 continue                                                             2652
-      if(a(k).eq.ak)goto 17491                                             2652
-      d=a(k)-ak                                                            2652
-      dlx=max(dlx,v(k)*d**2)                                               2653
-      dv=d/xs(k)                                                           2653
-      wr(jx(jb:je))=wr(jx(jb:je))-dv*w(jx(jb:je))*x(jb:je)                 2654
-      t(jx(jb:je))=t(jx(jb:je))+dv*x(jb:je)                                2655
-      uu=uu-dv*xb(k)                                                       2655
-      tt=tt-dv*xm(k)                                                       2656
-17491 continue                                                             2657
-17492 continue                                                             2657
-      d=tt/ww-uu                                                           2657
-      az=az+d                                                              2657
-      dlx=max(dlx,ww*d**2)                                                 2657
-      uu=uu+d                                                              2658
-      if(dlx.lt.shr)goto 17482                                             2658
-      if(nlp .le. maxit)goto 17541                                         2658
-      jerr=-ilm                                                            2658
-      return                                                               2658
-17541 continue                                                             2659
-      goto 17481                                                           2660
-17482 continue                                                             2660
-      goto 17391                                                           2661
-17392 continue                                                             2661
-      if(nin.gt.nx)goto 17372                                              2662
-      euu=exp(sign(min(abs(uu),fmax),uu))                                  2663
-      w=euu*q*exp(sign(min(abs(t),fmax),t))                                2663
-      ww=sum(w)                                                            2664
-      wr=qy-w*(1.0-uu)                                                     2664
-      tt=sum(wr)                                                           2665
-      if(ww*(az-az0)**2 .ge. shr)goto 17561                                2665
-      kx=0                                                                 2666
-17570 do 17571 j=1,nin                                                     2666
-      k=m(j)                                                               2667
-      if(v(k)*(a(k)-as(k))**2.lt.shr)goto 17571                            2667
-      kx=1                                                                 2667
-      goto 17572                                                           2668
-17571 continue                                                             2669
-17572 continue                                                             2669
-      if(kx .ne. 0)goto 17591                                              2670
-17600 do 17601 j=1,ni                                                      2670
-      if(ixx(j).eq.1)goto 17601                                            2670
-      if(ju(j).eq.0)goto 17601                                             2671
-      jb=ix(j)                                                             2671
-      je=ix(j+1)-1                                                         2672
-      xm(j)=dot_product(w(jx(jb:je)),x(jb:je))                             2673
-      ga(j)=abs(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(j)-ww*xb(j)   2675 
+      au=abs(u)-vp(k)*al1                                                  2652
+      if(au .gt. 0.0)goto 17531                                            2652
+      a(k)=0.0                                                             2652
+      goto 17541                                                           2653
+17531 continue                                                             2653
+      a(k)=sign(au,u)/(v(k)+vp(k)*al2)                                     2653
+17541 continue                                                             2654
+17521 continue                                                             2654
+      if(a(k).eq.ak)goto 17511                                             2654
+      d=a(k)-ak                                                            2654
+      dlx=max(dlx,v(k)*d**2)                                               2655
+      dv=d/xs(k)                                                           2655
+      wr(jx(jb:je))=wr(jx(jb:je))-dv*w(jx(jb:je))*x(jb:je)                 2656
+      t(jx(jb:je))=t(jx(jb:je))+dv*x(jb:je)                                2657
+      uu=uu-dv*xb(k)                                                       2657
+      tt=tt-dv*xm(k)                                                       2658
+17511 continue                                                             2659
+17512 continue                                                             2659
+      d=tt/ww-uu                                                           2659
+      az=az+d                                                              2659
+      dlx=max(dlx,ww*d**2)                                                 2659
+      uu=uu+d                                                              2660
+      if(dlx.lt.shr)goto 17502                                             2660
+      if(nlp .le. maxit)goto 17561                                         2660
+      jerr=-ilm                                                            2660
+      return                                                               2660
+17561 continue                                                             2661
+      goto 17501                                                           2662
+17502 continue                                                             2662
+      goto 17411                                                           2663
+17412 continue                                                             2663
+      if(nin.gt.nx)goto 17392                                              2664
+      euu=exp(sign(min(abs(uu),fmax),uu))                                  2665
+      w=euu*q*exp(sign(min(abs(t),fmax),t))                                2665
+      ww=sum(w)                                                            2666
+      wr=qy-w*(1.0-uu)                                                     2666
+      tt=sum(wr)                                                           2667
+      if(ww*(az-az0)**2 .ge. shr)goto 17581                                2667
+      kx=0                                                                 2668
+17590 do 17591 j=1,nin                                                     2668
+      k=m(j)                                                               2669
+      if(v(k)*(a(k)-as(k))**2.lt.shr)goto 17591                            2669
+      kx=1                                                                 2669
+      goto 17592                                                           2670
+17591 continue                                                             2671
+17592 continue                                                             2671
+      if(kx .ne. 0)goto 17611                                              2672
+17620 do 17621 j=1,ni                                                      2672
+      if(ixx(j).eq.1)goto 17621                                            2672
+      if(ju(j).eq.0)goto 17621                                             2673
+      jb=ix(j)                                                             2673
+      je=ix(j+1)-1                                                         2674
+      xm(j)=dot_product(w(jx(jb:je)),x(jb:je))                             2675
+      ga(j)=abs(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(j)-ww*xb(j)   2677 
      *)-xb(j)*tt)/xs(j)
-      if(ga(j) .le. al1*vp(j))goto 17621                                   2675
-      ixx(j)=1                                                             2675
-      kx=1                                                                 2675
-17621 continue                                                             2676
-17601 continue                                                             2677
-17602 continue                                                             2677
-      if(kx.eq.1) go to 10680                                              2678
-      goto 17372                                                           2679
-17591 continue                                                             2680
-17561 continue                                                             2681
-      goto 17371                                                           2682
-17372 continue                                                             2682
-      if(nin .le. nx)goto 17641                                            2682
-      jerr=-10000-ilm                                                      2682
-      goto 17292                                                           2682
-17641 continue                                                             2683
-      if(nin.gt.0) ca(1:nin,ilm)=a(m(1:nin))                               2683
-      kin(ilm)=nin                                                         2684
-      a0(ilm)=az                                                           2684
-      alm(ilm)=al                                                          2684
-      lmu=ilm                                                              2685
-      dev(ilm)=(dot_product(qy,t)+yb*uu-ww-dv0)/dvr                        2686
-      if(ilm.lt.mnl)goto 17291                                             2686
-      if(flmin.ge.1.0)goto 17291                                           2687
-      me=0                                                                 2687
-17650 do 17651 j=1,nin                                                     2687
-      if(ca(j,ilm).ne.0.0) me=me+1                                         2687
-17651 continue                                                             2687
-17652 continue                                                             2687
-      if(me.gt.ne)goto 17292                                               2688
-      if((dev(ilm)-dev(ilm-mnl+1))/dev(ilm).lt.sml)goto 17292              2689
-      if(dev(ilm).gt.devmax)goto 17292                                     2690
-17291 continue                                                             2691
-17292 continue                                                             2691
-      g=t+uu                                                               2692
-11790 continue                                                             2692
-      deallocate(t,w,wr,v,a,qy,xm,as,mm,ga,ixx)                            2693
-      return                                                               2694
-      end                                                                  2695
-      subroutine spdeviance(no,ni,x,ix,jx,y,g,q,nlam,a0,a,flog,jerr)       2696
-      real x(*),y(no),g(no),q(no),a(ni,nlam),a0(nlam),flog(nlam)           2697
-      integer ix(*),jx(*)                                                  2698
+      if(ga(j) .le. al1*vp(j))goto 17641                                   2677
+      ixx(j)=1                                                             2677
+      kx=1                                                                 2677
+17641 continue                                                             2678
+17621 continue                                                             2679
+17622 continue                                                             2679
+      if(kx.eq.1) go to 10680                                              2680
+      goto 17392                                                           2681
+17611 continue                                                             2682
+17581 continue                                                             2683
+      goto 17391                                                           2684
+17392 continue                                                             2684
+      if(nin .le. nx)goto 17661                                            2684
+      jerr=-10000-ilm                                                      2684
+      goto 17312                                                           2684
+17661 continue                                                             2685
+      if(nin.gt.0) ca(1:nin,ilm)=a(m(1:nin))                               2685
+      kin(ilm)=nin                                                         2686
+      a0(ilm)=az                                                           2686
+      alm(ilm)=al                                                          2686
+      lmu=ilm                                                              2687
+      dev(ilm)=(dot_product(qy,t)+yb*uu-ww-dv0)/dvr                        2688
+      if(ilm.lt.mnl)goto 17311                                             2688
+      if(flmin.ge.1.0)goto 17311                                           2689
+      me=0                                                                 2689
+17670 do 17671 j=1,nin                                                     2689
+      if(ca(j,ilm).ne.0.0) me=me+1                                         2689
+17671 continue                                                             2689
+17672 continue                                                             2689
+      if(me.gt.ne)goto 17312                                               2690
+      if((dev(ilm)-dev(ilm-mnl+1))/dev(ilm).lt.sml)goto 17312              2691
+      if(dev(ilm).gt.devmax)goto 17312                                     2692
+17311 continue                                                             2693
+17312 continue                                                             2693
+      g=t+uu                                                               2694
+11790 continue                                                             2694
+      deallocate(t,w,wr,v,a,qy,xm,as,mm,ga,ixx)                            2695
+      return                                                               2696
+      end                                                                  2697
+      subroutine spdeviance(no,ni,x,ix,jx,y,g,q,nlam,a0,a,flog,jerr)       2698
+      real x(*),y(no),g(no),q(no),a(ni,nlam),a0(nlam),flog(nlam)           2699
+      integer ix(*),jx(*)                                                  2700
       real, dimension (:), allocatable :: w,f                                   
-      if(minval(y) .ge. 0.0)goto 17671                                     2701
-      jerr=8888                                                            2701
-      return                                                               2701
-17671 continue                                                             2702
-      allocate(w(1:no),stat=jerr)                                          2703
-      allocate(f(1:no),stat=ierr)                                          2703
-      jerr=jerr+ierr                                                       2704
-      if(jerr.ne.0) return                                                 2705
-      w=max(0.0,q)                                                         2705
-      sw=sum(w)                                                            2705
-      if(sw .gt. 0.0)goto 17691                                            2705
-      jerr=9999                                                            2705
-      go to 11790                                                          2705
-17691 continue                                                             2706
-      yb=dot_product(w,y)/sw                                               2706
-      fmax=log(huge(y(1))*0.1)                                             2707
-17700 do 17701 lam=1,nlam                                                  2707
-      f=a0(lam)                                                            2708
-17710 do 17711 j=1,ni                                                      2708
-      if(a(j,lam).eq.0.0)goto 17711                                        2708
-      jb=ix(j)                                                             2708
-      je=ix(j+1)-1                                                         2709
-      f(jx(jb:je))=f(jx(jb:je))+a(j,lam)*x(jb:je)                          2710
-17711 continue                                                             2711
-17712 continue                                                             2711
-      f=f+g                                                                2712
-      s=dot_product(w,y*f-exp(sign(min(abs(f),fmax),f)))                   2713
-      flog(lam)=2.0*(sw*yb*(log(yb)-1.0)-s)                                2714
-17701 continue                                                             2715
-17702 continue                                                             2715
-11790 continue                                                             2715
-      deallocate(w,f)                                                      2716
-      return                                                               2717
-      end                                                                  2718
-      subroutine cspdeviance(no,x,ix,jx,y,g,q,nx,nlam,a0,ca,ia,nin,flog,   2719 
+      if(minval(y) .ge. 0.0)goto 17691                                     2703
+      jerr=8888                                                            2703
+      return                                                               2703
+17691 continue                                                             2704
+      allocate(w(1:no),stat=jerr)                                          2705
+      allocate(f(1:no),stat=ierr)                                          2705
+      jerr=jerr+ierr                                                       2706
+      if(jerr.ne.0) return                                                 2707
+      w=max(0.0,q)                                                         2707
+      sw=sum(w)                                                            2707
+      if(sw .gt. 0.0)goto 17711                                            2707
+      jerr=9999                                                            2707
+      go to 11790                                                          2707
+17711 continue                                                             2708
+      yb=dot_product(w,y)/sw                                               2708
+      fmax=log(huge(y(1))*0.1)                                             2709
+17720 do 17721 lam=1,nlam                                                  2709
+      f=a0(lam)                                                            2710
+17730 do 17731 j=1,ni                                                      2710
+      if(a(j,lam).eq.0.0)goto 17731                                        2710
+      jb=ix(j)                                                             2710
+      je=ix(j+1)-1                                                         2711
+      f(jx(jb:je))=f(jx(jb:je))+a(j,lam)*x(jb:je)                          2712
+17731 continue                                                             2713
+17732 continue                                                             2713
+      f=f+g                                                                2714
+      s=dot_product(w,y*f-exp(sign(min(abs(f),fmax),f)))                   2715
+      flog(lam)=2.0*(sw*yb*(log(yb)-1.0)-s)                                2716
+17721 continue                                                             2717
+17722 continue                                                             2717
+11790 continue                                                             2717
+      deallocate(w,f)                                                      2718
+      return                                                               2719
+      end                                                                  2720
+      subroutine cspdeviance(no,x,ix,jx,y,g,q,nx,nlam,a0,ca,ia,nin,flog,   2721 
      *jerr)
-      real x(*),y(no),g(no),q(no),ca(nx,nlam),a0(nlam),flog(nlam)          2720
-      integer ix(*),jx(*),nin(nlam),ia(nx)                                 2721
+      real x(*),y(no),g(no),q(no),ca(nx,nlam),a0(nlam),flog(nlam)          2722
+      integer ix(*),jx(*),nin(nlam),ia(nx)                                 2723
       real, dimension (:), allocatable :: w,f                                   
-      if(minval(y) .ge. 0.0)goto 17731                                     2724
-      jerr=8888                                                            2724
-      return                                                               2724
-17731 continue                                                             2725
-      allocate(w(1:no),stat=jerr)                                          2726
-      allocate(f(1:no),stat=ierr)                                          2726
-      jerr=jerr+ierr                                                       2727
-      if(jerr.ne.0) return                                                 2728
-      w=max(0.0,q)                                                         2728
-      sw=sum(w)                                                            2728
-      if(sw .gt. 0.0)goto 17751                                            2728
-      jerr=9999                                                            2728
-      go to 11790                                                          2728
-17751 continue                                                             2729
-      yb=dot_product(w,y)/sw                                               2729
-      fmax=log(huge(y(1))*0.1)                                             2730
-17760 do 17761 lam=1,nlam                                                  2730
-      f=a0(lam)                                                            2731
-17770 do 17771 k=1,nin(lam)                                                2731
-      j=ia(k)                                                              2731
-      jb=ix(j)                                                             2731
-      je=ix(j+1)-1                                                         2732
-      f(jx(jb:je))=f(jx(jb:je))+ca(k,lam)*x(jb:je)                         2733
-17771 continue                                                             2734
-17772 continue                                                             2734
-      f=f+g                                                                2735
-      s=dot_product(w,y*f-exp(sign(min(abs(f),fmax),f)))                   2736
-      flog(lam)=2.0*(sw*yb*(log(yb)-1.0)-s)                                2737
-17761 continue                                                             2738
-17762 continue                                                             2738
-11790 continue                                                             2738
-      deallocate(w,f)                                                      2739
-      return                                                               2740
-      end                                                                  2741
+      if(minval(y) .ge. 0.0)goto 17751                                     2726
+      jerr=8888                                                            2726
+      return                                                               2726
+17751 continue                                                             2727
+      allocate(w(1:no),stat=jerr)                                          2728
+      allocate(f(1:no),stat=ierr)                                          2728
+      jerr=jerr+ierr                                                       2729
+      if(jerr.ne.0) return                                                 2730
+      w=max(0.0,q)                                                         2730
+      sw=sum(w)                                                            2730
+      if(sw .gt. 0.0)goto 17771                                            2730
+      jerr=9999                                                            2730
+      go to 11790                                                          2730
+17771 continue                                                             2731
+      yb=dot_product(w,y)/sw                                               2731
+      fmax=log(huge(y(1))*0.1)                                             2732
+17780 do 17781 lam=1,nlam                                                  2732
+      f=a0(lam)                                                            2733
+17790 do 17791 k=1,nin(lam)                                                2733
+      j=ia(k)                                                              2733
+      jb=ix(j)                                                             2733
+      je=ix(j+1)-1                                                         2734
+      f(jx(jb:je))=f(jx(jb:je))+ca(k,lam)*x(jb:je)                         2735
+17791 continue                                                             2736
+17792 continue                                                             2736
+      f=f+g                                                                2737
+      s=dot_product(w,y*f-exp(sign(min(abs(f),fmax),f)))                   2738
+      flog(lam)=2.0*(sw*yb*(log(yb)-1.0)-s)                                2739
+17781 continue                                                             2740
+17782 continue                                                             2740
+11790 continue                                                             2740
+      deallocate(w,f)                                                      2741
+      return                                                               2742
+      end                                                                  2743
       subroutine psort7 (v,a,ii,jj)                                             
 c                                                                               
 c     puts into a the permutation vector which sorts v into                     

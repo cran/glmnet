@@ -50,7 +50,7 @@ cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,groupe
       apply(2*(ly-lp),c(1,3),sum)
     },
     "class"={
-       classid=as.numeric(apply(predmat, 3, softmax))# drops it into a long vector
+       classid=as.numeric(apply(predmat, 3, glmnet_softmax))# drops it into a long vector
        yperm=matrix(aperm(bigY,c(1,3,2)),ncol=nc)#Makes a long x nc matrix
        matrix(1-yperm[cbind(seq(classid),classid)],ncol=length(lambda))#puts it back in shape
      }

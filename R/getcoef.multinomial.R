@@ -21,7 +21,7 @@ getcoef.multinomial=function(fit,nvars,nx,vnames,nc,classnames){
         df=apply(df,2,sum)
         for(k in seq(nc)){
           cak=ca[oja,k, ,drop=FALSE]
-          dfmat[k,]=apply(abs(cak)>0,2,sum)
+          dfmat[k,]=apply(abs(cak)>0,3,sum)
           beta=new("dgCMatrix",Dim=dd,Dimnames=list(vnames,stepnames),x=as.vector(cak),p=as.integer(ia-1),i=as.integer(ja-1))
           beta.list[[k]]=beta
         }

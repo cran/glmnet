@@ -28,14 +28,14 @@ standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2, nv
   \code{family="cox"}, \code{y} should be a two-column matrix with
   columns named 'time' and 'status'. The latter is a binary variable,
   with '1' indicating death, and '0' indicating right censored. The
-  function \code{Surv()} in package \pkg{survival} produces such a matrix}
+  function \code{Surv()} in package \pkg{survival} produces such a matrix}d
   \item{family}{Response type (see above)}
   \item{weights}{observation weights. Can be total counts if responses are proportion matrices. Default is 1 for each observation}
   \item{offset}{A vector of length \code{nobs} that is included in the linear predictor (a \code{nobs x nc} matrix for the \code{"multinomial"} family). Useful for the \code{"poisson"} family (e.g. log of exposure time), or for refining a model by starting at a current fit. Default is \code{NULL}. If supplied, then values must also be supplied to the \code{predict} function.}
   \item{alpha}{The elasticnet mixing parameter, with
-    \eqn{0<\alpha\le 1}. The penalty is defined
+    \eqn{0\le\alpha\le 1}. The penalty is defined
     as \deqn{(1-\alpha)/2||\beta||_2^2+\alpha||\beta||_1.} \code{alpha=1}
-    is the lasso penalty.}
+    is the lasso penalty, and \code{alpha=0} the ridge penalty.}
   \item{nlambda}{The number of \code{lambda} values - default is 100.}
   \item{lambda.min.ratio}{Smallest value for \code{lambda}, as a fraction of
     \code{lambda.max}, the (data derived) entry value (i.e. the smallest
@@ -59,10 +59,11 @@ standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2, nv
     a decreasing sequence of \code{lambda} values. \code{glmnet} relies
   on its warms starts for speed, and its often faster to fit a whole
   path than compute a single fit.}
-  \item{standardize}{Logical flag for variable standardization, prior to
+  \item{standardize}{Logical flag for x variable standardization, prior to
     fitting the model sequence. The coefficients are always returned on
-    the original scale. Default is is \code{standardize=TRUE}.
-  If variables are in the same units already, you might not wish to standardize.}
+    the original scale. Default is \code{standardize=TRUE}.
+  If variables are in the same units already, you might not wish to
+  standardize. See details below for y standardization with \code{family="gaussian"}.}
   \item{thresh}{Convergence threshold for coordinate descent. Each inner
   coordinate-descent loop continues until the maximum change in the
   objective after any coefficient update is less than \code{thresh}
@@ -78,7 +79,9 @@ standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2, nv
     differential shrinkage. Can be 0 for some variables, which implies
     no shrinkage, and that variable is always included in the
     model. Default is 1 for all variables (and implicitly infinity for
-    variables listed in \code{exclude}).}
+    variables listed in \code{exclude}). Note: the penalty factors are
+  internally rescaled to sum to nobs, and the lambda sequence will
+  reflect this change.}
     \item{maxit}{Maximum number of passes over the data for all lambda
   values; default is 10^5.}
   \item{type.gaussian}{Two algorithm types are supported for (only)
@@ -105,8 +108,14 @@ standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2, nv
   will produce the same fit as the corresponding \code{"binomial"} model,
   except the pair of coefficient matrices will be equal in magnitude and
   opposite in sign, and half the \code{"binomial"} values. 
-  Note that the objective function for \code{"gaussian"} is \deqn{1/2 RSS/nobs + \lambda*penalty,} and for the other models it is  \deqn{-loglik/nobs + \lambda*penalty}
-}
+  Note that the objective function for \code{"gaussian"} is \deqn{1/2
+  RSS/nobs + \lambda*penalty,} and for the other models it is
+  \deqn{-loglik/nobs + \lambda*penalty}. Note also that for
+  \code{"gaussian"}, \code{glmnet} standardizes y to have unit variance
+  before computing its lambda sequence (and then unstandardizes the
+  resulting coefficients); if you wish to reproduce/compare results with other
+  software, best to supply a standardized y.
+  }
 \value{
 An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
 \code{"elnet"}, \code{"lognet"}, 
@@ -120,11 +129,11 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
   \item{lambda}{The actual sequence of \code{lambda} values used}
   \item{dev.ratio}{The fraction of (null) deviance explained (for \code{"elnet"}, this
       is the R-square). The deviance calculations incorporate weights if
-  present in the model. The deviance is defined to be -2*(loglike_sat -
+  present in the model. The deviance is defined to be 2*(loglike_sat -
   loglike), where loglike_sat is the log-likelihood for the saturated
-  model (a model with a free parameter per observation). Hence dev.fraction=1-dev/nulldev.}
+  model (a model with a free parameter per observation). Hence dev.ratio=1-dev/nulldev.}
     \item{nulldev}{Null deviance (per observation). This is defined to
-  be  -2*(loglike_sat -loglike(Null)); The NULL model refers to the
+  be  2*(loglike_sat -loglike(Null)); The NULL model refers to the
   intercept model, except for the Cox, where it is the 0 model.}
   \item{df}{The number of nonzero coefficients for each value of
     \code{lambda}. For \code{"multnet"}, this is the number of variables

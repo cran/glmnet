@@ -2,7 +2,16 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
 
 ### Prepare all the generic arguments, then hand off to family functions
   family=match.arg(family)
+  if(alpha>1){
+    warning("alpha >1; set to 1")
+    alpha=1
+  }
+  if(alpha<0){
+    warning("alpha<0; set to 0")
+    alpha=0
+  }
   alpha=as.double(alpha)
+
   this.call=match.call()
   nlam=as.integer(nlambda)
   y=drop(y) # we dont like matrix responses unless we need them

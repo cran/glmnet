@@ -21,11 +21,20 @@ nonzeroCoef = function (beta, bystep = FALSE)
     nz=as.vector((beta%*%ones)>0)
     which=which[nz]
     if (bystep) {
-      beta=as.matrix(beta[which,])
-      nzel = function(x, which) if (any(x)) 
-        which[x]
-      else NULL
-      apply(beta, 2, nzel, which)
+      if(length(which)>0){
+        beta=as.matrix(beta[which,])
+        nzel = function(x, which) if (any(x)) 
+          which[x]
+        else NULL
+        apply(beta, 2, nzel, which)
+      }
+      else{
+        dn=dimnames(beta)[[2]]
+        which=vector("list",length(dn))
+        names(which)=dn
+        which
+      }
+        
     }
     else which
   }

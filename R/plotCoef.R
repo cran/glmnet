@@ -1,7 +1,15 @@
 plotCoef=function(beta,norm,lambda,df,dev,label=FALSE,xvar=c("norm","lambda","dev"),xlab=iname,ylab="Coefficients",...){
   ##beta should be in "dgCMatrix" format
   which=nonzeroCoef(beta)
-  beta=as.matrix(beta[which,])
+  nwhich=length(which)
+  switch(nwhich+1,#we add one to make switch work
+         "0"={
+           warning("No plot produced since all coefficients zero")
+           return()
+         },
+         "1"=warning("1 or less nonzero coefficients; glmnet plot is not meaningful")
+         )
+  beta=as.matrix(beta[which,,drop=FALSE])
   xvar=match.arg(xvar)
   switch(xvar,
     "norm"={
@@ -24,7 +32,7 @@ plotCoef=function(beta,norm,lambda,df,dev,label=FALSE,xvar=c("norm","lambda","de
   else matplot(index,t(beta),lty=1,xlab=xlab,ylab=ylab,...)
   atdf=pretty(index)
  prettydf=trunc(approx(x=index,y=df,xout=atdf,rule=2)$y)
- axis(3,at=atdf,label=prettydf,tcl=NA)
+ axis(3,at=atdf,labels=prettydf,tcl=NA)
  if(label){
    nnz=length(which)
    xpos=max(index)
