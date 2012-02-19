@@ -1,6 +1,7 @@
 cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,type.measure=c("mse","deviance","class","auc","mae"),...,nfolds=10,foldid,grouped=TRUE){
   if(missing(type.measure))type.measure="default"
   else type.measure=match.arg(type.measure)
+  if(!is.null(lambda)&&length(lambda)<2)stop("Need more than one value of lambda for cv.glmnet")
   N=nrow(x)
   if(missing(weights))weights=rep(1.0,N)else weights=as.double(weights)
 ###Fit the model once to get dimensions etc of output

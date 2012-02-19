@@ -47,11 +47,11 @@ cv.lognet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped
    ###If auc we behave differently
   if(type.measure=="auc"){
     cvraw=matrix(NA,nfolds,length(lambda))
-    good=cvraw*0
+    good=matrix(0,nfolds,length(lambda))
     for(i in seq(nfolds)){
       good[i,seq(nlams[i])]=1
       which=foldid==i
-      for(j in seq(nlami)){
+      for(j in seq(nlams[i])){
         cvraw[i,j]=auc.mat(y[which,],predmat[which,j],weights[which])
       }
     }
