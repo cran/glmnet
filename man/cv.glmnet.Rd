@@ -18,7 +18,7 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, ..., nfolds, foldid, grou
     can be as large as the sample size (leave-one-out CV), it is not
     recommended for large datasets. Smallest value allowable is \code{nfolds=3}}
   \item{foldid}{an optional vector of values between 1 and \code{nfold}
-    identifying whhat fold each observation is in. If supplied,
+    identifying what fold each observation is in. If supplied,
     \code{nfold} can be missing.}
   \item{type.measure}{loss to use for cross-validation. Currently five
     options, not all available for all models. The default is \code{type.measure="deviance"}, which uses
@@ -51,6 +51,13 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, ..., nfolds, foldid, grou
   compute the fit with each of the folds omitted. The error is
   accumulated, and the average error and standard deviation over the
   folds is computed. 
+  Note that \code{cv.glmnet} does NOT search for
+  values for \code{alpha}. A specific value should be supplied, else
+  \code{alpha=1} is assumed by default. If users would like to
+  cross-validate \code{alpha} as well, they should call \code{cv.glmnet}
+  with a pre-computed vector \code{foldid}, and then use this same fold vector
+  in separate calls to \code{cv.glmnet} with different values of
+  \code{alpha}. 
 }
 \value{an object of class \code{"cv.glmnet"} is returned, which is a
   list with the ingredients of the cross-validation fit.

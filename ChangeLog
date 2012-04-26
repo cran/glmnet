@@ -1,3 +1,6 @@
+1012-4-26   Trevor Hastie <hastie@stanford.edu>
+	* nasty bug fixed in fortran - removed reference to dble
+	* check class of newx and make dgCmatrix if sparse
 2011-8-15   Trevor Hastie <hastie@stanford.edu>
 	* lognet added a classnames component to the object
 	* predict.lognet(type="class") now returns a character vector/matrix
