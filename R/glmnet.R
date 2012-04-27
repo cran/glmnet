@@ -16,9 +16,14 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   nlam=as.integer(nlambda)
   y=drop(y) # we dont like matrix responses unless we need them
   np=dim(x)
+  ###check dims
   nobs=as.integer(np[1])
   if(missing(weights))weights=rep(1,nobs)
+  else if(length(weights)!=nobs)stop(paste("number of elements in weights (",length(weights),") not equal to the number of rows of x (",nobs,")",sep=""))
   nvars=as.integer(np[2])
+  dimy=dim(y)
+  nrowy=ifelse(is.null(dimy),length(y),dimy[1])
+    if(nrowy!=nobs)stop(paste("number of observations in y (",nrowy,") not equal to the number of rows of x (",nobs,")",sep=""))
   vnames=colnames(x)
   if(is.null(vnames))vnames=paste("V",seq(nvars),sep="")
   ne=as.integer(dfmax)

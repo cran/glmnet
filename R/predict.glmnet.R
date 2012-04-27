@@ -16,6 +16,8 @@ predict.glmnet=function(object,newx,s=NULL,type=c("link","response","coefficient
   }
   if(type=="coefficients")return(nbeta)
   if(type=="nonzero")return(nonzeroCoef(nbeta[-1,,drop=FALSE],bystep=TRUE))
+  ###Check on newx
+ if(inherits(newx, "sparseMatrix"))newx=as(newx,"dgCMatrix")
   nfit=as.matrix(cbind2(1,newx)%*%nbeta)
    if(object$offset){
     if(missing(offset))stop("No offset provided for prediction, yet used in fit of glmnet",call.=FALSE)

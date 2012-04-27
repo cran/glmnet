@@ -10,11 +10,15 @@ getcoef=function(fit,nvars,nx,vnames){
   if(ninmax>0){
            ca=matrix(fit$ca[seq(nx*lmu)],nx,lmu)[seq(ninmax),,drop=FALSE]
            df=apply(abs(ca)>0,2,sum)
-           ja=fit$ia[seq(ninmax)]#confusing but too hard to change
+           ja=fit$ia[seq(ninmax)]
+####confusing but too hard to change
+###glmnet builds a list of ever active variables which is nondecreasing
+###Since ca was initialized to zero, no harm is done in passing a square matrix
+###to new(); then when we do a drop0 it makes it really sparse
            oja=order(ja)
            ja=rep(ja[oja],lmu)
            ia=cumsum(c(1,rep(ninmax,lmu)))
-           beta=new("dgCMatrix",Dim=dd,Dimnames=list(vnames,stepnames),x=as.vector(ca[oja,]),p=as.integer(ia-1),i=as.integer(ja-1))
+           beta=drop0(new("dgCMatrix",Dim=dd,Dimnames=list(vnames,stepnames),x=as.vector(ca[oja,]),p=as.integer(ia-1),i=as.integer(ja-1)))
          }else {
            beta = zeromat(nvars,lmu,vnames,stepnames)
            df=rep(0,lmu)

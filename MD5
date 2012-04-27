@@ -1,5 +1,5 @@
-8972e8ec1601863f4a64a65ae61d2964 *ChangeLog
-69b087b8165199d4a6e475b4fe43a9cd *DESCRIPTION
+e1b644b5443433cf6e44cb26d0d0a054 *ChangeLog
+a96cd0b0e0764a04f5cec15153881632 *DESCRIPTION
 8ebc77e0ff5663a4f1b7e7a945d4b61a *NAMESPACE
 dfe9c97d146f93a159830f9cf0c8cf34 *R/auc.R
 8cd96999dce298c1d81ce51ea2f6d2a3 *R/auc.mat.R
@@ -19,14 +19,14 @@ ec0edbc2f1c664d90ec289972408d1c0 *R/cvcompute.R
 0c6c0b1dfa5c98b55f2e9e097df3747d *R/error.bars.R
 aaa4a6edb9d18d308095b3c17f0b2eef *R/fishnet.R
 6e90ab29d5e11bfe3e213e5b9ff58d3d *R/fix.lam.R
-61ab552c2e08b5255e6c4485e2825b91 *R/getcoef.R
-ce625536d927c63b195948f19405f502 *R/getcoef.multinomial.R
+66e6e2ebae1ef3ae951a155443389979 *R/getcoef.R
+cb180e89e7d6d0826004c65ba83ac124 *R/getcoef.multinomial.R
 8760639e2ea9b369f21a2223fe6307cf *R/getmin.R
-c5485f62a34f979e7e98b91f71f26bdd *R/glmnet.R
+9952b02ec7c8a85aa207a757b2ab2f68 *R/glmnet.R
 1fc24d371e7db200baff9922fe5118a4 *R/glmnet_softmax.R
 d0b4b45d355e06ae43f9fb53b93431d4 *R/jerr.R
 004ae05552ab64eb5c9b6aa892d2c05f *R/jerr.coxnet.R
-3b654038dc7b57a5872da3588b8b63fd *R/jerr.elnet.R
+5acd474cede565ec9bff39674d9cdac0 *R/jerr.elnet.R
 0ee642ef97444c8b0c05b43face38094 *R/jerr.fishnet.R
 7dee3aaa8ade0dc444a381be9b62a023 *R/jerr.lognet.R
 41dc1576c9c13e65f5e62143018392ea *R/lambda.interp.R
@@ -42,7 +42,7 @@ e9e6b9aa4673186beab1fd7e9585760c *R/predict.coxnet.R
 4b2aa41adb3d2df3293901edb52e5942 *R/predict.cv.glmnet.R
 9d94cbb290468b9e357ab1f67fe65831 *R/predict.elnet.R
 f794a6242fe4cb70c3334e30f61a7688 *R/predict.fishnet.R
-1dcbadca811c4906a31c6c8161238810 *R/predict.glmnet.R
+a589c08ace5c61f390a2ec6b47d9c92f *R/predict.glmnet.R
 f714df69858c8be76c72bab054cb72bb *R/predict.lognet.R
 50ab4beb5802d4adc7673a05805e46dd *R/predict.multnet.R
 ea696d8bc26ce7a5900ec3e52cad8ccb *R/print.glmnet.R
@@ -54,10 +54,9 @@ f8710d59d8eb569aa24d28a98f81d7f4 *configure
 42057f97e377d05e3f766c218a912a0f *configure.in
 c958f720990442fa6dafede1b2c5f45e *configure.win
 c22d19c217bc163a2c38b84add608c31 *inst/CITATION
-2e988b4065c273141cecfbc44905fd92 *inst/doc/Coxnet.pdf
-dcfa8f79ad4d5b4aa5f475a1d222faec *inst/doc/Coxnet.rnw
-bbb84222f5172db7113f5f9f07214ed9 *inst/doc/VignetteExample.rdata
-d72cb9e6d2828eb9fc8af5412e3b3c30 *man/cv.glmnet.Rd
+e7cbb3809a58af8eafb6bdbbe9bbd516 *inst/doc/Coxnet.pdf
+89bb275bc27d5cebcf61d4f0517fb5d5 *inst/doc/Coxnet.rnw
+606b7df574a73cdd4b6774d07ab2b351 *man/cv.glmnet.Rd
 a9f31f3162f2729793d2e034a4279a25 *man/deviance.glmnet.Rd
 a9e33936f194bf30e5c80bf8f2d1145a *man/glmnet-internal.Rd
 8bc8329dfa867a6a28621d03bc19d649 *man/glmnet-package.Rd
@@ -69,4 +68,6 @@ e9693412aa7d68b0bdb6acf269b24376 *man/predict.cv.glmnet.Rd
 ec4cf2278b0e3cace7980b6d05506f53 *man/print.glmnet.Rd
 03d5d624b734ace367b45b789fbf66a4 *src/Makevars.in
 1bd30ec98a50c49ec6aabebbb458d0cb *src/Makevars.win
-8727a97cf1d5be106cc73bbace5c5337 *src/newGLMnet.f90
+b98cba8358c6981bf3a5114ba5849f4f *src/newGLMnet.f90
+89bb275bc27d5cebcf61d4f0517fb5d5 *vignettes/Coxnet.rnw
+bbb84222f5172db7113f5f9f07214ed9 *vignettes/VignetteExample.rdata

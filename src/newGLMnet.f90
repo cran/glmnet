@@ -1,4 +1,5 @@
 c
+c
 c                          newGLMnet (2/17/12)
 c
 c
@@ -2401,7 +2402,7 @@ c
       if(nin.gt.0) fi=fi+dot_product(b(m(1:nin),ic),x(i,m(1:nin)))         1555
       fi=min(max(exmn,fi),exmx)                                            1555
       sxp(i)=sxp(i)-q(i,ic)                                                1556
-      q(i,ic)=min(max(emin*sxp(i),exp(dble(fi))),emax*sxp(i))              1557
+      q(i,ic)=min(max(emin*sxp(i),exp(fi)),emax*sxp(i))                    1557
       sxp(i)=sxp(i)+q(i,ic)                                                1558
 13361 continue                                                             1559
 13362 continue                                                             1559
@@ -3445,7 +3446,7 @@ c
 15342 continue                                                             2046
       sc=min(max(exmn,sc+b0),exmx)                                         2047
       sxp=sxp-q(:,ic)                                                      2048
-      q(:,ic)=min(max(emin*sxp,exp(dble(sc))),emax*sxp)                    2049
+      q(:,ic)=min(max(emin*sxp,exp(sc)),emax*sxp)                          2049
       sxp=sxp+q(:,ic)                                                      2050
 14981 continue                                                             2051
 14982 continue                                                             2051

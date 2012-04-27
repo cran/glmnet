@@ -6,7 +6,7 @@ jerr.elnet=function(n,maxit,pmax){
     else msg="Unknown error"
     list(n=n,fatal=TRUE,msg=msg)
   }
-  if(n<0){# non-fatal error
+  else if(n<0){# non-fatal error
            if(n>-10000)msg=paste("Convergence for ",-n,"th lambda value not reached after maxit=",maxit," iterations; solutions for larger lambdas returned",sep="")
     if(n < -10000)msg=paste("Number of nonzero coefficients along the path exceeds pmax=",pmax, " at ",-n-10000,"th lambda value; solutions for larger lambdas returned",sep="")
 list(n=n,fatal=FALSE,msg=msg)
