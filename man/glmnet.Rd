@@ -10,16 +10,17 @@
   }
 \usage{
 glmnet(x, y,
-family=c("gaussian","binomial","poisson","multinomial","cox"), weights, offset=NULL,
+family=c("gaussian","binomial","poisson","multinomial","cox","mgaussian"), weights, offset=NULL,
 alpha = 1, nlambda = 100, lambda.min.ratio = ifelse(nobs<nvars,0.01,0.0001), lambda=NULL,
 standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2, nvars),
- exclude, penalty.factor = rep(1, nvars), maxit=100000, type.gaussian=ifelse(nvars<500,"covariance","naive"))
+ exclude, penalty.factor = rep(1, nvars), maxit=100000, type.gaussian=ifelse(nvars<500,"covariance","naive"),
+ standardize.response=FALSE,type.multinomial=c("ungrouped","grouped"))
 }
 
 \arguments{
   \item{x}{input matrix, of dimension nobs x nvars; each row is an
   observation vector. Can be in sparse matrix format (inherit from class \code{"sparseMatrix"} as in package \code{Matrix}; not yet available for \code{family="cox"})}
-  \item{y}{response variable. Quantitative for \code{family="gaussian"}
+  \item{y}{response variable. Quantitative for \code{family="gaussian"},
   or \code{family="poisson"} (non-negative counts). For
   \code{family="binomial"} should be either a factor with two levels, or
   a two-column matrix of counts or proportions. For
@@ -28,7 +29,8 @@ standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2, nv
   \code{family="cox"}, \code{y} should be a two-column matrix with
   columns named 'time' and 'status'. The latter is a binary variable,
   with '1' indicating death, and '0' indicating right censored. The
-  function \code{Surv()} in package \pkg{survival} produces such a matrix}d
+  function \code{Surv()} in package \pkg{survival} produces such a
+  matrix. For  \code{family="mgaussian"}, \code{y} is a matrix of quantitative responses.}
   \item{family}{Response type (see above)}
   \item{weights}{observation weights. Can be total counts if responses are proportion matrices. Default is 1 for each observation}
   \item{offset}{A vector of length \code{nobs} that is included in the linear predictor (a \code{nobs x nc} matrix for the \code{"multinomial"} family). Useful for the \code{"poisson"} family (e.g. log of exposure time), or for refining a model by starting at a current fit. Default is \code{NULL}. If supplied, then values must also be supplied to the \code{predict} function.}
@@ -90,7 +92,12 @@ standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2, nv
     inner-products ever computed. This  can be much faster than
     \code{type.gaussian="naive"}, which loops through \code{nobs} every
   time an inner-product is computed. The latter can be far more efficient for \code{nvar >>
-      nobs} situations, or when \code{nvar > 500}.}
+    nobs} situations, or when \code{nvar > 500}.}
+\item{standardize.response}{This is for the \code{family="mgaussian"}
+  family, and allows the user to standardize the response variables}
+\item{type.multinomial}{If \code{"grouped"} then a grouped lasso penalty
+  is used on the multinomial coefficients for a variable. This ensures
+  they are all in our out together. The default is \code{"ungrouped"}}
 }
 \details{
   The sequence of models implied by \code{lambda} is fit by coordinate
@@ -115,11 +122,21 @@ standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2, nv
   before computing its lambda sequence (and then unstandardizes the
   resulting coefficients); if you wish to reproduce/compare results with other
   software, best to supply a standardized y.
+  The latest two features in glmnet are the \code{family="mgaussian"}
+  family and the \code{type.multinomial="grouped"} option for
+  multinomial fitting. The former allows a multi-response gaussian model
+  to be fit, using a "group -lasso" penalty on the coefficients for each
+  variable. The latter also allows the same penalty for the
+  \code{family="multinomial"} model, which is also multi-responsed. For
+  both of these the penalty on the coefficient vector for variable j is 
+   \deqn{(1-\alpha)/2||\beta_j||_2^2+\alpha||\beta_j||_2. When
+  \code{alpha=1} this is a group-lasso penalty, and otherwise it mixes
+  with quadratic just like elasticnet} 
   }
 \value{
 An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
 \code{"elnet"}, \code{"lognet"}, 
-\code{"multnet"}, \code{"fishnet"} (poisson) or \code{"coxnet"}  for the five types of models.
+\code{"multnet"}, \code{"fishnet"} (poisson), \code{"coxnet"} or \code{"mrelnet"}  for the various types of models.
   \item{call}{the call that produced this object}
   \item{a0}{Intercept sequence of length \code{length(lambda)}}
   \item{beta}{For \code{"elnet"} and \code{"lognet"} models, a \code{nvars x
@@ -176,6 +193,11 @@ print(fit1)
 coef(fit1,s=0.01) # extract coefficients at a single value of lambda
 predict(fit1,newx=x[1:10,],s=c(0.01,0.005)) # make predictions
 
+#multivariate gaussian
+y=matrix(rnorm(100*3),100,3)
+fit1m=glmnet(x,y,family="mgaussian")
+plot(fit1m,type.coef="2norm")
+
 #binomial
 g2=sample(1:2,100,replace=TRUE)
 fit2=glmnet(x,g2,family="binomial")
@@ -183,7 +205,7 @@ fit2=glmnet(x,g2,family="binomial")
 #multinomial
 g4=sample(1:4,100,replace=TRUE)
 fit3=glmnet(x,g4,family="multinomial")
-
+fit3a=glmnet(x,g4,family="multinomial",type.multinomial="grouped")
 #poisson
 N=500; p=20
 nzc=5

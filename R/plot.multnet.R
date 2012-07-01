@@ -1,5 +1,6 @@
-plot.multnet=function(x, xvar=c("norm","lambda","dev"),label=FALSE,...){
+plot.multnet=function(x, xvar=c("norm","lambda","dev"),label=FALSE,type.coef=c("coef","2norm"),...){
   xvar=match.arg(xvar)
+  type.coef=match.arg(type.coef)
     beta=x$beta
     if(xvar=="norm"){
       cnorm1=function(beta){
@@ -10,9 +11,16 @@ plot.multnet=function(x, xvar=c("norm","lambda","dev"),label=FALSE,...){
       norm=apply(sapply(x$beta,cnorm1),1,sum)
     } else norm = NULL
     dfmat=x$dfmat
+  if(type.coef=="coef"){
     ncl=nrow(dfmat)
     clnames=rownames(dfmat)
     for( i in seq(ncl)){
-      plotCoef(beta[[i]],norm,x$lambda,dfmat[i,],x$dev.ratio,label=label,xvar=xvar,ylab=paste("Coefficients: Class",clnames[i]),...)
+      plotCoef(beta[[i]],norm,x$lambda,dfmat[i,],x$dev.ratio,label=label,xvar=xvar,ylab=paste("Coefficients: Response",clnames[i]),...)
     }
-}
+  }
+  else {
+    dfseq=round(apply(dfmat,2,mean),1)
+    plotCoef(coefnorm(beta,2),norm,x$lambda,dfseq,x$dev.ratio,label=label,xvar=xvar,ylab="Coefficient 2Norms",...)
+  }
+  
+  }
