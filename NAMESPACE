@@ -2,13 +2,14 @@ useDynLib("glmnet")
 importFrom(utils,head,tail,packageDescription)
 export(glmnet,
        cv.glmnet,
-       cv.elnet,cv.lognet,cv.multnet,cv.fishnet,cv.coxnet,getmin,auc,auc.mat,cvcompute,coxnet.deviance,
+       cv.elnet,cv.lognet,cv.multnet,cv.fishnet,cv.coxnet,cv.mrelnet,getmin,auc,auc.mat,cvcompute,coxnet.deviance,
        lambda.interp,response.coxnet,rmult,glmnet_softmax,na.mean,
-       predict.elnet,predict.lognet,predict.fishnet,predict.multnet,predict.coxnet,nonzeroCoef,plotCoef,jerr,jerr.elnet,jerr.lognet,jerr.fishnet,jerr.coxnet,elnet,lognet,fishnet,coxnet,getcoef,getcoef.multinomial)
+       predict.elnet,predict.lognet,predict.fishnet,mrelnet,predict.multnet,predict.coxnet,predict.mrelnet,nonzeroCoef,plotCoef,jerr,jerr.elnet,jerr.lognet,jerr.fishnet,jerr.coxnet,elnet,lognet,fishnet,coxnet,getcoef,getcoef.multinomial,coefnorm)
 
 S3method("print","glmnet")
 S3method("plot","glmnet")
 S3method("plot","multnet")
+S3method("plot","mrelnet")
 S3method("predict","glmnet")
 S3method("coef","glmnet")
 S3method("coef","cv.glmnet")

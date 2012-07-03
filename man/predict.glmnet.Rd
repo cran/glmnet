@@ -4,6 +4,7 @@
 \alias{predict.elnet}
 \alias{predict.lognet}
 \alias{predict.multnet}
+\alias{predict.mrelnet}
 \alias{predict.fishnet}
 \alias{predict.coxnet}
 \title{make predictions from a "glmnet" object.}

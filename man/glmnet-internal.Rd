@@ -11,12 +11,15 @@
 \alias{error.bars}
 \alias{getmin}
 \alias{elnet}
+\alias{mrelnet}
 \alias{lognet}
 \alias{fishnet}
+\alias{coefnorm}
 \alias{coxnet}
 \alias{cv.lognet}
 \alias{cv.elnet}
 \alias{cv.multnet}
+\alias{cv.mrelnet}
 \alias{cv.coxnet}
 \alias{cv.fishnet}
 \alias{lambda.interp}

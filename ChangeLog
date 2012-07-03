@@ -1,4 +1,10 @@
-1012-4-26   Trevor Hastie <hastie@stanford.edu>
+2012-7-01   Trevor Hastie <hastie@stanford.edu> 
+
+	Major new release
+	* added mgaussian family for multivariate response
+	* added grouped option for multinomial family
+	
+2012-4-26   Trevor Hastie <hastie@stanford.edu>
 	* nasty bug fixed in fortran - removed reference to dble
 	* check class of newx and make dgCmatrix if sparse
 2011-8-15   Trevor Hastie <hastie@stanford.edu>

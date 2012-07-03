@@ -34,8 +34,10 @@ predict.multnet <-
   }
   if (type == "coefficients") 
     return(nbeta)
-  if (type == "nonzero") 
-    return(lapply(nbeta, function(x) nonzeroCoef(x[-1, , 
+  if (type == "nonzero")
+    if(object$grouped)return(nonzeroCoef(object$beta[[1]],bystep=TRUE))
+    else
+      return(lapply(nbeta, function(x) nonzeroCoef(x[-1, , 
                                                    drop = FALSE], bystep = TRUE)))
   dd = dim(newx)
   npred = dd[[1]]
