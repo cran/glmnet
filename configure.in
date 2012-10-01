@@ -1,33 +1,17 @@
-AC_INIT(src/Makevars.in)
-###
-### It would be ideal if this worked, but it doesn't!
-### FC=`"${R_HOME}/bin/R" CMD config FC`
-###
-AC_PREREQ(2.60)
-echo " This package has only been tested with gfortran."
-echo " So some checks are needed."
+AC_INIT(DESCRIPTION)
+AC_PREREQ(2.69)
+## 
+echo " This package requires a fortran 90 compiler. We assume"
+echo " that your fortran 90 environment is set up appropriately."
+echo " Reference: Section on 'Using F95 code' in R-exts manual."
 echo " R_HOME is ${R_HOME}"
 
-echo "Attempting to determine R_ARCH..."
-r_arch=`echo 'cat(.Platform$r_arch);q();' | ${R_HOME}/bin/R --silent --vanilla|grep -v 'cat'`
+FC=`"${R_HOME}/bin/R" CMD config FC`
 
-if test -z "${r_arch}"; then
-  R_ARCH=
-else
-  R_ARCH="/${r_arch}"
-fi
-echo "R_ARCH is ${R_ARCH}"
-
-echo "Attempting to detect how R was configured for Fortran 90...."
-
-if test -f ${R_HOME}/etc${R_ARCH}/Makeconf ; then
-  FC=`grep '^FC ' ${R_HOME}/etc${R_ARCH}/Makeconf|cut -c6-`
-else
-  echo "I cannot find your Makeconf file; This seems to be"
-  echo "   a non-standard R build or R did not detect a"
-  echo "   Foftran 90 compiler during build time. So I will"
-  echo "   attempt Fortran 90 compiler detection on my own."
-  echo "   NOTE:  All bets are off!"
+if test -z "${FC}"; then
+  echo "R could not detect your Fortran 90 compiler in the documented"
+  echo "   way, so we will attempt Fortran 90 compiler detection on our"
+  echo "   own. NOTE:  All bets are off!"
   AC_PROG_FC()
 fi
 
@@ -36,10 +20,17 @@ if test "x${FC}" != x; then
 fi
 
 case "${FC}" in
-    gfortran*)
-      echo "  R configured for gfortran; Good!"
+    *g77*) 
+      echo "  R configured for g77; hope it groks F90/95..."
       AC_SUBST(OUR_FCFLAGS, "-fdefault-real-8 -ffixed-form")
-      AC_OUTPUT(src/Makevars)
+      ;;
+    *gfortran*)
+      echo "  R configured for gfortran..."
+      AC_SUBST(OUR_FCFLAGS, "-fdefault-real-8 -ffixed-form")
+      ;;
+    ifort)
+      echo "  R configured for Intel fortran..."
+      AC_SUBST(OUR_FCFLAGS, "-O3 -axsse4.2 -r8")
       ;;
     *)
       echo "    Unsupported Fortran 90 compiler or Fortran 90"
@@ -47,3 +38,4 @@ case "${FC}" in
       exit 1
       ;;
 esac
+AC_OUTPUT(src/Makevars)	

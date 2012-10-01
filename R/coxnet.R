@@ -26,7 +26,7 @@ coxnet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,
               nlp=integer(1),
               jerr=integer(1),PACKAGE="glmnet"
               )
-if(fit$jerr!=0){
+ if(fit$jerr!=0){
   errmsg=jerr(fit$jerr,maxit,pmax=nx,family="cox")
   if(errmsg$fatal)stop(errmsg$msg,call.=FALSE)
   else warning(errmsg$msg,call.=FALSE)
