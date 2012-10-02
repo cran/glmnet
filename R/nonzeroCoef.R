@@ -22,7 +22,7 @@ nonzeroCoef = function (beta, bystep = FALSE)
     which=which[nz]
     if (bystep) {
       if(length(which)>0){
-        beta=as.matrix(beta[which,])
+        beta=as.matrix(beta[which,,drop=FALSE])
         nzel = function(x, which) if (any(x)) 
           which[x]
         else NULL

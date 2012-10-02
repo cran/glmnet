@@ -1,5 +1,6 @@
 useDynLib("glmnet")
 importFrom(utils,head,tail,packageDescription)
+import(Matrix)
 export(glmnet,
        cv.glmnet,
        cv.elnet,cv.lognet,cv.multnet,cv.fishnet,cv.coxnet,cv.mrelnet,getmin,auc,auc.mat,cvcompute,coxnet.deviance,

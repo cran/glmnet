@@ -117,7 +117,7 @@ standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2, nv
   opposite in sign, and half the \code{"binomial"} values. 
   Note that the objective function for \code{"gaussian"} is \deqn{1/2
   RSS/nobs + \lambda*penalty,} and for the other models it is
-  \deqn{-loglik/nobs + \lambda*penalty}. Note also that for
+  \deqn{-loglik/nobs + \lambda*penalty.} Note also that for
   \code{"gaussian"}, \code{glmnet} standardizes y to have unit variance
   before computing its lambda sequence (and then unstandardizes the
   resulting coefficients); if you wish to reproduce/compare results with other
@@ -126,12 +126,13 @@ standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2, nv
   family and the \code{type.multinomial="grouped"} option for
   multinomial fitting. The former allows a multi-response gaussian model
   to be fit, using a "group -lasso" penalty on the coefficients for each
-  variable. The latter also allows the same penalty for the
+  variable. Tying the responses together like this is called
+  "multi-task" learning in some domains. The grouped multinomial allows the same penalty for the
   \code{family="multinomial"} model, which is also multi-responsed. For
   both of these the penalty on the coefficient vector for variable j is 
-   \deqn{(1-\alpha)/2||\beta_j||_2^2+\alpha||\beta_j||_2. When
+   \deqn{(1-\alpha)/2||\beta_j||_2^2+\alpha||\beta_j||_2.} When
   \code{alpha=1} this is a group-lasso penalty, and otherwise it mixes
-  with quadratic just like elasticnet} 
+  with quadratic just like elasticnet. 
   }
 \value{
 An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
@@ -139,9 +140,9 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
 \code{"multnet"}, \code{"fishnet"} (poisson), \code{"coxnet"} or \code{"mrelnet"}  for the various types of models.
   \item{call}{the call that produced this object}
   \item{a0}{Intercept sequence of length \code{length(lambda)}}
-  \item{beta}{For \code{"elnet"} and \code{"lognet"} models, a \code{nvars x
+  \item{beta}{For \code{"elnet"}, \code{"lognet"}, \code{"fishnet"} and \code{"coxnet"} models, a \code{nvars x
       length(lambda)} matrix of coefficients, stored in sparse column
-    format (\code{"CsparseMatrix"}). For \code{"multnet"}, a list of \code{nc} such
+    format (\code{"CsparseMatrix"}). For \code{"multnet"} and \code{"mgaussian"}, a list of \code{nc} such
     matrices, one for each class.}
   \item{lambda}{The actual sequence of \code{lambda} values used}
   \item{dev.ratio}{The fraction of (null) deviance explained (for \code{"elnet"}, this
@@ -155,7 +156,7 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
   \item{df}{The number of nonzero coefficients for each value of
     \code{lambda}. For \code{"multnet"}, this is the number of variables
     with a nonzero coefficient for \emph{any} class.}
-  \item{dfmat}{For \code{"multnet"} only. A matrix consisting of the
+  \item{dfmat}{For \code{"multnet"} and \code{"mrelnet"} only. A matrix consisting of the
     number of nonzero coefficients per class}
   \item{dim}{dimension of coefficient matrix (ices)}
   \item{nobs}{number of observations}
