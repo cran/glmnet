@@ -1,6 +1,11 @@
 getcoef=function(fit,nvars,nx,vnames){
   lmu=fit$lmu
-  if(lmu<1)stop("an empty model has been returned; something is wrong")
+  if(lmu<1){
+    ## changed this to a warning message, and return an empty model
+    warning("an empty model has been returned; probably a convergence issue")
+    coefob=list(a0=fit$a0,beta=zeromat(nvars,as.integer(1),vnames,"s0"),df=0,dim=c(nvars,1),lambda=Inf)
+    return(coefob)
+  }
   nin=fit$nin[seq(lmu)]
   ninmax=max(nin)
   lam=fit$alm[seq(lmu)]

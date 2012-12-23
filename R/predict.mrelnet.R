@@ -1,5 +1,5 @@
 predict.mrelnet=function(object, newx, s = NULL, type = c("link", "response", 
-                                      "coefficients", "nonzero"), exact = FALSE, offset, ...)
+                                      "coefficients", "nonzero"), exact = TRUE, offset, ...)
   {
   type=match.arg(type)
   if(type=="response")type="link"

@@ -12,7 +12,7 @@
 glmnet(x, y,
 family=c("gaussian","binomial","poisson","multinomial","cox","mgaussian"), weights, offset=NULL,
 alpha = 1, nlambda = 100, lambda.min.ratio = ifelse(nobs<nvars,0.01,0.0001), lambda=NULL,
-standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2, nvars),
+standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2+20, nvars),
  exclude, penalty.factor = rep(1, nvars), maxit=100000, type.gaussian=ifelse(nvars<500,"covariance","naive"),
  standardize.response=FALSE,type.multinomial=c("ungrouped","grouped"))
 }

@@ -1,4 +1,4 @@
-glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox","mgaussian"),weights,offset=NULL,alpha=1.0,nlambda=100,lambda.min.ratio=ifelse(nobs<nvars,1e-2,1e-4),lambda=NULL,standardize=TRUE,thresh=1e-7,dfmax=nvars+1,pmax=min(dfmax*2,nvars),exclude,penalty.factor=rep(1,nvars),maxit=100000,type.gaussian=ifelse(nvars<500,"covariance","naive"),standardize.response=FALSE,type.multinomial=c("ungrouped","grouped")){
+glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox","mgaussian"),weights,offset=NULL,alpha=1.0,nlambda=100,lambda.min.ratio=ifelse(nobs<nvars,1e-2,1e-4),lambda=NULL,standardize=TRUE,thresh=1e-7,dfmax=nvars+1,pmax=min(dfmax*2+20,nvars),exclude,penalty.factor=rep(1,nvars),maxit=100000,type.gaussian=ifelse(nvars<500,"covariance","naive"),standardize.response=FALSE,type.multinomial=c("ungrouped","grouped")){
 
 ### Prepare all the generic arguments, then hand off to family functions
   family=match.arg(family)

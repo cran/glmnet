@@ -1,8 +1,18 @@
-predict.glmnet=function(object,newx,s=NULL,type=c("link","response","coefficients","nonzero","class"),exact=FALSE,offset,...){
+predict.glmnet=function(object,newx,s=NULL,type=c("link","response","coefficients","nonzero","class"),exact=TRUE,offset,...){
  type=match.arg(type)
   if(missing(newx)){
     if(!match(type,c("coefficients","nonzero"),FALSE))stop("You need to supply a value for 'newx'")
      }
+  if(exact&&(!is.null(s))){
+###we augment the lambda sequence with the new values, if they are different,and refit the model using update
+    lambda=object$lambda
+    which=match(s,lambda,FALSE)
+    if(!all(which>0)){
+      lambda=unique(rev(sort(c(s,lambda))))
+      object=update(object,lambda=lambda)
+    }
+  }
+    
   a0=t(as.matrix(object$a0))
   rownames(a0)="(Intercept)"
   nbeta=rbind2(a0,object$beta)

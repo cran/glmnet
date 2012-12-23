@@ -1,4 +1,4 @@
-cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,type.measure=c("mse","deviance","class","auc","mae"),...,nfolds=10,foldid,grouped=TRUE){
+cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,type.measure=c("mse","deviance","class","auc","mae"),nfolds=10,foldid,grouped=TRUE,...){
   if(missing(type.measure))type.measure="default"
   else type.measure=match.arg(type.measure)
   if(!is.null(lambda)&&length(lambda)<2)stop("Need more than one value of lambda for cv.glmnet")
@@ -6,7 +6,14 @@ cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,type.measure=c("mse","dev
   if(missing(weights))weights=rep(1.0,N)else weights=as.double(weights)
 ###Fit the model once to get dimensions etc of output
   y=drop(y) # we dont like matrix responses unless we need them
+###Next we construct a call, that could recreate a glmnet object - tricky
+### This if for predict, exact=TRUE
+  glmnet.call=match.call(expand.dots=TRUE)
+    which=match(c("type.measure","nfolds","foldid","grouped"),names(glmnet.call),F)
+  if(any(which))glmnet.call=glmnet.call[-which]
+  glmnet.call[[1]]=as.name("glmnet") 
   glmnet.object=glmnet(x,y,weights=weights,offset=offset,lambda=lambda,...)
+  glmnet.object$call=glmnet.call
   is.offset=glmnet.object$offset
   lambda=glmnet.object$lambda
   if(inherits(glmnet.object,"multnet")){

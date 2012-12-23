@@ -4,7 +4,7 @@
 \description{Does k-fold cross-validation for glmnet, produces a plot,
   and returns a value for \code{lambda}}
 \usage{
-cv.glmnet(x, y, weights, offset, lambda, type.measure, ..., nfolds, foldid, grouped)
+cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, ...)
 }
 \arguments{
   \item{x}{\code{x} matrix as in \code{glmnet}.}
@@ -13,7 +13,6 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, ..., nfolds, foldid, grou
   \item{offset}{Offset vector (matrix) as in \code{glmnet}}
   \item{lambda}{Optional user-supplied lambda sequence; default is
     \code{NULL}, and \code{glmnet} chooses its own sequence}
-  \item{\dots}{Other arguments that can be passed to \code{glmnet}.}
   \item{nfolds}{number of folds - default is 10. Although \code{nfolds}
     can be as large as the sample size (leave-one-out CV), it is not
     recommended for large datasets. Smallest value allowable is \code{nfolds=3}}
@@ -45,6 +44,7 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, ..., nfolds, foldid, grou
       the  on the (K-1)/K dataset. This makes more efficient use of risk
       sets. With \code{grouped=FALSE} the log partial likelihood is
       computed only on the Kth fold}
+  \item{\dots}{Other arguments that can be passed to \code{glmnet}.}
 }
 \details{The function runs \code{glmnet} \code{nfolds}+1 times; the
   first to get the \code{lambda} sequence, and then the remainder to
@@ -134,7 +134,7 @@ cvob4=cv.glmnet(x,y,family="poisson")
 plot(cvob4)
 title("Poisson Family",line=2.5)
 # Multinomial
-n=1000;p=30
+n=500;p=30
 nzc=trunc(p/10)
 x=matrix(rnorm(n*p),n,p)
 beta3=matrix(rnorm(30),10,3)
@@ -147,13 +147,6 @@ set.seed(10101)
 cvfit=cv.glmnet(x,g3,family="multinomial")
 plot(cvfit)
 title("Multinomial Family",line=2.5)
-set.seed(10101)
-cvfit=cv.glmnet(x,g3,family="mult",type="mse")
-plot(cvfit)
-title("Multinomial Family",line=2.5)
-set.seed(10101)
-cvfit=cv.glmnet(x,g3,family="mult",type="class")
-plot(cvfit)
 # Cox
 beta=rnorm(nzc)
 fx=x[,seq(nzc)]\%*\%beta/3
