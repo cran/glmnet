@@ -14,8 +14,8 @@ coefficients and more from a fitted \code{"glmnet"} object.
 }
 \usage{
 \method{predict}{glmnet}(object, newx, s = NULL,
-type=c("link","response","coefficients","nonzero","class"), exact = FALSE, offset, ...)
-\method{coef}{glmnet}(object,s=NULL, exact=FALSE, ...)
+type=c("link","response","coefficients","nonzero","class"), exact = TRUE, offset, ...)
+\method{coef}{glmnet}(object,s=NULL, exact=TRUE, ...)
 }
 \arguments{
   \item{object}{Fitted \code{"glmnet"} model object.}
@@ -42,14 +42,13 @@ type=c("link","response","coefficients","nonzero","class"), exact = FALSE, offse
     class label corresponding to the maximum probability. Type
     \code{"nonzero"} returns a list of the indices of the nonzero
     coefficients for each value of \code{s}.}
-  \item{exact}{By default (\code{exact=FALSE}) the predict function uses linear interpolation
+  \item{exact}{If \code{exact=TRUE} (default),
+  and predictions are to made at values of \code{s} not included in the
+  original fit, these values of \code{s} are merged with
+  \code{object$lambda}, and the model is refit before predictions are
+  made. If (\code{exact=FALSE}), then the predict function uses linear interpolation
   to make predictions for values of \code{s} that do not coincide with
-  those used in the fitting algorithm. Currently \code{exact=TRUE} is
-  not implemented, but prints an error message telling the user how to
-  achieve the exact predictions. This is done my rerunning the algorithm
-with the desired values interspersed (in order) with the values used in
-the original fit. This is easily achieved via the R command
-\code{lamba=sort(c(object$lambda, new.lambda))}}
+  those used in the fitting algorithm.}
  \item{offset}{If an offset is used in the fit, then one must be
    supplied for making predictions (except for
    \code{type="coefficients"} or \code{type="nonzero"})}

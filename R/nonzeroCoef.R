@@ -26,7 +26,9 @@ nonzeroCoef = function (beta, bystep = FALSE)
         nzel = function(x, which) if (any(x)) 
           which[x]
         else NULL
-        apply(beta, 2, nzel, which)
+        which=apply(beta, 2, nzel, which)
+        if(!is.list(which))which=data.frame(which)# apply can return a matrix!!
+        which
       }
       else{
         dn=dimnames(beta)[[2]]

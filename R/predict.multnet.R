@@ -1,12 +1,20 @@
 predict.multnet <-
   function (object, newx, s = NULL, type = c("link", "response", 
-                                      "coefficients", "class", "nonzero"), exact = FALSE, offset, 
+                                      "coefficients", "class", "nonzero"), exact = TRUE, offset, 
             ...) 
 {
   type = match.arg(type)
     ###multnet  is very different, so we treat it separately
   if(missing(newx)){
     if(!match(type,c("coefficients","nonzero"),FALSE))stop("You need to supply a value for 'newx'")
+  }
+  if(exact&&(!is.null(s))){
+    lambda=object$lambda
+    which=match(s,lambda,FALSE)
+    if(!all(which>0)){
+      lambda=unique(rev(sort(c(s,lambda))))
+      object=update(object,lambda=lambda)
+    }
   }
 
   a0 = object$a0

@@ -1,8 +1,16 @@
-predict.coxnet=function(object,newx,s=NULL,type=c("link","response","coefficients","nonzero"),exact=FALSE,offset,...){
+predict.coxnet=function(object,newx,s=NULL,type=c("link","response","coefficients","nonzero"),exact=TRUE,offset,...){
   type=match.arg(type)
   ###coxnet has no intercept, so we treat it separately
   if(missing(newx)){
     if(!match(type,c("coefficients","nonzero"),FALSE))stop("You need to supply a value for 'newx'")
+  }
+  if(exact&&(!is.null(s))){
+    lambda=object$lambda
+    which=match(s,lambda,FALSE)
+    if(!all(which>0)){
+      lambda=unique(rev(sort(c(s,lambda))))
+      object=update(object,lambda=lambda)
+    }
   }
 
   nbeta=object$beta
