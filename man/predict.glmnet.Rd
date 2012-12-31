@@ -14,8 +14,8 @@ coefficients and more from a fitted \code{"glmnet"} object.
 }
 \usage{
 \method{predict}{glmnet}(object, newx, s = NULL,
-type=c("link","response","coefficients","nonzero","class"), exact = TRUE, offset, ...)
-\method{coef}{glmnet}(object,s=NULL, exact=TRUE, ...)
+type=c("link","response","coefficients","nonzero","class"), exact = FALSE, offset, ...)
+\method{coef}{glmnet}(object,s=NULL, exact=FALSE, ...)
 }
 \arguments{
   \item{object}{Fitted \code{"glmnet"} model object.}
@@ -42,13 +42,16 @@ type=c("link","response","coefficients","nonzero","class"), exact = TRUE, offset
     class label corresponding to the maximum probability. Type
     \code{"nonzero"} returns a list of the indices of the nonzero
     coefficients for each value of \code{s}.}
-  \item{exact}{If \code{exact=TRUE} (default),
+  \item{exact}{If \code{exact=TRUE},
   and predictions are to made at values of \code{s} not included in the
   original fit, these values of \code{s} are merged with
   \code{object$lambda}, and the model is refit before predictions are
-  made. If (\code{exact=FALSE}), then the predict function uses linear interpolation
+  made. If \code{exact=FALSE} (default), then the predict function uses linear interpolation
   to make predictions for values of \code{s} that do not coincide with
-  those used in the fitting algorithm.}
+  those used in the fitting algorithm. Note that \code{exact=TRUE} is
+  fragile when used inside a nested sequence of function
+  calls. \code{predict.glmnet()} needs to  \code{update} the model,
+and expects the data used to create it to be around.}
  \item{offset}{If an offset is used in the fit, then one must be
    supplied for making predictions (except for
    \code{type="coefficients"} or \code{type="nonzero"})}
