@@ -1,3 +1,7 @@
+2012-12-31   Trevor Hastie <hastie@stanford.edu> version 1.8-5 
+
+	* added exact=TRUE option for prediction and coef functions
+
 2012-7-01   Trevor Hastie <hastie@stanford.edu> 
 
 	Major new release

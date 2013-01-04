@@ -1,6 +1,6 @@
 predict.multnet <-
   function (object, newx, s = NULL, type = c("link", "response", 
-                                      "coefficients", "class", "nonzero"), exact = TRUE, offset, 
+                                      "coefficients", "class", "nonzero"), exact = FALSE, offset, 
             ...) 
 {
   type = match.arg(type)

@@ -1,4 +1,4 @@
-predict.coxnet=function(object,newx,s=NULL,type=c("link","response","coefficients","nonzero"),exact=TRUE,offset,...){
+predict.coxnet=function(object,newx,s=NULL,type=c("link","response","coefficients","nonzero"),exact=FALSE,offset,...){
   type=match.arg(type)
   ###coxnet has no intercept, so we treat it separately
   if(missing(newx)){
