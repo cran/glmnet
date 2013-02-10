@@ -1,7 +1,6 @@
-lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,HessianExact,family){
+lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,kopt,family){
   nc=dim(y)
   maxit=as.integer(maxit)
-  kopt=as.integer(HessianExact)
   if(is.null(nc)){
     ## Need to construct a y matrix, and include the weights
     y=as.factor(y)
@@ -18,7 +17,8 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,
   }
   if(family=="binomial"){
     if(nc>2)stop("More than two classes; use multinomial family instead in call to glmnet",call.=FALSE)
-    nc=as.integer(1) # for calling multnet
+    nc=as.integer(1) # for calling lognet
+    y=y[,c(2,1)]#fortran lognet models the first column; we prefer the second (for 0/1 data)
   }
   o=NULL
   if(!missing(weights)){
@@ -44,13 +44,13 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,
       if(!is.null(o))offset=offset[o,]# we might have zero weights
       do=dim(offset)
       if(do[[1]]!=nobs)stop("offset should have the same number of values as observations in binomial/multinomial call to glmnet",call.=FALSE)
-      if((do[[2]]==1)&(nc==1))offset=cbind(-offset,offset)
+      if((do[[2]]==1)&(nc==1))offset=cbind(offset,-offset)
       if((family=="multinomial")&(do[[2]]!=nc))stop("offset should have same shape as y in multinomial call to glmnet",call.=FALSE)
       storage.mode(offset)="double"
       is.offset=TRUE
     }
     fit=if(is.sparse) .Fortran("splognet",
-      parm=alpha,nobs,nvars,nc,x,ix,jx,y,offset,jd,vp,ne=ne,nx,nlam,flmin,ulam,thresh,isd,maxit,kopt,
+      parm=alpha,nobs,nvars,nc,x,ix,jx,y,offset,jd,vp,cl,ne=ne,nx,nlam,flmin,ulam,thresh,isd,maxit,kopt,
                     lmu=integer(1),
                     a0=double(nlam*nc),
                     ca=double(nx*nlam*nc),
@@ -63,7 +63,7 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,ne,nx,
                     jerr=integer(1),PACKAGE="glmnet"
                     )
   else .Fortran("lognet",
-          parm=alpha,nobs,nvars,nc,as.double(x),y,offset,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,maxit,kopt,
+          parm=alpha,nobs,nvars,nc,as.double(x),y,offset,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,maxit,kopt,
           lmu=integer(1),
           a0=double(nlam*nc),
           ca=double(nx*nlam*nc),
@@ -82,8 +82,8 @@ if(fit$jerr!=0){
 }
  if(family=="binomial"){
    outlist=getcoef(fit,nvars,nx,vnames)
-   outlist$a0=-outlist$a0#sign flips make 2 target class
-   outlist$beta=-outlist$beta#sign flips make 2 target class
+#   outlist$a0=-outlist$a0#sign flips make 2 target class
+#   outlist$beta=-outlist$beta#sign flips make 2 target class
  }
  else  outlist=getcoef.multinomial(fit,nvars,nx,vnames,nc,classnames)
  dev=fit$dev[seq(fit$lmu)]

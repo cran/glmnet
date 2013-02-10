@@ -1,4 +1,4 @@
-cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,type.measure=c("mse","deviance","class","auc","mae"),nfolds=10,foldid,grouped=TRUE,...){
+cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,type.measure=c("mse","deviance","class","auc","mae"),nfolds=10,foldid,grouped=TRUE,keep=FALSE,...){
   if(missing(type.measure))type.measure="default"
   else type.measure=match.arg(type.measure)
   if(!is.null(lambda)&&length(lambda)<2)stop("Need more than one value of lambda for cv.glmnet")
@@ -9,7 +9,7 @@ cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,type.measure=c("mse","dev
 ###Next we construct a call, that could recreate a glmnet object - tricky
 ### This if for predict, exact=TRUE
   glmnet.call=match.call(expand.dots=TRUE)
-    which=match(c("type.measure","nfolds","foldid","grouped"),names(glmnet.call),F)
+    which=match(c("type.measure","nfolds","foldid","grouped","keep"),names(glmnet.call),F)
   if(any(which))glmnet.call=glmnet.call[-which]
   glmnet.call[[1]]=as.name("glmnet") 
   glmnet.object=glmnet(x,y,weights=weights,offset=offset,lambda=lambda,...)
@@ -35,12 +35,13 @@ cv.glmnet=function(x,y,weights,offset=NULL,lambda=NULL,type.measure=c("mse","dev
   }
   ###What to do depends on the type.measure and the model fit
   fun=paste("cv",class(glmnet.object)[[1]],sep=".")
-  cvstuff=do.call(fun,list(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped))
+  cvstuff=do.call(fun,list(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped,keep))
   cvm=cvstuff$cvm
   cvsd=cvstuff$cvsd
   cvname=cvstuff$name
   
 out=list(lambda=lambda,cvm=cvm,cvsd=cvsd,cvup=cvm+cvsd,cvlo=cvm-cvsd,nzero=nz,name=cvname,glmnet.fit=glmnet.object)
+if(keep)out=c(out,list(fit.preval=cvstuff$fit.preval,foldid=foldid))
   lamin=if(type.measure=="auc")getmin(lambda,-cvm,cvsd)
   else getmin(lambda,cvm,cvsd)
   obj=c(out,as.list(lamin))

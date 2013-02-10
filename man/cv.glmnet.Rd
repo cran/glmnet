@@ -4,7 +4,7 @@
 \description{Does k-fold cross-validation for glmnet, produces a plot,
   and returns a value for \code{lambda}}
 \usage{
-cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, ...)
+cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, keep, ...)
 }
 \arguments{
   \item{x}{\code{x} matrix as in \code{glmnet}.}
@@ -44,7 +44,12 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, 
       the  on the (K-1)/K dataset. This makes more efficient use of risk
       sets. With \code{grouped=FALSE} the log partial likelihood is
       computed only on the Kth fold}
-  \item{\dots}{Other arguments that can be passed to \code{glmnet}.}
+    \item{keep}{If \code{keep=TRUE}, a \emph{prevalidated} array is
+      returned containing fitted values for each observation and each
+      value of \code{lambda}. This means these fits are computed with
+      this observation and the rest of its fold omitted. The
+      \code{folid} vector is also returned. Default is {keep=FALSE}}
+  \item{\dots}{Other arguments that can be passed to \code{glmnet}}
 }
 \details{The function runs \code{glmnet} \code{nfolds}+1 times; the
   first to get the \code{lambda} sequence, and then the remainder to
@@ -75,6 +80,10 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, 
     \code{cvm}.}
   \item{lambda.1se}{largest value of \code{lambda} such that error is
     within 1 standard error of the minimum.}
+  \item{fit.preval}{if \code{keep=TRUE}, this is the array of
+    prevalidated fits. Some entries can be \code{NA}, if that and
+    subsequent values of \code{lambda} are not reached for that fold}
+  \item{foldid}{if \code{keep=TRUE}, the fold assignments used}
 }
 \references{Friedman, J., Hastie, T. and Tibshirani, R. (2008)
   \emph{Regularization Paths for Generalized Linear Models via Coordinate
