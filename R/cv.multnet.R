@@ -1,4 +1,4 @@
-cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped){
+cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped,keep){
   typenames=c(mse="Mean-Squared Error",mae="Mean Absolute Error",deviance="Multinomial Deviance",class="Misclassification Error")
   if(type.measure=="default")type.measure="deviance"
   if(!match(type.measure,c("mse","mae","deviance","class"),FALSE)){
@@ -67,5 +67,8 @@ cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,groupe
 
    cvm=apply(cvraw,2,weighted.mean,w=weights,na.rm=TRUE)
   cvsd=sqrt(apply(scale(cvraw,cvm,FALSE)^2,2,weighted.mean,w=weights,na.rm=TRUE)/(N-1))
-  list(cvm=cvm,cvsd=cvsd,name=typenames[type.measure])
+  out=list(cvm=cvm,cvsd=cvsd,name=typenames[type.measure])
+    if(keep)out$fit.preval=predmat
+  out
+
 }

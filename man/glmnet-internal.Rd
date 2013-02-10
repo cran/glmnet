@@ -31,6 +31,7 @@
 \alias{jerr.lognet}
 \alias{jerr.fishnet}
 \alias{jerr.coxnet}
+\alias{jerr.mrelnet}
 \alias{plotCoef}
 \alias{zeromat}
 \alias{na.mean}

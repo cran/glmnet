@@ -13,7 +13,7 @@ glmnet(x, y,
 family=c("gaussian","binomial","poisson","multinomial","cox","mgaussian"), weights, offset=NULL,
 alpha = 1, nlambda = 100, lambda.min.ratio = ifelse(nobs<nvars,0.01,0.0001), lambda=NULL,
 standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2+20, nvars),
- exclude, penalty.factor = rep(1, nvars), maxit=100000, type.gaussian=ifelse(nvars<500,"covariance","naive"),
+ exclude, penalty.factor = rep(1, nvars),lower.limits=-Inf,upper.limits=Inf, maxit=100000, type.gaussian=ifelse(nvars<500,"covariance","naive"),type.logistic=c("Newton","modified.Newton"),
  standardize.response=FALSE,type.multinomial=c("ungrouped","grouped"))
 }
 
@@ -84,6 +84,12 @@ standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2+20,
     variables listed in \code{exclude}). Note: the penalty factors are
   internally rescaled to sum to nobs, and the lambda sequence will
   reflect this change.}
+  \item{lower.limits}{Vector of lower limits for each coefficient;
+  default \code{-Inf}. Each
+  of these must be non-positive. Can be presented as a single value
+  (which will then be replicated), else a vector of length \code{nvars}}
+ \item{upper.limits}{Vector of upper limits for each coefficient;
+  default \code{Inf}. See \code{lower.limits}}
     \item{maxit}{Maximum number of passes over the data for all lambda
   values; default is 10^5.}
   \item{type.gaussian}{Two algorithm types are supported for (only)
@@ -93,6 +99,9 @@ standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2+20,
     \code{type.gaussian="naive"}, which loops through \code{nobs} every
   time an inner-product is computed. The latter can be far more efficient for \code{nvar >>
     nobs} situations, or when \code{nvar > 500}.}
+\item{type.logistic}{If \code{"Newton"} then the exact hessian is used
+  (default), while \code{"modified.Newton"} uses an upper-bound on the
+  hessian, and can be faster.}
 \item{standardize.response}{This is for the \code{family="mgaussian"}
   family, and allows the user to standardize the response variables}
 \item{type.multinomial}{If \code{"grouped"} then a grouped lasso penalty

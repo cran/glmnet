@@ -1,4 +1,4 @@
-elnet=function(x,is.sparse,ix,jx,y,weights,offset,type.gaussian=c("covariance","naive"),alpha,nobs,nvars,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit){
+elnet=function(x,is.sparse,ix,jx,y,weights,offset,type.gaussian=c("covariance","naive"),alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit){
   maxit=as.integer(maxit)
   weights=as.double(weights)
 ### compute the null deviance
@@ -22,7 +22,7 @@ elnet=function(x,is.sparse,ix,jx,y,weights,offset,type.gaussian=c("covariance","
   }
 
 fit=if(is.sparse).Fortran("spelnet",
-        ka,parm=alpha,nobs,nvars,x,ix,jx,y-offset,weights,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,maxit,
+        ka,parm=alpha,nobs,nvars,x,ix,jx,y-offset,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,maxit,
         lmu=integer(1),
         a0=double(nlam),
         ca=double(nx*nlam),
@@ -34,7 +34,7 @@ fit=if(is.sparse).Fortran("spelnet",
         jerr=integer(1),PACKAGE="glmnet"
         )
 else .Fortran("elnet",
-          ka,parm=alpha,nobs,nvars,as.double(x),y-offset,weights,jd,vp,ne,nx,nlam,flmin,ulam,thresh,isd,maxit,
+          ka,parm=alpha,nobs,nvars,as.double(x),y-offset,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,maxit,
           lmu=integer(1),
           a0=double(nlam),
           ca=double(nx*nlam),
