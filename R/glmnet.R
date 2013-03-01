@@ -1,4 +1,4 @@
-glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox","mgaussian"),weights,offset=NULL,alpha=1.0,nlambda=100,lambda.min.ratio=ifelse(nobs<nvars,1e-2,1e-4),lambda=NULL,standardize=TRUE,thresh=1e-7,dfmax=nvars+1,pmax=min(dfmax*2+20,nvars),exclude,penalty.factor=rep(1,nvars),lower.limits=-Inf,upper.limits=Inf,maxit=100000,type.gaussian=ifelse(nvars<500,"covariance","naive"),type.logistic=c("Newton","modified.Newton"),standardize.response=FALSE,type.multinomial=c("ungrouped","grouped")){
+glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox","mgaussian"),weights,offset=NULL,alpha=1.0,nlambda=100,lambda.min.ratio=ifelse(nobs<nvars,1e-2,1e-4),lambda=NULL,standardize=TRUE,intercept=TRUE,thresh=1e-7,dfmax=nvars+1,pmax=min(dfmax*2+20,nvars),exclude,penalty.factor=rep(1,nvars),lower.limits=-Inf,upper.limits=Inf,maxit=100000,type.gaussian=ifelse(nvars<500,"covariance","naive"),type.logistic=c("Newton","modified.Newton"),standardize.response=FALSE,type.multinomial=c("ungrouped","grouped")){
 
 ### Prepare all the generic arguments, then hand off to family functions
   family=match.arg(family)
@@ -62,6 +62,8 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   ### end check on limits
   
   isd=as.integer(standardize)
+  intr=as.integer(intercept)
+  if(!missing(intercept)&&family=="cox")warning("Cox model has no intercept")
   jsd=as.integer(standardize.response)
   thresh=as.double(thresh)
   if(is.null(lambda)){
@@ -98,12 +100,12 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   kopt=as.integer(kopt)
 
   fit=switch(family,
-    "gaussian"=elnet(x,is.sparse,ix,jx,y,weights,offset,type.gaussian,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit),
-    "poisson"=fishnet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit),
-    "binomial"=lognet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,kopt,family),
-    "multinomial"=lognet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,kopt,family),
+    "gaussian"=elnet(x,is.sparse,ix,jx,y,weights,offset,type.gaussian,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit),
+    "poisson"=fishnet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit),
+    "binomial"=lognet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family),
+    "multinomial"=lognet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family),
     "cox"=coxnet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit),
-    "mgaussian"=mrelnet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,vnames,maxit)
+    "mgaussian"=mrelnet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,vnames,maxit)
     )
     
   if(is.null(lambda))fit$lambda=fix.lam(fit$lambda)##first lambda is infinity; changed to entry point

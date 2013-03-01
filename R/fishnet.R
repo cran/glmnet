@@ -1,4 +1,4 @@
-fishnet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit){
+fishnet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit){
   if(any(y<0))stop("negative responses encountered;  not permitted for Poisson family")
   maxit=as.integer(maxit)
   weights=as.double(weights)
@@ -12,7 +12,7 @@ fishnet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne
     is.offset=TRUE
   }
 fit=if(is.sparse).Fortran("spfishnet",
-  parm=alpha,nobs,nvars,x,ix,jx,y,offset,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,maxit,
+  parm=alpha,nobs,nvars,x,ix,jx,y,offset,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,
   lmu=integer(1),
   a0=double(nlam),
   ca=double(nx*nlam),
@@ -25,7 +25,7 @@ fit=if(is.sparse).Fortran("spfishnet",
   jerr=integer(1),PACKAGE="glmnet"
   )
 else .Fortran("fishnet",
-              parm=alpha,nobs,nvars,as.double(x),y,offset,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,maxit,
+              parm=alpha,nobs,nvars,as.double(x),y,offset,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,
               lmu=integer(1),
               a0=double(nlam),
               ca=double(nx*nlam),

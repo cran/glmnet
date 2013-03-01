@@ -1,4 +1,4 @@
-lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,kopt,family){
+lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family){
   nc=dim(y)
   maxit=as.integer(maxit)
   if(is.null(nc)){
@@ -50,7 +50,7 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
       is.offset=TRUE
     }
     fit=if(is.sparse) .Fortran("splognet",
-      parm=alpha,nobs,nvars,nc,x,ix,jx,y,offset,jd,vp,cl,ne=ne,nx,nlam,flmin,ulam,thresh,isd,maxit,kopt,
+      parm=alpha,nobs,nvars,nc,x,ix,jx,y,offset,jd,vp,cl,ne=ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,kopt,
                     lmu=integer(1),
                     a0=double(nlam*nc),
                     ca=double(nx*nlam*nc),
@@ -63,7 +63,7 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
                     jerr=integer(1),PACKAGE="glmnet"
                     )
   else .Fortran("lognet",
-          parm=alpha,nobs,nvars,nc,as.double(x),y,offset,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,maxit,kopt,
+          parm=alpha,nobs,nvars,nc,as.double(x),y,offset,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,kopt,
           lmu=integer(1),
           a0=double(nlam*nc),
           ca=double(nx*nlam*nc),

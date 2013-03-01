@@ -1,4 +1,4 @@
-cv.coxnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped,keep){
+cv.coxnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped,keep=FALSE){
   typenames=c("deviance"="Partial Likelihood Deviance")
   if(type.measure=="default")type.measure="deviance"
   if(!match(type.measure,c("deviance"),FALSE)){

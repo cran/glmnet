@@ -1,4 +1,4 @@
-cv.elnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped,keep){
+cv.elnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped,keep=FALSE){
   typenames=c(deviance="Mean-Squared Error",mse="Mean-Squared Error",mae="Mean Absolute Error")
   if(type.measure=="default")type.measure="mse"
   if(!match(type.measure,c("mse","mae","deviance"),FALSE)){
