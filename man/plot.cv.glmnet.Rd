@@ -2,7 +2,7 @@
 \alias{plot.cv.glmnet}
 \title{plot the cross-validation curve produced by cv.glmnet}
 \description{
-Plots the cross-validation curve, and upper and lower stabdard deviation
+Plots the cross-validation curve, and upper and lower standard deviation
 curves, as a function of the \code{lambda} values used.}
 \usage{
 \method{plot}{cv.glmnet}(x, sign.lambda, ...)

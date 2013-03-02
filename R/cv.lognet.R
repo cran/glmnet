@@ -1,4 +1,4 @@
-cv.lognet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped,keep){
+cv.lognet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped,keep=FALSE){
   typenames=c(mse="Mean-Squared Error",mae="Mean Absolute Error",deviance="Binomial Deviance",auc="AUC",class="Misclassification Error")
   if(type.measure=="default")type.measure="deviance"
   if(!match(type.measure,c("mse","mae","deviance","auc","class"),FALSE)){

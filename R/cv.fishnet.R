@@ -1,4 +1,4 @@
-cv.fishnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped,keep){
+cv.fishnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,grouped,keep=FALSE){
   typenames=c(mse="Mean-Squared Error",mae="Mean Absolute Error","deviance"="Poisson Deviance")
   if(type.measure=="default")type.measure="deviance"
   if(!match(type.measure,c("mse","mae","deviance"),FALSE)){

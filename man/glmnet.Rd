@@ -12,7 +12,7 @@
 glmnet(x, y,
 family=c("gaussian","binomial","poisson","multinomial","cox","mgaussian"), weights, offset=NULL,
 alpha = 1, nlambda = 100, lambda.min.ratio = ifelse(nobs<nvars,0.01,0.0001), lambda=NULL,
-standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2+20, nvars),
+standardize = TRUE, intercept=TRUE,thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2+20, nvars),
  exclude, penalty.factor = rep(1, nvars),lower.limits=-Inf,upper.limits=Inf, maxit=100000, type.gaussian=ifelse(nvars<500,"covariance","naive"),type.logistic=c("Newton","modified.Newton"),
  standardize.response=FALSE,type.multinomial=c("ungrouped","grouped"))
 }
@@ -66,7 +66,9 @@ standardize = TRUE, thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2+20,
     the original scale. Default is \code{standardize=TRUE}.
   If variables are in the same units already, you might not wish to
   standardize. See details below for y standardization with \code{family="gaussian"}.}
-  \item{thresh}{Convergence threshold for coordinate descent. Each inner
+ \item{intercept}{Should intercept(s) be fitted (default=TRUE) or set to
+  zero (FALSE)}
+\item{thresh}{Convergence threshold for coordinate descent. Each inner
   coordinate-descent loop continues until the maximum change in the
   objective after any coefficient update is less than \code{thresh}
   times the null deviance. Defaults value is \code{1E-7}.}
