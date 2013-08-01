@@ -30,7 +30,7 @@ case "${FC}" in
       ;;
     ifort)
       echo "  R configured for Intel fortran..."
-      AC_SUBST(OUR_FCFLAGS, "-O3 -axsse4.2 -r8")
+      AC_SUBST(OUR_FCFLAGS, "-O3 -axsse4.2 -r8 -fpp -fixed")
       ;;
     *)
       echo "    Unsupported Fortran 90 compiler or Fortran 90"

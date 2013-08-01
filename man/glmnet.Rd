@@ -9,12 +9,15 @@
   linear, logistic and multinomial, poisson, and Cox regression models.
   }
 \usage{
-glmnet(x, y,
-family=c("gaussian","binomial","poisson","multinomial","cox","mgaussian"), weights, offset=NULL,
-alpha = 1, nlambda = 100, lambda.min.ratio = ifelse(nobs<nvars,0.01,0.0001), lambda=NULL,
-standardize = TRUE, intercept=TRUE,thresh = 1e-07,  dfmax = nvars + 1, pmax = min(dfmax * 2+20, nvars),
- exclude, penalty.factor = rep(1, nvars),lower.limits=-Inf,upper.limits=Inf, maxit=100000, type.gaussian=ifelse(nvars<500,"covariance","naive"),type.logistic=c("Newton","modified.Newton"),
- standardize.response=FALSE,type.multinomial=c("ungrouped","grouped"))
+glmnet(x, y, family=c("gaussian","binomial","poisson","multinomial","cox","mgaussian"),
+    weights, offset=NULL, alpha = 1, nlambda = 100,
+    lambda.min.ratio = ifelse(nobs<nvars,0.01,0.0001), lambda=NULL,
+    standardize = TRUE, intercept=TRUE, thresh = 1e-07,  dfmax = nvars + 1,
+    pmax = min(dfmax * 2+20, nvars), exclude, penalty.factor = rep(1, nvars),
+    lower.limits=-Inf, upper.limits=Inf, maxit=100000,
+    type.gaussian=ifelse(nvars<500,"covariance","naive"),
+    type.logistic=c("Newton","modified.Newton"),
+    standardize.response=FALSE, type.multinomial=c("ungrouped","grouped"))
 }
 
 \arguments{
@@ -84,7 +87,7 @@ standardize = TRUE, intercept=TRUE,thresh = 1e-07,  dfmax = nvars + 1, pmax = mi
     no shrinkage, and that variable is always included in the
     model. Default is 1 for all variables (and implicitly infinity for
     variables listed in \code{exclude}). Note: the penalty factors are
-  internally rescaled to sum to nobs, and the lambda sequence will
+  internally rescaled to sum to nvars, and the lambda sequence will
   reflect this change.}
   \item{lower.limits}{Vector of lower limits for each coefficient;
   default \code{-Inf}. Each
@@ -192,8 +195,7 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
   \url{http://www-stat.stanford.edu/~tibs/ftp/strong.pdf}\cr
   \emph{Stanford Statistics Technical Report}
   }
-\author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr 
-Noah Simon helped develop the 'cox' feature.\cr
+\author{Jerome Friedman, Trevor Hastie, Noah Simon and Rob Tibshirani\cr 
 Maintainer: Trevor Hastie \email{hastie@stanford.edu}}
 \seealso{\code{print}, \code{predict}, \code{coef} and \code{plot} methods, and the \code{cv.glmnet} function.}
 \examples{

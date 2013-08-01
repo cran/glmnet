@@ -5,7 +5,8 @@
   View and/or change the factory default parameters in glmnet
   }
 \usage{
-glmnet.control(fdev=1.0e-5,devmax=0.999,eps=1.0e-6,big=9.9e35,mnlam=5,pmin=1.0e-5,exmx=250.0,prec=1e-10,mxit=100,factory=FALSE)
+glmnet.control(fdev=1.0e-5, devmax=0.999, eps=1.0e-6, big=9.9e35, mnlam=5, pmin=1.0e-5,
+     exmx=250.0,prec=1e-10,mxit=100,factory=FALSE)
 }
 \arguments{
 \item{fdev}{minimum fractional change in deviance for stopping path;

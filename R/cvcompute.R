@@ -6,7 +6,7 @@ cvcompute=function(mat,weights,foldid,nlams){
   good=matrix(0,nfolds,ncol(mat))
   mat[is.infinite(mat)]=NA#just in case some infinities crept in
   for(i in seq(nfolds)){
-    mati=mat[foldid==i,]
+    mati=mat[foldid==i,,drop=FALSE]
     wi=weights[foldid==i]
     outmat[i,]=apply(mati,2,weighted.mean,w=wi,na.rm=TRUE)
     good[i,seq(nlams[i])]=1

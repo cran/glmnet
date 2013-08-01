@@ -4,7 +4,8 @@
 \description{Does k-fold cross-validation for glmnet, produces a plot,
   and returns a value for \code{lambda}}
 \usage{
-cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, keep, ...)
+cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, keep,
+      parallel, ...)
 }
 \arguments{
   \item{x}{\code{x} matrix as in \code{glmnet}.}
@@ -49,7 +50,10 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, 
       value of \code{lambda}. This means these fits are computed with
       this observation and the rest of its fold omitted. The
       \code{folid} vector is also returned. Default is {keep=FALSE}}
-  \item{\dots}{Other arguments that can be passed to \code{glmnet}}
+    \item{parallel}{If \code{TRUE}, use parallel \code{foreach} to fit each fold.
+      Must register parallel before hand, such as \code{doMC} or others.
+    See the example below.}
+ \item{\dots}{Other arguments that can be passed to \code{glmnet}}
 }
 \details{The function runs \code{glmnet} \code{nfolds}+1 times; the
   first to get the \code{lambda} sequence, and then the remainder to
@@ -97,7 +101,8 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, 
   \url{http://www.jstatsoft.org/v39/i05/}
 }
 \author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr 
-Noah Simon helped develop the 'coxnet' function.\cr
+  Noah Simon helped develop the 'coxnet' function.\cr
+  Jeffrey Wong and B. Narasimhan helped with the parallel option\cr
 Maintainer: Trevor Hastie \email{hastie@stanford.edu}}
 \seealso{\code{glmnet} and \code{plot}, \code{predict}, and \code{coef} methods for \code{"cv.glmnet"} object.}
 \examples{
@@ -167,6 +172,15 @@ foldid=sample(rep(seq(10),length=n))
 fit1_cv=cv.glmnet(x,y,family="cox",foldid=foldid)
 plot(fit1_cv)
 title("Cox Family",line=2.5)
+\dontrun{
+# Parallel
+require(doMC)
+registerDoMC(cores=4)
+x = matrix(rnorm(1e5 * 100), 1e5, 100)
+y = rnorm(1e5)
+system.time(cv.glmnet(x,y))
+system.time(cv.glmnet(x,y,parallel=TRUE))
+}
 }
 \keyword{models}
 \keyword{regression}

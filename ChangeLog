@@ -1,3 +1,5 @@
+2013-08-02   Trevor Hastie <hastie@stanford.edu> version 1.9-5
+	* added parallel capabilities, and fixed some minor bugs
 2013-03-01   Trevor Hastie <hastie@stanford.edu> version 1.9-3
 	* added intercept option
 2013-02-10   Trevor Hastie <hastie@stanford.edu> version 1.9-1 

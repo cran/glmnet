@@ -10,7 +10,7 @@ jerr=function(n,maxit,pmax,family){
               "mrelnet"=jerr.mrelnet(n,maxit,pmax)
       )
     names(errlist)=c("n","fatal","msg")
-    errlist$msg=paste("from glmnet Fortran code -", errlist$msg)
+    errlist$msg=paste("from glmnet Fortran code (error code ",n, "); ",errlist$msg,sep="")
     errlist
   }
 }
