@@ -1,4 +1,4 @@
-getcoef.multinomial=function(fit,nvars,nx,vnames,nc,classnames){
+getcoef.multinomial=function(fit,nvars,nx,vnames,nc,classnames,center.intercept=TRUE){
   lmu=fit$lmu
   nin=fit$nin[seq(lmu)]
   ninmax=max(nin)
@@ -7,8 +7,10 @@ getcoef.multinomial=function(fit,nvars,nx,vnames,nc,classnames){
   beta.list=as.list(seq(nc))
   names(beta.list)=classnames
     a0=matrix(fit$a0[seq(lmu*nc)],nc,lmu,dimnames=list(classnames,stepnames))
-      a0=scale(a0,TRUE,FALSE)
-      attr(a0,"scaled:center")=NULL
+      if(center.intercept){
+        a0=scale(a0,TRUE,FALSE)
+        attr(a0,"scaled:center")=NULL
+      }
       dfmat=a0
       dd=c(nvars,lmu)
       if(ninmax>0){

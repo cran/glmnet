@@ -2194,7 +2194,7 @@ case "${FC}" in
       ;;
     ifort)
       echo "  R configured for Intel fortran..."
-      OUR_FCFLAGS="-O3 -axsse4.2 -r8"
+      OUR_FCFLAGS="-O3 -axsse4.2 -r8 -fpp -fixed"
 
       ;;
     *)

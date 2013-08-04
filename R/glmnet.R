@@ -16,8 +16,9 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   nlam=as.integer(nlambda)
   y=drop(y) # we dont like matrix responses unless we need them
   np=dim(x)
-  ###check dims
-  nobs=as.integer(np[1])
+   ###check dims
+  if(is.null(np)|(np[2]<=1))stop("x should be a matrix with 2 or more columns")
+ nobs=as.integer(np[1])
   if(missing(weights))weights=rep(1,nobs)
   else if(length(weights)!=nobs)stop(paste("number of elements in weights (",length(weights),") not equal to the number of rows of x (",nobs,")",sep=""))
   nvars=as.integer(np[2])
@@ -107,7 +108,6 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
     "cox"=coxnet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit),
     "mgaussian"=mrelnet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,vnames,maxit)
     )
-    
   if(is.null(lambda))fit$lambda=fix.lam(fit$lambda)##first lambda is infinity; changed to entry point
 fit$call=this.call
   fit$nobs=nobs

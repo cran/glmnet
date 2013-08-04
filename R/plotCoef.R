@@ -15,14 +15,17 @@ plotCoef=function(beta,norm,lambda,df,dev,label=FALSE,xvar=c("norm","lambda","de
     "norm"={
       index=if(missing(norm))apply(abs(beta),2,sum)else norm
       iname="L1 Norm"
+      approx.f=1
     },
     "lambda"={
       index=log(lambda)
       iname="Log Lambda"
+      approx.f=0
     },
     "dev"= {
       index=dev
       iname="Fraction Deviance Explained"
+      approx.f=1
     }
          )
   dotlist=list(...)
@@ -31,7 +34,10 @@ plotCoef=function(beta,norm,lambda,df,dev,label=FALSE,xvar=c("norm","lambda","de
     matplot(index,t(beta),lty=1,xlab=xlab,ylab=ylab,type="l",...)
   else matplot(index,t(beta),lty=1,xlab=xlab,ylab=ylab,...)
   atdf=pretty(index)
- prettydf=trunc(approx(x=index,y=df,xout=atdf,rule=2)$y)
+  ### compute df by interpolating to df at next smaller lambda
+  ### thanks to Yunyang Qian
+ prettydf=approx(x=index,y=df,xout=atdf,rule=2,method="constant",f=approx.f)$y
+# prettydf=ceiling(approx(x=index,y=df,xout=atdf,rule=2)$y)
  axis(3,at=atdf,labels=prettydf,tcl=NA)
  if(label){
    nnz=length(which)

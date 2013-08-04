@@ -56,7 +56,7 @@ if(fit$jerr!=0){
   else warning(errmsg$msg,call.=FALSE)
 }
   if(nr>1)
-    outlist=getcoef.multinomial(fit,nvars,nx,vnames,nr,responseNames)
+    outlist=getcoef.multinomial(fit,nvars,nx,vnames,nr,responseNames,center.intercept=FALSE)
   else 
     outlist=getcoef(fit,nvars,nx,vnames)
   dev=fit$rsq[seq(fit$lmu)]

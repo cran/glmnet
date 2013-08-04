@@ -1,14 +1,14 @@
 "
 c
-c                          newGLMnet (2/07/13)
+c                          newGLMnet (2/15/13)
 c                            
 c                        
 c                 Elastic net with squared-error loss
 c
 c dense predictor matrix:
 c
-c call elnet(ka,parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,maxit,
-c            lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
+c call elnet(ka,parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,
+c            intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
 c
 c   x(no,ni) = predictor data matrix flat file (overwritten)
 c
@@ -16,7 +16,7 @@ c
 c sparse predictor matrix:
 c
 c call spelnet(ka,parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
-c             isd,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
+c             isd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
 c
 c   x, ix, jx = predictor data matrix in compressed sparse row format
 c
@@ -60,6 +60,8 @@ c      isd = 0 => regression on original predictor variables
 c      isd = 1 => regression on standardized predictor variables
 c      Note: output solutions always reference original
 c            variables locations and scales.
+c   intr = intercept flag
+c      intr = 0/1 => don't/do include intercept in model
 c   maxit = maximum allowed number of passes over the data for all lambda
 c      values (suggested values, maxit = 100000)
 c
@@ -168,7 +170,7 @@ c
 c dense predictor matrix:
 c
 c call multelnet(parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,
-c                jsd,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
+c                jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
 c
 c   x(no,ni) = predictor data matrix flat file (overwritten)
 c
@@ -176,7 +178,7 @@ c
 c sparse predictor matrix:
 c
 c call multspelnet(parm,no,ni,nr,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
-c             isd,jsd,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
+c             isd,jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
 c
 c   x, ix, jx = predictor data matrix in compressed sparse row format
 c
@@ -282,7 +284,7 @@ c
 c dense predictor matrix:
 c
 c call lognet (parm,no,ni,nc,x,y,o,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,
-c              maxit,kopt,lmu,a0,ca,ia,nin,dev0,fdev,alm,nlp,jerr)
+c              intr,maxit,kopt,lmu,a0,ca,ia,nin,dev0,fdev,alm,nlp,jerr)
 c
 c   x(no,ni) = predictor data matrix flat file (overwritten)
 c
@@ -290,14 +292,14 @@ c
 c sparse predictor matrix:
 c
 c call splognet (parm,no,ni,nc,x,ix,jx,y,o,jd,vp,cl,ne,nx,nlam,flmin,
-c             ulam,thr,isd,maxit,kopt,lmu,a0,ca,ia,nin,dev0,fdev,alm,nlp,jerr)
+c      ulam,thr,isd,intr,maxit,kopt,lmu,a0,ca,ia,nin,dev0,fdev,alm,nlp,jerr)
 c
 c   x, ix, jx = predictor data matrix in compressed sparse row format
 c
 c
 c other inputs:
 c
-c   parm,no,ni,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,maxit
+c   parm,no,ni,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit
 c    = same as elnet above.
 c   
 c   nc = number of classes (distinct outcome values)
@@ -424,14 +426,14 @@ c
 c dense predictor matrix:                      
 c
 c call fishnet (parm,no,ni,x,y,o,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
-c               isd,maxit,lmu,a0,ca,ia,nin,dev0,fdev,alm,nlp,jerr)
+c               isd,intr,maxit,lmu,a0,ca,ia,nin,dev0,fdev,alm,nlp,jerr)
 c
 c   x(no,ni) = predictor data matrix flat file (overwritten)
 c
 c sparse predictor matrix:
 c
 c call spfishnet (parm,no,ni,x,ix,jx,y,o,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
-c               isd,maxit,lmu,a0,ca,ia,nin,dev0,fdev,alm,nlp,jerr)
+c               isd,intr,maxit,lmu,a0,ca,ia,nin,dev0,fdev,alm,nlp,jerr)
 c
 c    x, ix, jx = predictor data matrix in compressed sparse row format
 c
@@ -439,7 +441,7 @@ c other inputs:
 c
 c   y(no) = observation response counts
 c   o(no) = observation off-sets
-c   parm,no,ni,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,maxit
+c   parm,no,ni,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit
 c    = same as elnet above
 c
 c output:
@@ -694,7 +696,7 @@ entry chg_min_null_prob(arg); pmin0=arg; return;
 entry chg_max_exp(arg); exmx0=arg; return;
 end;
 subroutine elnet
- (ka,parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,maxit,
+ (ka,parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,
    lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 real x(no,ni),y(no),w(no),vp(ni),ca(nx,nlam),cl(2,ni);
 real ulam(nlam),a0(nlam),rsq(nlam),alm(nlam);
@@ -707,19 +709,19 @@ allocate(vq(1:ni),stat=jerr); if(jerr.ne.0) return;
 vq=max(0.0,vp); vq=vq*ni/sum(vq);
 if ka.eq.1 <
    call elnetu
-    (parm,no,ni,x,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,isd,maxit,
+    (parm,no,ni,x,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,
       lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 >
 else <
    call elnetn
-    (parm,no,ni,x,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,isd,maxit,
+    (parm,no,ni,x,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,
       lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 >
 deallocate(vq);
 return;
 end;
 subroutine elnetu
- (parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,maxit,
+ (parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,
    lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 real x(no,ni),y(no),w(no),vp(ni),ulam(nlam),cl(2,ni);
 real ca(nx,nlam),a0(nlam),rsq(nlam),alm(nlam);
@@ -738,7 +740,7 @@ if(jerr.ne.0) return;
 call chkvars(no,ni,x,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
-call standard(no,ni,x,y,w,isd,ju,g,xm,xs,ym,ys,xv,jerr);
+call standard(no,ni,x,y,w,isd,intr,ju,g,xm,xs,ym,ys,xv,jerr);
 if(jerr.ne.0) return;
 cl=cl/ys; if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
 if(flmin.ge.1.0) vlam=ulam/ys;
@@ -746,30 +748,42 @@ call elnet1(parm,ni,ju,vp,cl,g,no,ne,nx,x,nlam,flmin,vlam,thr,maxit,xv,
    lmu,ca,ia,nin,rsq,alm,nlp,jerr);
 if(jerr.gt.0) return;
 <k=1,lmu; alm(k)=ys*alm(k); nk=nin(k);
-   <l=1,nk; ca(l,k)=ys*ca(l,k)/xs(ia(l));>
-   a0(k)=ym-dot_product(ca(1:nk,k),xm(ia(1:nk)));
+   <l=1,nk; ca(l,k)=ys*ca(l,k)/xs(ia(l));> a0(k)=0.0;
+   if(intr.ne.0) a0(k)=ym-dot_product(ca(1:nk,k),xm(ia(1:nk)));
 >
 deallocate(xm,xs,g,ju,xv,vlam);
 return;
 end;
-subroutine standard (no,ni,x,y,w,isd,ju,g,xm,xs,ym,ys,xv,jerr);
+subroutine standard (no,ni,x,y,w,isd,intr,ju,g,xm,xs,ym,ys,xv,jerr);
 real x(no,ni),y(no),w(no),g(ni),xm(ni),xs(ni),xv(ni); integer ju(ni);
 %fortran
       real, dimension (:), allocatable :: v
 %mortran
 allocate(v(1:no),stat=jerr); if(jerr.ne.0) return;
 w=w/sum(w); v=sqrt(w);
-<j=1,ni; if(ju(j).eq.0) next;
-   xm(j)=dot_product(w,x(:,j)); x(:,j)=v*(x(:,j)-xm(j));
-   xv(j)=dot_product(x(:,j),x(:,j)); if(isd.gt.0) xs(j)=sqrt(xv(j));
+if intr.eq.0 < ym=0.0; y=v*y;
+   ys=sqrt(dot_product(y,y)-dot_product(v,y)**2); y=y/ys;
+   <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; x(:,j)=v*x(:,j);
+      xv(j)=dot_product(x(:,j),x(:,j));
+      if isd.ne.0 < xbq=dot_product(v,x(:,j))**2; vc=xv(j)-xbq;
+         xs(j)=sqrt(vc); x(:,j)=x(:,j)/xs(j); xv(j)=1.0+xbq/vc;
+      >
+      else < xs(j)=1.0;>
+   >
 >
-if isd.eq.0 < xs=1.0;>
 else <
-   <j=1,ni; if(ju(j).eq.0) next; x(:,j)=x(:,j)/xs(j);>
-   xv=1.0;
+   <j=1,ni; if(ju(j).eq.0) next;
+      xm(j)=dot_product(w,x(:,j)); x(:,j)=v*(x(:,j)-xm(j));
+      xv(j)=dot_product(x(:,j),x(:,j)); if(isd.gt.0) xs(j)=sqrt(xv(j));
+   >
+   if isd.eq.0 < xs=1.0;>
+   else <
+      <j=1,ni; if(ju(j).eq.0) next; x(:,j)=x(:,j)/xs(j);>
+      xv=1.0;
+   >
+   ym=dot_product(w,y); y=v*(y-ym); ys=sqrt(dot_product(y,y)); y=y/ys;
 >
-ym=dot_product(w,y); y=v*(y-ym); ys=sqrt(dot_product(y,y)); y=y/ys; g=0.0;
-<j=1,ni; if(ju(j).ne.0) g(j)=dot_product(y,x(:,j));>
+g=0.0; <j=1,ni; if(ju(j).ne.0) g(j)=dot_product(y,x(:,j));>
 deallocate(v);
 return;
 end;
@@ -853,7 +867,7 @@ deallocate(a,mm,c,da);
 return;
 end;
 subroutine elnetn (parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,
-   maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
+   intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 real vp(ni),x(no,ni),y(no),w(no),ulam(nlam),cl(2,ni);
 real ca(nx,nlam),a0(nlam),rsq(nlam),alm(nlam);
 integer jd(*),ia(nx),nin(nlam);
@@ -870,7 +884,7 @@ if(jerr.ne.0) return;
 call chkvars(no,ni,x,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
-call standard1(no,ni,x,y,w,isd,ju,xm,xs,ym,ys,xv,jerr);
+call standard1(no,ni,x,y,w,isd,intr,ju,xm,xs,ym,ys,xv,jerr);
 if(jerr.ne.0) return;
 cl=cl/ys; if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
 if(flmin.ge.1.0) vlam=ulam/ys;
@@ -878,19 +892,30 @@ call elnet2(parm,ni,ju,vp,cl,y,no,ne,nx,x,nlam,flmin,vlam,thr,maxit,xv,
    lmu,ca,ia,nin,rsq,alm,nlp,jerr);
 if(jerr.gt.0) return;
 <k=1,lmu; alm(k)=ys*alm(k); nk=nin(k);
-   <l=1,nk; ca(l,k)=ys*ca(l,k)/xs(ia(l));>
-   a0(k)=ym-dot_product(ca(1:nk,k),xm(ia(1:nk)));
+   <l=1,nk; ca(l,k)=ys*ca(l,k)/xs(ia(l));> a0(k)=0.0;
+   if(intr.ne.0) a0(k)=ym-dot_product(ca(1:nk,k),xm(ia(1:nk)));
 >
 deallocate(xm,xs,ju,xv,vlam);
 return;
 end;
-subroutine standard1 (no,ni,x,y,w,isd,ju,xm,xs,ym,ys,xv,jerr);
+subroutine standard1 (no,ni,x,y,w,isd,intr,ju,xm,xs,ym,ys,xv,jerr);
 real x(no,ni),y(no),w(no),xm(ni),xs(ni),xv(ni); integer ju(ni);
 %fortran
       real, dimension (:), allocatable :: v
 %mortran
 allocate(v(1:no),stat=jerr); if(jerr.ne.0) return;
 w=w/sum(w); v=sqrt(w);
+if intr.eq.0 < ym=0.0; y=v*y;
+   ys=sqrt(dot_product(y,y)-dot_product(v,y)**2); y=y/ys;
+   <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; x(:,j)=v*x(:,j);
+      xv(j)=dot_product(x(:,j),x(:,j));
+      if isd.ne.0 < xbq=dot_product(v,x(:,j))**2; vc=xv(j)-xbq;
+         xs(j)=sqrt(vc); x(:,j)=x(:,j)/xs(j); xv(j)=1.0+xbq/vc;
+      >
+      else < xs(j)=1.0;>
+   >
+   go to :out:;
+>
 <j=1,ni; if(ju(j).eq.0) next;
    xm(j)=dot_product(w,x(:,j)); x(:,j)=v*(x(:,j)-xm(j));
    xv(j)=dot_product(x(:,j),x(:,j)); if(isd.gt.0) xs(j)=sqrt(xv(j));
@@ -900,7 +925,7 @@ else < <j=1,ni; if(ju(j).eq.0) next; x(:,j)=x(:,j)/xs(j);>
    xv=1.0;
 >
 ym=dot_product(w,y); y=v*(y-ym); ys=sqrt(dot_product(y,y)); y=y/ys;
-deallocate(v);
+:out:deallocate(v);
 return;
 end;
 subroutine elnet2(beta,ni,ju,vp,cl,y,no,ne,nx,x,nlam,flmin,ulam,thr,maxit,xv,
@@ -1001,8 +1026,8 @@ f=a0; if(nin.le.0) return;
 return;
 end;
 subroutine spelnet
- (ka,parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,maxit,
-   lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
+ (ka,parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,
+   maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 real x(*),y(no),w(no),vp(ni),ulam(nlam),cl(2,ni);
 real ca(nx,nlam),a0(nlam),rsq(nlam),alm(nlam);
 integer ix(*),jx(*),jd(*),ia(nx),nin(nlam);
@@ -1014,20 +1039,20 @@ allocate(vq(1:ni),stat=jerr); if(jerr.ne.0) return;
 vq=max(0.0,vp); vq=vq*ni/sum(vq);
 if ka.eq.1 <
    call spelnetu
-    (parm,no,ni,x,ix,jx,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,isd,maxit,
-      lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
+    (parm,no,ni,x,ix,jx,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,isd,
+      intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 >
 else <
    call spelnetn
-    (parm,no,ni,x,ix,jx,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,isd,maxit,
-      lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
+    (parm,no,ni,x,ix,jx,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,
+      maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 >
 deallocate(vq);
 return;
 end;
 subroutine spelnetu
- (parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,maxit,
-   lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
+ (parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,
+   maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 real x(*),y(no),w(no),vp(ni),ulam(nlam),cl(2,ni);
 real ca(nx,nlam),a0(nlam),rsq(nlam),alm(nlam);
 integer ix(*),jx(*),jd(*),ia(nx),nin(nlam);
@@ -1045,7 +1070,7 @@ if(jerr.ne.0) return;
 call spchkvars(no,ni,x,ix,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
-call spstandard(no,ni,x,ix,jx,y,w,ju,isd,g,xm,xs,ym,ys,xv,jerr);
+call spstandard(no,ni,x,ix,jx,y,w,ju,isd,intr,g,xm,xs,ym,ys,xv,jerr);
 if(jerr.ne.0) return;
 cl=cl/ys; if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
 if(flmin.ge.1.0) vlam=ulam/ys;
@@ -1053,22 +1078,35 @@ call spelnet1(parm,ni,g,no,w,ne,nx,x,ix,jx,ju,vp,cl,nlam,flmin,vlam,thr,maxit,
    xm,xs,xv,lmu,ca,ia,nin,rsq,alm,nlp,jerr);
 if(jerr.gt.0) return;
 <k=1,lmu; alm(k)=ys*alm(k); nk=nin(k);
-   <l=1,nk; ca(l,k)=ys*ca(l,k)/xs(ia(l));>
-   a0(k)=ym-dot_product(ca(1:nk,k),xm(ia(1:nk)));
+   <l=1,nk; ca(l,k)=ys*ca(l,k)/xs(ia(l));> a0(k)=0.0;
+   if(intr.ne.0) a0(k)=ym-dot_product(ca(1:nk,k),xm(ia(1:nk)));
 >
 deallocate(xm,xs,g,ju,xv,vlam);
 return;
 end;
-subroutine spstandard (no,ni,x,ix,jx,y,w,ju,isd,g,xm,xs,ym,ys,xv,jerr);
+subroutine spstandard (no,ni,x,ix,jx,y,w,ju,isd,intr,g,xm,xs,ym,ys,xv,jerr);
 real x(*),y(no),w(no),g(ni),xm(ni),xs(ni),xv(ni); integer ix(*),jx(*),ju(ni);
 w=w/sum(w);
-<j=1,ni; if(ju(j).eq.0) next;
-   jb=ix(j); je=ix(j+1)-1; xm(j)=dot_product(w(jx(jb:je)),x(jb:je));
-   xv(j)=dot_product(w(jx(jb:je)),x(jb:je)**2)-xm(j)**2;
-   if(isd.gt.0) xs(j)=sqrt(xv(j));
+if intr.eq.0 < ym=0.0;
+   ys=sqrt(dot_product(w,y**2)-dot_product(w,y)**2); y=y/ys;
+   <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; jb=ix(j); je=ix(j+1)-1; 
+      xv(j)=dot_product(w(jx(jb:je)),x(jb:je)**2);
+      if isd.ne.0 < xbq=dot_product(w(jx(jb:je)),x(jb:je))**2; vc=xv(j)-xbq;
+         xs(j)=sqrt(vc); xv(j)=1.0+xbq/vc;
+      >
+      else < xs(j)=1.0;>
+   >
 >
-if isd.eq.0 < xs=1.0;> else < xv=1.0;>
-ym=dot_product(w,y); y=y-ym; ys=sqrt(dot_product(w,y**2)); y=y/ys; g=0.0;
+else <
+   <j=1,ni; if(ju(j).eq.0) next;
+      jb=ix(j); je=ix(j+1)-1; xm(j)=dot_product(w(jx(jb:je)),x(jb:je));
+      xv(j)=dot_product(w(jx(jb:je)),x(jb:je)**2)-xm(j)**2;
+      if(isd.gt.0) xs(j)=sqrt(xv(j));
+   >
+   if isd.eq.0 < xs=1.0;> else < xv=1.0;>
+   ym=dot_product(w,y); y=y-ym; ys=sqrt(dot_product(w,y**2)); y=y/ys;
+>
+g=0.0;
 <j=1,ni; if(ju(j).eq.0) next; jb=ix(j); je=ix(j+1)-1;
    g(j)=dot_product(w(jx(jb:je))*y(jx(jb:je)),x(jb:je))/xs(j);
 >
@@ -1155,7 +1193,7 @@ deallocate(a,mm,c,da);
 return;
 end;
 subroutine spelnetn(parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,
-   thr,isd,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
+   thr,isd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 real x(*),vp(ni),y(no),w(no),ulam(nlam),cl(2,ni);
 real ca(nx,nlam),a0(nlam),rsq(nlam),alm(nlam);
 integer ix(*),jx(*),jd(*),ia(nx),nin(nlam);
@@ -1172,7 +1210,7 @@ if(jerr.ne.0) return;
 call spchkvars(no,ni,x,ix,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
-call spstandard1(no,ni,x,ix,jx,y,w,ju,isd,xm,xs,ym,ys,xv,jerr);
+call spstandard1(no,ni,x,ix,jx,y,w,ju,isd,intr,xm,xs,ym,ys,xv,jerr);
 if(jerr.ne.0) return;
 cl=cl/ys; if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
 if(flmin.ge.1.0) vlam=ulam/ys;
@@ -1180,15 +1218,26 @@ call spelnet2(parm,ni,y,w,no,ne,nx,x,ix,jx,ju,vp,cl,nlam,flmin,vlam,thr,maxit,
    xm,xs,xv,lmu,ca,ia,nin,rsq,alm,nlp,jerr);
 if(jerr.gt.0) return;
 <k=1,lmu; alm(k)=ys*alm(k); nk=nin(k);
-   <l=1,nk; ca(l,k)=ys*ca(l,k)/xs(ia(l));>
-   a0(k)=ym-dot_product(ca(1:nk,k),xm(ia(1:nk)));
+   <l=1,nk; ca(l,k)=ys*ca(l,k)/xs(ia(l));> a0(k)=0.0;
+   if(intr.ne.0) a0(k)=ym-dot_product(ca(1:nk,k),xm(ia(1:nk)));
 >
 deallocate(xm,xs,ju,xv,vlam);
 return;
 end;
-subroutine spstandard1 (no,ni,x,ix,jx,y,w,ju,isd,xm,xs,ym,ys,xv,jerr);
+subroutine spstandard1 (no,ni,x,ix,jx,y,w,ju,isd,intr,xm,xs,ym,ys,xv,jerr);
 real x(*),y(no),w(no),xm(ni),xs(ni),xv(ni); integer ix(*),jx(*),ju(ni);
 w=w/sum(w);
+if intr.eq.0 < ym=0.0;
+   ys=sqrt(dot_product(w,y**2)-dot_product(w,y)**2); y=y/ys;
+   <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; jb=ix(j); je=ix(j+1)-1;
+      xv(j)=dot_product(w(jx(jb:je)),x(jb:je)**2);
+      if isd.ne.0 < xbq=dot_product(w(jx(jb:je)),x(jb:je))**2; vc=xv(j)-xbq;
+         xs(j)=sqrt(vc); xv(j)=1.0+xbq/vc;
+      >
+      else < xs(j)=1.0;>
+   >
+   return;
+>
 <j=1,ni; if(ju(j).eq.0) next;
    jb=ix(j); je=ix(j+1)-1; xm(j)=dot_product(w(jx(jb:je)),x(jb:je));
    xv(j)=dot_product(w(jx(jb:je)),x(jb:je)**2)-xm(j)**2;
@@ -1323,7 +1372,7 @@ loop <
 return;
 end;
 subroutine lognet (parm,no,ni,nc,x,y,g,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
-   isd,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
+   isd,intr,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 real x(no,ni),y(no,max(2,nc)),g(no,nc),vp(ni),ulam(nlam);
 real ca(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam),cl(2,ni);
 integer jd(*),ia(nx),nin(nlam);
@@ -1344,41 +1393,59 @@ if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
 vq=max(0.0,vp); vq=vq*ni/sum(vq);
 <i=1,no; ww(i)=sum(y(i,:)); y(i,:)=y(i,:)/ww(i);> sw=sum(ww); ww=ww/sw;
-if nc.eq.1 < call lstandard1(no,ni,x,ww,ju,isd,xm,xs);
+if nc.eq.1 < call lstandard1(no,ni,x,ww,ju,isd,intr,xm,xs);
    if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
    call lognet2n(parm,no,ni,x,y(:,1),g(:,1),ww,ju,vq,cl,ne,nx,nlam,flmin,ulam,
-         thr,isd,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
+         thr,isd,intr,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 >
-elseif kopt.eq.2 < call multlstandard1(no,ni,x,ww,ju,isd,xm,xs,xv);
+elseif kopt.eq.2 < call multlstandard1(no,ni,x,ww,ju,isd,intr,xm,xs,xv);
    if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
    call multlognetn(parm,no,ni,nc,x,y,g,ww,ju,vq,cl,ne,nx,nlam,flmin,ulam,thr,
-         isd,maxit,xv,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
+         intr,maxit,xv,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 >
-else < call lstandard1(no,ni,x,ww,ju,isd,xm,xs);
+else < call lstandard1(no,ni,x,ww,ju,isd,intr,xm,xs);
    if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
    call lognetn(parm,no,ni,nc,x,y,g,ww,ju,vq,cl,ne,nx,nlam,flmin,ulam,thr,
-         isd,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
+         isd,intr,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 >
 if(jerr.gt.0) return; dev0=2.0*sw*dev0;
 <k=1,lmu; nk=nin(k);
    <ic=1,nc; if isd.gt.0 < <l=1,nk; ca(l,ic,k)=ca(l,ic,k)/xs(ia(l));>>
-       a0(ic,k)=a0(ic,k)-dot_product(ca(1:nk,ic,k),xm(ia(1:nk)));
+      if intr.eq.0 < a0(ic,k)=0.0;>
+      else < a0(ic,k)=a0(ic,k)-dot_product(ca(1:nk,ic,k),xm(ia(1:nk)));>
    >
 >
 deallocate(ww,ju,vq,xm); if(isd.gt.0) deallocate(xs);
 if(kopt.eq.2) deallocate(xv);
 return;
 end;
-subroutine lstandard1 (no,ni,x,w,ju,isd,xm,xs);
+subroutine lstandard1 (no,ni,x,w,ju,isd,intr,xm,xs);
 real x(no,ni),w(no),xm(ni),xs(ni); integer ju(ni);
+if intr.eq.0 <
+   <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0;
+      if isd.ne.0 < vc=dot_product(w,x(:,j)**2)-dot_product(w,x(:,j))**2;
+         xs(j)=sqrt(vc); x(:,j)=x(:,j)/xs(j);
+      >
+   >
+   return;
+>
 <j=1,ni; if(ju(j).eq.0) next;
    xm(j)=dot_product(w,x(:,j)); x(:,j)=x(:,j)-xm(j);
    if isd.gt.0 < xs(j)=sqrt(dot_product(w,x(:,j)**2)); x(:,j)=x(:,j)/xs(j);>
 >
 return;
 end;
-subroutine multlstandard1 (no,ni,x,w,ju,isd,xm,xs,xv);
+subroutine multlstandard1 (no,ni,x,w,ju,isd,intr,xm,xs,xv);
 real x(no,ni),w(no),xm(ni),xs(ni),xv(ni); integer ju(ni);
+if intr.eq.0 <
+   <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0;
+      xv(j)=dot_product(w,x(:,j)**2);
+      if isd.ne.0 < xbq=dot_product(w,x(:,j))**2; vc=xv(j)-xbq;
+         xs(j)=sqrt(vc); x(:,j)=x(:,j)/xs(j); xv(j)=1.0+xbq/vc;
+      >
+   >
+   return;
+>
 <j=1,ni; if(ju(j).eq.0) next;
    xm(j)=dot_product(w,x(:,j)); x(:,j)=x(:,j)-xm(j);
    xv(j)=dot_product(w,x(:,j)**2);
@@ -1387,7 +1454,7 @@ real x(no,ni),w(no),xm(ni),xs(ni),xv(ni); integer ju(ni);
 return;
 end;
 subroutine lognet2n(parm,no,ni,x,y,g,w,ju,vp,cl,ne,nx,nlam,flmin,ulam,shri,
-    isd,maxit,kopt,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr);
+    isd,intr,maxit,kopt,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr);
 real x(no,ni),y(no),g(no),w(no),vp(ni),ulam(nlam),cl(2,ni);
 real a(nx,nlam),a0(nlam),dev(nlam),alm(nlam);
 integer ju(ni),m(nx),kin(nlam);
@@ -1410,16 +1477,18 @@ fmax=log(1.0/pmin-1.0); fmin=-fmax; vmin=(1.0+pmin)*pmin*(1.0-pmin);
 bta=parm; omb=1.0-bta;
 q0=dot_product(w,y); if q0.le.pmin < jerr=8001; return;>
 if q0.ge.1.0-pmin < jerr=9001; return;>
-ixx=0; al=0.0; bz=log(q0/(1.0-q0));
+if(intr.eq.0.0) q0=0.5;
+ixx=0; al=0.0; bz=0.0; if(intr.ne.0) bz=log(q0/(1.0-q0));
 if nonzero(no,g).eq.0 < vi=q0*(1.0-q0); b(0)=bz; v=vi*w;
    r=w*(y-q0); q=q0; xmz=vi; dev1=-(bz*q0+log(1.0-q0));
 >
-else < b(0)=azero(no,y,g,w,jerr); if(jerr.ne.0) return;
+else < b(0)=0.0;
+   if intr.ne.0 < b(0)=azero(no,y,g,w,jerr); if(jerr.ne.0) return;>
    q=1.0/(1.0+exp(-b(0)-g)); v=w*q*(1.0-q); r=w*(y-q); xmz=sum(v);
    dev1=-(b(0)*q0+dot_product(w,y*g+log(1.0-q)));
 >
 if kopt.gt.0 <
-   if isd.gt.0 < xv=0.25;>
+   if isd.gt.0.and.intr.ne.0 < xv=0.25;>
    else < <j=1,ni; if(ju(j).ne.0) xv(j)=0.25*dot_product(w,x(:,j)**2);>>
 >
 dev0=dev1;
@@ -1462,7 +1531,7 @@ shr=shri*dev0;
             >
          >
          if(nin.gt.nx) exit;
-         d=sum(r)/xmz;
+         d=0.0; if(intr.ne.0) d=sum(r)/xmz;
          if d.ne.0.0 < b(0)=b(0)+d; dlx=max(dlx,xmz*d**2); r=r-d*v;>
          if(dlx.lt.shr) exit; if nlp.gt.maxit < jerr=-ilm; return;>
          loop < nlp=nlp+1; dlx=0.0;
@@ -1476,7 +1545,7 @@ shr=shri*dev0;
                d=b(k)-bk; if(abs(d).le.0.0) next; dlx=max(dlx,xv(k)*d**2);
                r=r-d*v*x(:,k);
             >
-            d=sum(r)/xmz;
+            d=0.0; if(intr.ne.0) d=sum(r)/xmz;
             if d.ne.0.0 < b(0)=b(0)+d; dlx=max(dlx,xmz*d**2); r=r-d*v;>
             if(dlx.lt.shr) exit; if nlp.gt.maxit < jerr=-ilm; return;>
          >
@@ -1544,7 +1613,7 @@ deallocate(e,p,w);
 return;
 end;
 subroutine lognetn(parm,no,ni,nc,x,y,g,w,ju,vp,cl,ne,nx,nlam,flmin,ulam,shri,
-    isd,maxit,kopt,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr);
+    isd,intr,maxit,kopt,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr);
 real x(no,ni),y(no,nc),g(no,nc),w(no),vp(ni),ulam(nlam);
 real a(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam),cl(2,ni);
 integer ju(ni),m(nx),kin(nlam);
@@ -1576,15 +1645,18 @@ bta=parm; omb=1.0-bta; dev1=0.0; dev0=0.0;
 <ic=1,nc; q0=dot_product(w,y(:,ic));
    if q0.le.pmin < jerr =8000+ic; return;>
    if q0.ge.1.0-pmin < jerr =9000+ic; return;>
-   b(0,ic)=log(q0); dev1=dev1-q0*b(0,ic); b(1:ni,ic)=0.0;
+   if intr.eq.0 < q0=1.0/nc; b(0,ic)=0.0;>
+   else < b(0,ic)=log(q0); dev1=dev1-q0*b(0,ic);>
+   b(1:ni,ic)=0.0;
 >
-ixx=0; al=0.0;
+if(intr.eq.0) dev1=log(float(nc)); ixx=0; al=0.0;
 if nonzero(no*nc,g).eq.0 <
    b(0,:)=b(0,:)-sum(b(0,:))/nc; sxp=0.0;
    <ic=1,nc; q(:,ic)=exp(b(0,ic)); sxp=sxp+q(:,ic);>
 >
 else < <i=1,no; g(i,:)=g(i,:)-sum(g(i,:))/nc;> sxp=0.0;
-   call kazero(nc,no,y,g,w,b(0,:),jerr); if(jerr.ne.0) return;
+   if intr.eq.0 < b(0,:)=0.0;>
+   else < call kazero(nc,no,y,g,w,b(0,:),jerr); if(jerr.ne.0) return;>
    dev1=0.0;
    <ic=1,nc; q(:,ic)=b(0,ic)+g(:,ic);
       dev1=dev1-dot_product(w,y(:,ic)*q(:,ic)); 
@@ -1595,7 +1667,7 @@ else < <i=1,no; g(i,:)=g(i,:)-sum(g(i,:))/nc;> sxp=0.0;
 <ic=1,nc; <i=1,no; if(y(i,ic).gt.0.0) dev0=dev0+w(i)*y(i,ic)*log(y(i,ic));>>
 dev0=dev0+dev1;
 if kopt.gt.0 <
-   if isd.gt.0 < xv=0.25;>
+   if isd.gt.0.and.intr.ne.0 < xv=0.25;>
    else < <j=1,ni; if(ju(j).ne.0) xv(j,:)=0.25*dot_product(w,x(:,j)**2);>>
 >
 if flmin.lt.1.0 < eqs=max(eps,flmin); alf=eqs**(1.0/(nlam-1));>
@@ -1648,7 +1720,7 @@ ga=0.0;
                >
             >
             if(jx.gt.0) exit;
-            d=sum(r)/xmz;
+            d=0.0; if(intr.ne.0) d=sum(r)/xmz;
             if d.ne.0.0 < b(0,ic)=b(0,ic)+d; dlx=max(dlx,xmz*d**2); r=r-d*v;>
             if(dlx.lt.shr) exit;
             if nlp.gt.maxit < jerr=-ilm; return;>
@@ -1664,7 +1736,7 @@ ga=0.0;
                   d=b(k,ic)-bk; if(abs(d).le.0.0) next;
                   dlx=max(dlx,xv(k,ic)*d**2); r=r-d*v*x(:,k);
                >
-               d=sum(r)/xmz;
+               d=0.0; if(intr.ne.0) d=sum(r)/xmz;
                if d.ne.0.0 < b(0,ic)=b(0,ic)+d;
                   dlx=max(dlx,xmz*d**2); r=r-d*v;
                >
@@ -1797,7 +1869,7 @@ real a0(nc),ca(nx,nc),x(nt,*),ans(nc,nt); integer ia(nx);
 return;
 end;
 subroutine splognet (parm,no,ni,nc,x,ix,jx,y,g,jd,vp,cl,ne,nx,nlam,flmin,
-   ulam,thr,isd,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
+   ulam,thr,isd,intr,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 real x(*),y(no,max(2,nc)),g(no,nc),vp(ni),ulam(nlam);
 real ca(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam),cl(2,ni);
 integer ix(*),jx(*),jd(*),ia(nx),nin(nlam);
@@ -1818,33 +1890,46 @@ if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
 vq=max(0.0,vp); vq=vq*ni/sum(vq);
 <i=1,no; ww(i)=sum(y(i,:)); y(i,:)=y(i,:)/ww(i);> sw=sum(ww); ww=ww/sw;
-if nc.eq.1 < call splstandard2(no,ni,x,ix,jx,ww,ju,isd,xm,xs);
+if nc.eq.1 < call splstandard2(no,ni,x,ix,jx,ww,ju,isd,intr,xm,xs);
    if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
    call sprlognet2n(parm,no,ni,x,ix,jx,y(:,1),g(:,1),ww,ju,vq,cl,ne,nx,nlam,
-      flmin,ulam,thr,isd,maxit,kopt,xm,xs,lmu,a0,ca,ia,nin,dev0,dev,
+      flmin,ulam,thr,isd,intr,maxit,kopt,xm,xs,lmu,a0,ca,ia,nin,dev0,dev,
       alm,nlp,jerr);
 >
-elseif kopt.eq.2 < call multsplstandard2(no,ni,x,ix,jx,ww,ju,isd,xm,xs,xv);
+elseif kopt.eq.2 <
+   call multsplstandard2(no,ni,x,ix,jx,ww,ju,isd,intr,xm,xs,xv);
    if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
    call multsprlognetn(parm,no,ni,nc,x,ix,jx,y,g,ww,ju,vq,cl,ne,nx,nlam,flmin,
-      ulam,thr,isd,maxit,xv,xm,xs,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
+      ulam,thr,intr,maxit,xv,xm,xs,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 >
-else < call splstandard2(no,ni,x,ix,jx,ww,ju,isd,xm,xs);
+else < call splstandard2(no,ni,x,ix,jx,ww,ju,isd,intr,xm,xs);
    if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
    call sprlognetn(parm,no,ni,nc,x,ix,jx,y,g,ww,ju,vq,cl,ne,nx,nlam,flmin,
-      ulam,thr,isd,maxit,kopt,xm,xs,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
+      ulam,thr,isd,intr,maxit,kopt,xm,xs,lmu,a0,ca,
+      ia,nin,dev0,dev,alm,nlp,jerr);
 >
 if(jerr.gt.0) return; dev0=2.0*sw*dev0;
 <k=1,lmu; nk=nin(k);
    <ic=1,nc; if isd.gt.0 < <l=1,nk; ca(l,ic,k)=ca(l,ic,k)/xs(ia(l));>>
-      a0(ic,k)=a0(ic,k)-dot_product(ca(1:nk,ic,k),xm(ia(1:nk)));
+      if intr.eq.0 < a0(ic,k)=0.0;>
+      else < a0(ic,k)=a0(ic,k)-dot_product(ca(1:nk,ic,k),xm(ia(1:nk)));>
    >
 >
 deallocate(ww,ju,vq,xm,xs); if(kopt.eq.2) deallocate(xv);
 return;
 end;
-subroutine multsplstandard2(no,ni,x,ix,jx,w,ju,isd,xm,xs,xv);
+subroutine multsplstandard2(no,ni,x,ix,jx,w,ju,isd,intr,xm,xs,xv);
 real x(*),w(no),xm(ni),xs(ni),xv(ni); integer ix(*),jx(*),ju(ni);
+if intr.eq.0 < 
+   <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; jb=ix(j); je=ix(j+1)-1;
+      xv(j)=dot_product(w(jx(jb:je)),x(jb:je)**2);
+      if isd.ne.0 < xbq=dot_product(w(jx(jb:je)),x(jb:je))**2; vc=xv(j)-xbq;
+         xs(j)=sqrt(vc); xv(j)=1.0+vbq/vc;
+      >
+      else < xs(j)=1.0;>
+   >
+   return;
+>
 <j=1,ni; if(ju(j).eq.0) next; jb=ix(j); je=ix(j+1)-1;
    xm(j)=dot_product(w(jx(jb:je)),x(jb:je));
    xv(j)=dot_product(w(jx(jb:je)),x(jb:je)**2)-xm(j)**2;
@@ -1853,8 +1938,19 @@ real x(*),w(no),xm(ni),xs(ni),xv(ni); integer ix(*),jx(*),ju(ni);
 if(isd.eq.0) xs=1.0;
 return;
 end;
-subroutine splstandard2(no,ni,x,ix,jx,w,ju,isd,xm,xs);
+subroutine splstandard2(no,ni,x,ix,jx,w,ju,isd,intr,xm,xs);
 real x(*),w(no),xm(ni),xs(ni); integer ix(*),jx(*),ju(ni);
+if intr.eq.0 <
+   <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; jb=ix(j); je=ix(j+1)-1;
+      if isd.ne.0 <
+         vc=dot_product(w(jx(jb:je)),x(jb:je)**2)
+            -dot_product(w(jx(jb:je)),x(jb:je))**2;
+         xs(j)=sqrt(vc);
+      >
+      else < xs(j)=1.0;>
+   >
+   return;
+>
 <j=1,ni; if(ju(j).eq.0) next; jb=ix(j); je=ix(j+1)-1;
    xm(j)=dot_product(w(jx(jb:je)),x(jb:je));
    if(isd.ne.0) xs(j)=sqrt(dot_product(w(jx(jb:je)),x(jb:je)**2)-xm(j)**2);
@@ -1863,7 +1959,8 @@ if(isd.eq.0) xs=1.0;
 return;
 end;
 subroutine sprlognet2n (parm,no,ni,x,ix,jx,y,g,w,ju,vp,cl,ne,nx,nlam,
-   flmin,ulam,shri,isd,maxit,kopt,xb,xs,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr);
+   flmin,ulam,shri,isd,intr,maxit,kopt,xb,xs,
+   lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr);
 real x(*),y(no),g(no),w(no),vp(ni),ulam(nlam),cl(2,ni);
 real a(nx,nlam),a0(nlam),dev(nlam),alm(nlam);
 real xb(ni),xs(ni); integer ix(*),jx(*),ju(ni),m(nx),kin(nlam);
@@ -1887,16 +1984,18 @@ if(jerr.ne.0) return;
 fmax=log(1.0/pmin-1.0); fmin=-fmax; vmin=(1.0+pmin)*pmin*(1.0-pmin);
 bta=parm; omb=1.0-bta;
 q0=dot_product(w,y); if q0.le.pmin < jerr=8001; return;>
-if q0.ge.1.0-pmin < jerr=9001; return;> bz=log(q0/(1.0-q0));
+if q0.ge.1.0-pmin < jerr=9001; return;>
+if(intr.eq.0) q0=0.5; bz=0.0; if(intr.ne.0) bz=log(q0/(1.0-q0));
 if nonzero(no,g).eq.0 < vi=q0*(1.0-q0); b(0)=bz; v=vi*w;
    r=w*(y-q0); q=q0; xm(0)=vi; dev1=-(bz*q0+log(1.0-q0));
 >
-else < b(0)=azero(no,y,g,w,jerr); if(jerr.ne.0) return;
+else < b(0)=0.0;
+   if intr.ne.0 < b(0)=azero(no,y,g,w,jerr); if(jerr.ne.0) return;>
    q=1.0/(1.0+exp(-b(0)-g)); v=w*q*(1.0-q); r=w*(y-q); xm(0)=sum(v);
    dev1=-(b(0)*q0+dot_product(w,y*g+log(1.0-q)));
 >
 if kopt.gt.0 <
-   if isd.gt.0 < xv=0.25;>
+   if isd.gt.0.and.intr.ne.0 < xv=0.25;>
    else <
       <j=1,ni; if(ju(j).eq.0) next; jb=ix(j); je=ix(j+1)-1;
          xv(j)=0.25*(dot_product(w(jx(jb:je)),x(jb:je)**2)-xb(j)**2);
@@ -1960,9 +2059,11 @@ shr=shri*dev0; al=0.0; ixx=0;
             svr=svr-d*(xm(k)-xb(k)*xm(0))/xs(k);
          >
          if(nin.gt.nx) exit;
-         d=svr/xm(0);
-         if d.ne.0.0 < b(0)=b(0)+d; dlx=max(dlx,xm(0)*d**2); r=r-d*v;>
-         svr=svr-d*xm(0); if(dlx.lt.shr) exit;
+         d=0.0; if(intr.ne.0) d=svr/xm(0);
+         if d.ne.0.0 < b(0)=b(0)+d; dlx=max(dlx,xm(0)*d**2); r=r-d*v;
+            svr=svr-d*xm(0);
+         >
+         if(dlx.lt.shr) exit;
          if nlp.gt.maxit < jerr=-ilm; return;>
          loop < nlp=nlp+1; dlx=0.0;
             <l=1,nin; k=m(l); jb=ix(k); je=ix(k+1)-1;
@@ -1980,9 +2081,11 @@ shr=shri*dev0; al=0.0; ixx=0;
                o=o+d*(xb(k)/xs(k));
                svr=svr-d*(xm(k)-xb(k)*xm(0))/xs(k);
             >
-            d=svr/xm(0);
-            if d.ne.0.0 < b(0)=b(0)+d; dlx=max(dlx,xm(0)*d**2); r=r-d*v;>
-            svr=svr-d*xm(0); if(dlx.lt.shr) exit;
+            d=0.0; if(intr.ne.0) d=svr/xm(0);
+            if d.ne.0.0 < b(0)=b(0)+d; dlx=max(dlx,xm(0)*d**2); r=r-d*v;
+               svr=svr-d*xm(0);
+            >
+            if(dlx.lt.shr) exit;
             if nlp.gt.maxit < jerr=-ilm; return;>
          >
       >
@@ -2031,7 +2134,7 @@ deallocate(xm,b,bs,v,r,sc,xv,q,mm,ga,ixx);
 return;
 end;
 subroutine sprlognetn(parm,no,ni,nc,x,ix,jx,y,g,w,ju,vp,cl,ne,nx,nlam,flmin,
-   ulam,shri,isd,maxit,kopt,xb,xs,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr);
+   ulam,shri,isd,intr,maxit,kopt,xb,xs,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr);
 real x(*),y(no,nc),g(no,nc),w(no),vp(ni),ulam(nlam),xb(ni),xs(ni);
 real a(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam),cl(2,ni);
 integer ix(*),jx(*),ju(ni),m(nx),kin(nlam);
@@ -2064,15 +2167,18 @@ bta=parm; omb=1.0-bta; dev1=0.0; dev0=0.0;
 <ic=1,nc; q0=dot_product(w,y(:,ic));
    if q0.le.pmin < jerr =8000+ic; return;>
    if q0.ge.1.0-pmin < jerr =9000+ic; return;>
-   b(1:ni,ic)=0.0; b(0,ic)=log(q0); dev1=dev1-q0*b(0,ic);
+   if(intr.eq.0) q0=1.0/nc;
+   b(1:ni,ic)=0.0; b(0,ic)=0.0;
+   if intr.ne.0 < b(0,ic)=log(q0); dev1=dev1-q0*b(0,ic);>
 >
-iy=0; al=0.0;
+if(intr.eq.0) dev1=log(float(nc)); iy=0; al=0.0;
 if nonzero(no*nc,g).eq.0 <
    b(0,:)=b(0,:)-sum(b(0,:))/nc; sxp=0.0;
    <ic=1,nc; q(:,ic)=exp(b(0,ic)); sxp=sxp+q(:,ic);>
 >
 else < <i=1,no; g(i,:)=g(i,:)-sum(g(i,:))/nc;> sxp=0.0;
-   call kazero(nc,no,y,g,w,b(0,:),jerr); if(jerr.ne.0) return;
+   if intr.eq.0 < b(0,:)=0.0;>
+   else < call kazero(nc,no,y,g,w,b(0,:),jerr); if(jerr.ne.0) return;>
    dev1=0.0;
    <ic=1,nc; q(:,ic)=b(0,ic)+g(:,ic);
       dev1=dev1-dot_product(w,y(:,ic)*q(:,ic));
@@ -2083,7 +2189,7 @@ else < <i=1,no; g(i,:)=g(i,:)-sum(g(i,:))/nc;> sxp=0.0;
 <ic=1,nc; <i=1,no; if(y(i,ic).gt.0.0) dev0=dev0+w(i)*y(i,ic)*log(y(i,ic));>>
 dev0=dev0+dev1;
 if kopt.gt.0 <
-   if isd.gt.0 < xv=0.25;>
+   if isd.gt.0.and.intr.ne.0 < xv=0.25;>
    else <
       <j=1,ni; if(ju(j).eq.0) next; jb=ix(j); je=ix(j+1)-1;
          xv(j,:)=0.25*(dot_product(w(jx(jb:je)),x(jb:je)**2)-xb(j)**2);
@@ -2157,7 +2263,7 @@ shr=shri*dev0; ga=0.0;
                svr=svr-d*(xm(k)-xb(k)*xm(0))/xs(k);
             >
             if(jxx.gt.0) exit;
-            d=svr/xm(0);
+            d=0.0; if(intr.ne.0) d=svr/xm(0);
             if d.ne.0.0 < b(0,ic)=b(0,ic)+d; dlx=max(dlx,xm(0)*d**2);
                r=r-d*v; svr=svr-d*xm(0);
             >
@@ -2180,7 +2286,7 @@ shr=shri*dev0; ga=0.0;
                   o=o+d*(xb(k)/xs(k));
                   svr=svr-d*(xm(k)-xb(k)*xm(0))/xs(k);
                >
-               d=svr/xm(0);
+               d=0.0; if(intr.ne.0) d=svr/xm(0);
                if d.ne.0.0 < b(0,ic)=b(0,ic)+d; dlx=max(dlx,xm(0)*d**2);
                   r=r-d*v; svr=svr-d*xm(0);
                >
@@ -2521,7 +2627,7 @@ dq=d*q; call died(no,nk,dq,kp,jp,dk); gm=dot_product(q,g)/sw;
 return;
 end;
 subroutine fishnet (parm,no,ni,x,y,g,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
-   isd,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
+   isd,intr,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 real x(no,ni),y(no),g(no),w(no),vp(ni),ulam(nlam);
 real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam),cl(2,ni);
 integer jd(*),ia(nx),nin(nlam);
@@ -2543,20 +2649,21 @@ if maxval(ju).le.0 < jerr=7777; go to :done:;>
 vq=max(0.0,vp); vq=vq*ni/sum(vq);
 ww=max(0.0,w); sw=sum(ww); if sw.le.0.0 < jerr=9999; go to :done:;>
 ww=ww/sw;
-call lstandard1(no,ni,x,ww,ju,isd,xm,xs);
+call lstandard1(no,ni,x,ww,ju,isd,intr,xm,xs);
 if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
 call fishnet1(parm,no,ni,x,y,g,ww,ju,vq,cl,ne,nx,nlam,flmin,ulam,thr,
-      isd,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
+      isd,intr,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 if(jerr.gt.0) go to :done:; dev0=2.0*sw*dev0;
 <k=1,lmu; nk=nin(k);
    if(isd.gt.0) ca(1:nk,k)=ca(1:nk,k)/xs(ia(1:nk));
-   a0(k)=a0(k)-dot_product(ca(1:nk,k),xm(ia(1:nk)));
+   if intr.eq.0 < a0(k)=0.0;>
+   else < a0(k)=a0(k)-dot_product(ca(1:nk,k),xm(ia(1:nk)));>
 >
 :done:deallocate(ww,ju,vq,xm); if(isd.gt.0) deallocate(xs);
 return;
 end;
 subroutine fishnet1(parm,no,ni,x,y,g,q,ju,vp,cl,ne,nx,nlam,flmin,ulam,shri,
-    isd,maxit,lmu,a0,ca,m,kin,dev0,dev,alm,nlp,jerr);
+    isd,intr,maxit,lmu,a0,ca,m,kin,dev0,dev,alm,nlp,jerr);
 real x(no,ni),y(no),g(no),q(no),vp(ni),ulam(nlam);
 real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam),cl(2,ni);
 integer ju(ni),m(nx),kin(nlam);
@@ -2578,12 +2685,17 @@ allocate(f(1:no),stat=ierr); jerr=jerr+ierr;
 if(jerr.ne.0) return;
 bta=parm; omb=1.0-bta;
 t=q*y; yb=sum(t); fmax=log(huge(bta)*0.1);
-if nonzero(no,g).eq.0 < w=q*yb;  az=log(yb); f=az; dv0=yb*(log(yb)-1.0);>
-else < w=q*exp(sign(min(abs(g),fmax),g)); v0=sum(w); eaz=yb/v0;
-   w=eaz*w; az=log(eaz); f=az+g;
-   dv0=dot_product(t,g)-yb*(1.0-az);
+if nonzero(no,g).eq.0 <
+   if intr.ne.0 < w=q*yb;  az=log(yb); f=az; dv0=yb*(az-1.0);>
+   else < w=q; az=0.0; f=az; dv0=-1.0;>
 >
-a=0.0; as=0.0; wr=t-w; v0=yb; dvr=-yb;
+else < w=q*exp(sign(min(abs(g),fmax),g)); v0=sum(w);
+   if intr.ne.0 < eaz=yb/v0; w=eaz*w; az=log(eaz); f=az+g;
+      dv0=dot_product(t,g)-yb*(1.0-az);
+   >
+   else < az=0.0; f=g; dv0=dot_product(t,g)-v0;>
+>
+a=0.0; as=0.0; wr=t-w; v0=1.0; if(intr.ne.0) v0=yb; dvr=-yb;
 <i=1,no; if(t(i).gt.0.0) dvr=dvr+t(i)*log(y(i));> dvr=dvr-dv0; dev0=dvr;
 if flmin.lt.1.0 < eqs=max(eps,flmin); alf=eqs**(1.0/(nlam-1));>
 m=0; mm=0; /nlp,nin/=0; mnl=min(mnlam,nlam); shr=shri*dev0; ixx=0; al=0.0;
@@ -2617,8 +2729,10 @@ m=0; mm=0; /nlp,nin/=0; mnl=min(mnlam,nlam); shr=shri*dev0; ixx=0; al=0.0;
                mm(k)=nin; m(nin)=k;
             >
          >
-         if(nin.gt.nx) exit; d=sum(wr)/v0;
-         az=az+d; dlx=max(dlx,v0*d**2); wr=wr-d*w; f=f+d;
+         if(nin.gt.nx) exit;
+         if intr.ne.0 < d=sum(wr)/v0;
+            az=az+d; dlx=max(dlx,v0*d**2); wr=wr-d*w; f=f+d;
+         >
          if(dlx.lt.shr) exit; if nlp.gt.maxit < jerr=-ilm; return;>
          loop < nlp=nlp+1; dlx=0.0;
             <l=1,nin; k=m(l); ak=a(k);
@@ -2630,7 +2744,9 @@ m=0; mm=0; /nlp,nin/=0; mnl=min(mnlam,nlam); shr=shri*dev0; ixx=0; al=0.0;
                if(a(k).eq.ak) next; d=a(k)-ak; dlx=max(dlx,v(k)*d**2);
                wr=wr-d*w*x(:,k); f=f+d*x(:,k)
             >
-            d=sum(wr)/v0; az=az+d; dlx=max(dlx,v0*d**2); wr=wr-d*w; f=f+d;
+            if intr.ne.0 < d=sum(wr)/v0; az=az+d;
+               dlx=max(dlx,v0*d**2); wr=wr-d*w; f=f+d;
+            >
             if(dlx.lt.shr) exit; if nlp.gt.maxit < jerr=-ilm; return;>
          >
       >
@@ -2698,7 +2814,7 @@ yb=dot_product(w,y)/sw; fmax=log(huge(y(1))*0.1);
 return;
 end;
 subroutine spfishnet (parm,no,ni,x,ix,jx,y,g,w,jd,vp,cl,ne,nx,nlam,flmin,
-   ulam,thr,isd,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
+   ulam,thr,isd,intr,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 real x(*),y(no),g(no),w(no),vp(ni),ulam(nlam),cl(2,ni);
 real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam);
 integer ix(*),jx(*),jd(*),ia(nx),nin(nlam);
@@ -2720,20 +2836,21 @@ if maxval(ju).le.0 < jerr=7777; go to :done:;>
 vq=max(0.0,vp); vq=vq*ni/sum(vq);
 ww=max(0.0,w); sw=sum(ww); if sw.le.0.0 < jerr=9999; go to :done:;>
 ww=ww/sw;
-call splstandard2(no,ni,x,ix,jx,ww,ju,isd,xm,xs);
+call splstandard2(no,ni,x,ix,jx,ww,ju,isd,intr,xm,xs);
 if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
 call spfishnet1(parm,no,ni,x,ix,jx,y,g,ww,ju,vq,cl,ne,nx,nlam,flmin,ulam,thr,
-      isd,maxit,xm,xs,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
+      isd,intr,maxit,xm,xs,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 if(jerr.gt.0) go to :done:; dev0=2.0*sw*dev0;
 <k=1,lmu; nk=nin(k);
    if(isd.gt.0) ca(1:nk,k)=ca(1:nk,k)/xs(ia(1:nk));
-   a0(k)=a0(k)-dot_product(ca(1:nk,k),xm(ia(1:nk)));
+   if intr.eq.0 < a0(k)=0.0;>
+   else < a0(k)=a0(k)-dot_product(ca(1:nk,k),xm(ia(1:nk)));>
 >
 :done:deallocate(ww,ju,vq,xm,xs);
 return;
 end;
 subroutine spfishnet1(parm,no,ni,x,ix,jx,y,g,q,ju,vp,cl,ne,nx,nlam,flmin,ulam,
-   shri,isd,maxit,xb,xs,lmu,a0,ca,m,kin,dev0,dev,alm,nlp,jerr);
+   shri,isd,intr,maxit,xb,xs,lmu,a0,ca,m,kin,dev0,dev,alm,nlp,jerr);
 real x(*),y(no),g(no),q(no),vp(ni),ulam(nlam),xb(ni),xs(ni);
 real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam),cl(2,ni);
 integer ix(*),jx(*),ju(ni),m(nx),kin(nlam);
@@ -2756,16 +2873,22 @@ allocate(qy(1:no),stat=ierr); jerr=jerr+ierr;
 if(jerr.ne.0) return;
 bta=parm; omb=1.0-bta; fmax=log(huge(bta)*0.1);
 qy=q*y; yb=sum(qy);
-if nonzero(no,g).eq.0 < w=q*yb; az=log(yb); uu=az;
-   xm=yb*xb; t=0.0; dv0=yb*(log(yb)-1.0);
+if nonzero(no,g).eq.0 < t=0.0;
+   if intr.ne.0 < w=q*yb; az=log(yb); uu=az;
+      xm=yb*xb; dv0=yb*(az-1.0);
+   >
+   else < w=q; xm=0.0; /uu,az/=0.0; dv0=-1.0;>
 >
-else < w=q*exp(sign(min(abs(g),fmax),g)); ww=sum(w); eaz=yb/ww;
-   w=eaz*w; /az,uu/=log(eaz); t=g; dv0=dot_product(qy,g)-yb*(1.0-az);
+else < w=q*exp(sign(min(abs(g),fmax),g)); ww=sum(w); t=g;
+   if intr.ne.0 < eaz=yb/ww;
+      w=eaz*w; /az,uu/=log(eaz); dv0=dot_product(qy,g)-yb*(1.0-az);
+   >
+   else < /uu,az/=0.0; dv0=dot_product(qy,g)-ww;>
    <j=1,ni; if(ju(j).eq.0) next; jb=ix(j); je=ix(j+1)-1;
       xm(j)=dot_product(w(jx(jb:je)),x(jb:je));
    >
 >   
-tt=yb*uu; ww=yb; wr=qy-q*(yb*(1.0-uu)); a=0.0; as=0.0;
+tt=yb*uu; ww=1.0; if(intr.ne.0) ww=yb; wr=qy-q*(yb*(1.0-uu)); a=0.0; as=0.0;
 dvr=-yb;
 <i=1,no; if(qy(i).gt.0.0) dvr=dvr+qy(i)*log(y(i));> dvr=dvr-dv0; dev0=dvr;
 if flmin.lt.1.0 < eqs=max(eps,flmin); alf=eqs**(1.0/(nlam-1));>
@@ -2814,8 +2937,10 @@ m=0; mm=0; /nlp,nin/=0; mnl=min(mnlam,nlam); shr=shri*dev0; al=0.0; ixx=0;
             t(jx(jb:je))=t(jx(jb:je))+dv*x(jb:je);
             uu=uu-dv*xb(k); tt=tt-dv*xm(k);
          >
-         if(nin.gt.nx) exit; d=tt/ww-uu;
-         az=az+d; dlx=max(dlx,ww*d**2); uu=uu+d;
+         if(nin.gt.nx) exit;
+         if intr.ne.0 < d=tt/ww-uu;
+            az=az+d; dlx=max(dlx,ww*d**2); uu=uu+d;
+         >
          if(dlx.lt.shr) exit; if nlp.gt.maxit < jerr=-ilm; return;>
          loop < nlp=nlp+1; dlx=0.0;
             <l=1,nin; k=m(l);
@@ -2832,7 +2957,9 @@ m=0; mm=0; /nlp,nin/=0; mnl=min(mnlam,nlam); shr=shri*dev0; al=0.0; ixx=0;
                t(jx(jb:je))=t(jx(jb:je))+dv*x(jb:je);
                uu=uu-dv*xb(k); tt=tt-dv*xm(k);
             >
-            d=tt/ww-uu; az=az+d; dlx=max(dlx,ww*d**2); uu=uu+d;
+            if intr.ne.0 < d=tt/ww-uu; az=az+d;
+               dlx=max(dlx,ww*d**2); uu=uu+d;
+            >
             if(dlx.lt.shr) exit; if nlp.gt.maxit < jerr=-ilm; return;>
          >
       >
@@ -2917,7 +3044,7 @@ yb=dot_product(w,y)/sw; fmax=log(huge(y(1))*0.1);
 return;
 end;
 subroutine multelnet
- (parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,jsd,maxit,
+ (parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,jsd,intr,maxit,
    lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 real x(no,ni),y(no,nr),w(no),vp(ni),ca(nx,nr,nlam);
 real ulam(nlam),a0(nr,nlam),rsq(nlam),alm(nlam),cl(2,ni);
@@ -2929,12 +3056,12 @@ if maxval(vp).le.0.0 < jerr=10000; return;>
 allocate(vq(1:ni),stat=jerr); if(jerr.ne.0) return;
 vq=max(0.0,vp); vq=vq*ni/sum(vq);
 call multelnetn(parm,no,ni,nr,x,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,isd,
-   jsd,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
+   jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 deallocate(vq);
 return;
 end;
 subroutine multelnetn (parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
-   isd,jsd,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
+   isd,jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 real vp(ni),x(no,ni),y(no,nr),w(no),ulam(nlam),cl(2,ni);
 real ca(nx,nr,nlam),a0(nr,nlam),rsq(nlam),alm(nlam);
 integer jd(*),ia(nx),nin(nlam);
@@ -2954,7 +3081,7 @@ if(jerr.ne.0) return;
 call chkvars(no,ni,x,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
-call multstandard1(no,ni,nr,x,y,w,isd,jsd,ju,xm,xs,ym,ys,xv,ys0,jerr);
+call multstandard1(no,ni,nr,x,y,w,isd,jsd,intr,ju,xm,xs,ym,ys,xv,ys0,jerr);
 if(jerr.ne.0) return;
 <j=1,ni; <k=1,nr; <i=1,2; clt(i,k,j)=cl(i,j);>>>
 if isd.gt.0 < <j=1,ni; <k=1,nr; <i=1,2; clt(i,k,j)=clt(i,k,j)*xs(j);>>>>
@@ -2965,13 +3092,15 @@ if(jerr.gt.0) return;
 <k=1,lmu;  nk=nin(k);
    <j=1,nr;
       <l=1,nk; ca(l,j,k)=ys(j)*ca(l,j,k)/xs(ia(l));>
-      a0(j,k)=ym(j)-dot_product(ca(1:nk,j,k),xm(ia(1:nk)));
+      if intr.eq.0 < a0(j,k)=0.0;>
+      else < a0(j,k)=ym(j)-dot_product(ca(1:nk,j,k),xm(ia(1:nk)));>
    >
 >
 deallocate(xm,xs,ym,ys,ju,xv,clt);
 return;
 end;
-subroutine multstandard1 (no,ni,nr,x,y,w,isd,jsd,ju,xm,xs,ym,ys,xv,ys0,jerr);
+subroutine multstandard1
+   (no,ni,nr,x,y,w,isd,jsd,intr,ju,xm,xs,ym,ys,xv,ys0,jerr);
 real x(no,ni),y(no,nr),w(no),xm(ni),xs(ni),xv(ni),ym(nr),ys(nr);
 integer ju(ni);
 %fortran
@@ -2979,6 +3108,24 @@ integer ju(ni);
 %mortran
 allocate(v(1:no),stat=jerr); if(jerr.ne.0) return;
 w=w/sum(w); v=sqrt(w);
+if intr.eq.0 <
+   <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; x(:,j)=v*x(:,j);
+      z=dot_product(x(:,j),x(:,j));
+      if isd.gt.0 < xbq=dot_product(v,x(:,j))**2; vc=z-xbq;
+         xs(j)=sqrt(vc); x(:,j)=x(:,j)/xs(j); xv(j)=1.0+xbq/vc;
+      >
+      else < xs(j)=1.0; xv(j)=z;>
+   >
+   ys0=0.0;
+   <j=1,nr; ym(j)=0.0; y(:,j)=v*y(:,j);
+      z=dot_product(y(:,j),y(:,j));
+      if jsd.gt.0 < u=z-dot_product(v,y(:,j))**2; ys0=ys0+z/u;
+         ys(j)=sqrt(u); y(:,j)=y(:,j)/ys(j);
+      >
+      else < ys(j)=1.0; ys0=ys0+z;>
+   >
+   go to :out:;
+>   
 <j=1,ni; if(ju(j).eq.0) next;
    xm(j)=dot_product(w,x(:,j)); x(:,j)=v*(x(:,j)-xm(j));
    xv(j)=dot_product(x(:,j),x(:,j)); if(isd.gt.0) xs(j)=sqrt(xv(j));
@@ -2995,7 +3142,7 @@ ys0=0.0;
    else < ys0=ys0+z;>
 >
 if jsd.eq.0 < ys=1.0;> else < ys0=nr;>
-deallocate(v);
+:out:deallocate(v);
 return;
 end;
 subroutine multelnet2(beta,ni,nr,ju,vp,cl,y,no,ne,nx,x,nlam,flmin,ulam,thri,
@@ -3183,8 +3330,8 @@ real a0(nr),ca(nx,nr),x(n,*),f(nr,n); integer ia(nx);
 return;
 end;
 subroutine multspelnet
- (parm,no,ni,nr,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,jsd,maxit,
-   lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
+ (parm,no,ni,nr,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,
+   jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 real x(*),y(no,nr),w(no),vp(ni),ulam(nlam),cl(2,ni);
 real ca(nx,nr,nlam),a0(nr,nlam),rsq(nlam),alm(nlam);
 integer ix(*),jx(*),jd(*),ia(nx),nin(nlam);
@@ -3195,12 +3342,12 @@ if maxval(vp).le.0.0 < jerr=10000; return;>
 allocate(vq(1:ni),stat=jerr); if(jerr.ne.0) return;
 vq=max(0.0,vp); vq=vq*ni/sum(vq);
 call multspelnetn(parm,no,ni,nr,x,ix,jx,y,w,jd,vq,cl,ne,nx,nlam,flmin,
-   ulam,thr,isd,jsd,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
+   ulam,thr,isd,jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 deallocate(vq);
 return;
 end;
 subroutine multspelnetn(parm,no,ni,nr,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,
-   ulam,thr,isd,jsd,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
+   ulam,thr,isd,jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 real x(*),vp(ni),y(no,nr),w(no),ulam(nlam),cl(2,ni);
 real ca(nx,nr,nlam),a0(nr,nlam),rsq(nlam),alm(nlam);
 integer ix(*),jx(*),jd(*),ia(nx),nin(nlam);
@@ -3220,7 +3367,8 @@ if(jerr.ne.0) return;
 call spchkvars(no,ni,x,ix,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
-call multspstandard1(no,ni,nr,x,ix,jx,y,w,ju,isd,jsd,xm,xs,ym,ys,xv,ys0,jerr);
+call multspstandard1(no,ni,nr,x,ix,jx,y,w,ju,isd,jsd,intr,
+   xm,xs,ym,ys,xv,ys0,jerr);
 if(jerr.ne.0) return;
 <j=1,ni; <k=1,nr; <i=1,2; clt(i,k,j)=cl(i,j);>>>
 if isd.gt.0 < <j=1,ni; <k=1,nr; <i=1,2; clt(i,k,j)=clt(i,k,j)*xs(j);>>>>
@@ -3231,17 +3379,35 @@ if(jerr.gt.0) return;
 <k=1,lmu; nk=nin(k);
    <j=1,nr;
       <l=1,nk; ca(l,j,k)=ys(j)*ca(l,j,k)/xs(ia(l));>
-      a0(j,k)=ym(j)-dot_product(ca(1:nk,j,k),xm(ia(1:nk)));
+      if intr.eq.0 < a0(j,k)=0.0;>
+      else < a0(j,k)=ym(j)-dot_product(ca(1:nk,j,k),xm(ia(1:nk)));>
    >
 >
 deallocate(xm,xs,ym,ys,ju,xv,clt);
 return;
 end;
-subroutine multspstandard1(no,ni,nr,x,ix,jx,y,w,ju,isd,jsd,
+subroutine multspstandard1(no,ni,nr,x,ix,jx,y,w,ju,isd,jsd,intr,
    xm,xs,ym,ys,xv,ys0,jerr);
 real x(*),y(no,nr),w(no),xm(ni),xs(ni),xv(ni),ym(nr),ys(nr);
 integer ix(*),jx(*),ju(ni);
 w=w/sum(w);
+if intr.eq.0 <
+   <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; jb=ix(j); je=ix(j+1)-1;
+      z=dot_product(w(jx(jb:je)),x(jb:je)**2);
+      if isd.gt.0 < xbq=dot_product(w(jx(jb:je)),x(jb:je))**2; vc=z-xbq;
+         xs(j)=sqrt(vc); xv(j)=1.0+xbq/vc;
+      >
+      else < xs(j)=1.0; xv(j)=z;>
+   >
+   ys0=0.0;   
+   <j=1,nr; ym(j)=0.0; z=dot_product(w,y(:,j)**2);
+      if jsd.gt.0 < u=z-dot_product(w,y(:,j))**2; ys0=ys0+z/u;
+         ys(j)=sqrt(u); y(:,j)=y(:,j)/ys(j);
+      >
+      else < ys(j)=1.0; ys0=ys0+z;>
+   >
+   return;
+>
 <j=1,ni; if(ju(j).eq.0) next;
    jb=ix(j); je=ix(j+1)-1; xm(j)=dot_product(w(jx(jb:je)),x(jb:je));
    xv(j)=dot_product(w(jx(jb:je)),x(jb:je)**2)-xm(j)**2;
@@ -3376,7 +3542,7 @@ deallocate(a,mm,g,iy,gj,gk,del,o);
 return;
 end;
 subroutine multlognetn(parm,no,ni,nc,x,y,g,w,ju,vp,cl,ne,nx,nlam,flmin,ulam,
-   shri,isd,maxit,xv,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr);
+   shri,intr,maxit,xv,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr);
 real x(no,ni),y(no,nc),g(no,nc),w(no),vp(ni),ulam(nlam),cl(2,ni);
 real a(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam),xv(ni);
 integer ju(ni),m(nx),kin(nlam);
@@ -3405,15 +3571,18 @@ bta=parm; omb=1.0-bta; dev1=0.0; dev0=0.0;
 <ic=1,nc; q0=dot_product(w,y(:,ic));
    if q0.le.pmin < jerr =8000+ic; return;>
    if q0.ge.pmax < jerr =9000+ic; return;>
-   b(0,ic)=log(q0); dev1=dev1-q0*b(0,ic); b(1:ni,ic)=0.0;
+   if intr.eq.0 < q0=1.0/nc; b(0,ic)=0.0;>
+   else < b(0,ic)=log(q0); dev1=dev1-q0*b(0,ic);>
+   b(1:ni,ic)=0.0;
 >
-ixx=0; al=0.0;
+if(intr.eq.0) dev1=log(float(nc)); ixx=0; al=0.0;
 if nonzero(no*nc,g).eq.0 <
    b(0,:)=b(0,:)-sum(b(0,:))/nc; sxp=0.0;
    <ic=1,nc; q(:,ic)=exp(b(0,ic)); sxp=sxp+q(:,ic);>
 >
 else < <i=1,no; g(i,:)=g(i,:)-sum(g(i,:))/nc;> sxp=0.0;
-   call kazero(nc,no,y,g,w,b(0,:),jerr); if(jerr.ne.0) return;
+   if intr.eq.0 < b(0,:)=0.0;>
+   else < call kazero(nc,no,y,g,w,b(0,:),jerr); if(jerr.ne.0) return;>
    dev1=0.0;
    <ic=1,nc; q(:,ic)=b(0,ic)+g(:,ic);
       dev1=dev1-dot_product(w,y(:,ic)*q(:,ic));
@@ -3448,9 +3617,11 @@ ga=sqrt(ga);
       if t.lt.eps < kx=1; exit;> t=2.0*t; alt=al1/t; al2t=al2/t;
       <ic=1,nc;
          bs(0,ic)=b(0,ic); if(nin.gt.0) bs(m(1:nin),ic)=b(m(1:nin),ic);
-         r(:,ic)=w*(y(:,ic)-q(:,ic)/sxp)/t; d=sum(r(:,ic));
-         b(0,ic)=b(0,ic)+d; r(:,ic)=r(:,ic)-d*w; dlx=max(dlx,d**2);
-
+         r(:,ic)=w*(y(:,ic)-q(:,ic)/sxp)/t;
+         d=0.0; if(intr.ne.0) d=sum(r(:,ic));
+         if d.ne.0.0 <
+            b(0,ic)=b(0,ic)+d; r(:,ic)=r(:,ic)-d*w; dlx=max(dlx,d**2);
+         >
       >
       loop < nlp=nlp+nc; dlx=0.0;
          <k=1,ni; if(ixx(k).eq.0) next; gkn=0.0;
@@ -3549,7 +3720,7 @@ deallocate(sxp,b,bs,r,q,mm,is,ga,ixx,gk,del,sxpl);
 return;
 end;
 subroutine multsprlognetn(parm,no,ni,nc,x,ix,jx,y,g,w,ju,vp,cl,ne,nx,nlam,
-   flmin,ulam,shri,isd,maxit,xv,xb,xs,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr);
+   flmin,ulam,shri,intr,maxit,xv,xb,xs,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr);
 real x(*),y(no,nc),g(no,nc),w(no),vp(ni),ulam(nlam),xb(ni),xs(ni),xv(ni);
 real a(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam),cl(2,ni);
 integer ix(*),jx(*),ju(ni),m(nx),kin(nlam);
@@ -3580,15 +3751,18 @@ bta=parm; omb=1.0-bta; dev1=0.0; dev0=0.0;
 <ic=1,nc; q0=dot_product(w,y(:,ic));
    if q0.le.pmin < jerr =8000+ic; return;>
    if q0.ge.pmax < jerr =9000+ic; return;>
-   b(1:ni,ic)=0.0; b(0,ic)=log(q0); dev1=dev1-q0*b(0,ic);
+   b(1:ni,ic)=0.0;
+   if intr.eq.0 < q0=1.0/nc; b(0,ic)=0.0;>
+   else < b(0,ic)=log(q0); dev1=dev1-q0*b(0,ic);>
 >
-iy=0; al=0.0;
+if(intr.eq.0) dev1=log(float(nc)); iy=0; al=0.0;
 if nonzero(no*nc,g).eq.0 <
    b(0,:)=b(0,:)-sum(b(0,:))/nc; sxp=0.0;
    <ic=1,nc; q(:,ic)=exp(b(0,ic)); sxp=sxp+q(:,ic);>
 >
 else < <i=1,no; g(i,:)=g(i,:)-sum(g(i,:))/nc;> sxp=0.0;
-   call kazero(nc,no,y,g,w,b(0,:),jerr); if(jerr.ne.0) return;
+   if intr.eq.0 < b(0,:)=0.0;>
+   else < call kazero(nc,no,y,g,w,b(0,:),jerr); if(jerr.ne.0) return;>
    dev1=0.0;
    <ic=1,nc; q(:,ic)=b(0,ic)+g(:,ic);
       dev1=dev1-dot_product(w,y(:,ic)*q(:,ic));
@@ -3627,8 +3801,9 @@ ga=sqrt(ga);
       if t.lt.eps < kxx=1; exit;> t=2.0*t; alt=al1/t; al2t=al2/t;
       <ic=1,nc; bs(0,ic)=b(0,ic); if(nin.gt.0) bs(m(1:nin),ic)=b(m(1:nin),ic);
          r(:,ic)=w*(y(:,ic)-q(:,ic)/sxp)/t; svr(ic)=sum(r(:,ic));
-         b(0,ic)=b(0,ic)+svr(ic); r(:,ic)=r(:,ic)-svr(ic)*w;
-         dlx=max(dlx,svr(ic)**2);
+         if intr.ne.0 < b(0,ic)=b(0,ic)+svr(ic); r(:,ic)=r(:,ic)-svr(ic)*w;
+            dlx=max(dlx,svr(ic)**2);
+         >
       >
       loop < nlp=nlp+nc; dlx=0.0;
          <k=1,ni; if(iy(k).eq.0) next;
