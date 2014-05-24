@@ -19,7 +19,7 @@ cv.multnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,groupe
     }
   else nc=nc[2]
 
-  if(!is.null(offset))offset=TRUE else is.offset=FALSE
+  if(!is.null(offset))is.offset=TRUE else is.offset=FALSE
   predmat=array(NA,c(nrow(y),nc,length(lambda)))
   nfolds=max(foldid)
   nlams=double(nfolds)

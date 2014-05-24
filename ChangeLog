@@ -1,3 +1,10 @@
+2014-05-23  Trevor Hastie <hastie@stanford.edu> version 1.9-8
+	* fixed bug in multivariate response model (uninitialized variable), leading to valgrind issues
+	* fixed issue with multinomial response matrix and zeros
+	* Added a link to a glmnet vignette
+2014-04-02  Trevor Hastie <hastie@stanford.edu> version 1.9-6
+	* fixed bug in predict.glmnet, predict.multnet and predict.coxnet, when s= argument is used with a vector of values. It was not doing the matrix multiply correctly
+	* changed documentation of glmnet to explain logistic response matrix
 2013-08-02   Trevor Hastie <hastie@stanford.edu> version 1.9-5
 	* added parallel capabilities, and fixed some minor bugs
 2013-03-01   Trevor Hastie <hastie@stanford.edu> version 1.9-3

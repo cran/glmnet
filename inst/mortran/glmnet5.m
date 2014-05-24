@@ -1,6 +1,6 @@
 "
 c
-c                          newGLMnet (2/15/13)
+c                          newGLMnet (5/12/14)
 c                            
 c                        
 c                 Elastic net with squared-error loss
@@ -305,7 +305,8 @@ c
 c   nc = number of classes (distinct outcome values)
 c        nc=1 => binomial two-class logistic regression
 c            (all output references class 1)
-c   y(no,max(2,nc)) = number of each class at each design point(overwritten)
+c   y(no,max(2,nc)) = number of each class at each design point
+c      entries may have fractional values or all be zero (overwritten)
 c   o(no,nc) = observation off-sets for each class
 c   kopt = optimization flag
 c      kopt = 0 => Newton-Raphson (recommended)
@@ -661,7 +662,7 @@ c   mnlam = minimum number of path points (lambda values) allowed
 c      default = 5
 c
 c call chg_min_null_prob(pmin)
-c   pmin = minimum null probability for any class. default = 1.0e-5
+c   pmin = minimum null probability for any class. default = 1.0e-9
 c
 c call chg _max_exp(exmx)
 c   exmx = maximum allowed exponent. default = 250.0
@@ -683,7 +684,7 @@ c
 "
 subroutine get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx);
 data sml0,eps0,big0,mnlam0,rsqmax0,pmin0,exmx0
-   /1.0e-5,1.0e-6,9.9e35,5,0.999,1.0e-5,250.0/;
+   /1.0e-5,1.0e-6,9.9e35,5,0.999,1.0e-9,250.0/;
 sml=sml0; eps=eps0; big=big0; mnlam=mnlam0; rsqmax=rsqmax0;
 pmin=pmin0; exmx=exmx0;
 return;
@@ -1392,7 +1393,8 @@ call chkvars(no,ni,x,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
 vq=max(0.0,vp); vq=vq*ni/sum(vq);
-<i=1,no; ww(i)=sum(y(i,:)); y(i,:)=y(i,:)/ww(i);> sw=sum(ww); ww=ww/sw;
+<i=1,no; ww(i)=sum(y(i,:)); if(ww(i).gt.0.0) y(i,:)=y(i,:)/ww(i);>
+sw=sum(ww); ww=ww/sw;
 if nc.eq.1 < call lstandard1(no,ni,x,ww,ju,isd,intr,xm,xs);
    if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
    call lognet2n(parm,no,ni,x,y(:,1),g(:,1),ww,ju,vq,cl,ne,nx,nlam,flmin,ulam,
@@ -1889,7 +1891,8 @@ call spchkvars(no,ni,x,ix,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
 vq=max(0.0,vp); vq=vq*ni/sum(vq);
-<i=1,no; ww(i)=sum(y(i,:)); y(i,:)=y(i,:)/ww(i);> sw=sum(ww); ww=ww/sw;
+<i=1,no; ww(i)=sum(y(i,:)); if(ww(i).gt.0.0) y(i,:)=y(i,:)/ww(i);>
+sw=sum(ww); ww=ww/sw;
 if nc.eq.1 < call splstandard2(no,ni,x,ix,jx,ww,ju,isd,intr,xm,xs);
    if isd.gt.0 < <j=1,ni; cl(:,j)=cl(:,j)*xs(j);>>
    call sprlognet2n(parm,no,ni,x,ix,jx,y(:,1),g(:,1),ww,ju,vq,cl,ne,nx,nlam,
@@ -1924,7 +1927,7 @@ if intr.eq.0 <
    <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; jb=ix(j); je=ix(j+1)-1;
       xv(j)=dot_product(w(jx(jb:je)),x(jb:je)**2);
       if isd.ne.0 < xbq=dot_product(w(jx(jb:je)),x(jb:je))**2; vc=xv(j)-xbq;
-         xs(j)=sqrt(vc); xv(j)=1.0+vbq/vc;
+         xs(j)=sqrt(vc); xv(j)=1.0+xbq/vc;
       >
       else < xs(j)=1.0;>
    >
@@ -3172,7 +3175,7 @@ rsq=ys0; a=0.0; mm=0; /nlp,nin/=0; iz=0; mnl=min(mnlam,nlam); alm=0.0;
    <k=1,nr; g(j)=g(j)+dot_product(y(:,k),x(:,j))**2;>
    g(j)=sqrt(g(j));
 >
-<m=1,nlam;
+<m=1,nlam; alm0=alm;
    if flmin.ge.1.0 < alm=ulam(m);>
    elseif m.gt.2 < alm=alm*alf;>
    elseif m.eq.1 < alm=big;>

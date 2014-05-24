@@ -5,7 +5,7 @@
   View and/or change the factory default parameters in glmnet
   }
 \usage{
-glmnet.control(fdev=1.0e-5, devmax=0.999, eps=1.0e-6, big=9.9e35, mnlam=5, pmin=1.0e-5,
+glmnet.control(fdev=1.0e-5, devmax=0.999, eps=1.0e-6, big=9.9e35, mnlam=5, pmin=1.0e-9,
      exmx=250.0,prec=1e-10,mxit=100,factory=FALSE)
 }
 \arguments{
@@ -18,7 +18,7 @@ glmnet.control(fdev=1.0e-5, devmax=0.999, eps=1.0e-6, big=9.9e35, mnlam=5, pmin=
   definition of upper.limit is set to big}
 \item{mnlam}{minimum number of path points (lambda values) allowed;
   factory default = 5}
-\item{pmin}{minimum null probability for any class. factory default = 1.0e-5}
+\item{pmin}{minimum probability for any class. factory default = 1.0e-9. Note that this implies a pmax of 1-pmin.}
 \item{exmx}{maximum allowed exponent. factory default = 250.0}
 \item{prec}{convergence threshold for multi response bounds adjustment solution. factory default = 1.0e-10}
 \item{mxit}{maximum iterations for multiresponse bounds adjustment

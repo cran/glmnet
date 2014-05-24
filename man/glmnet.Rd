@@ -26,7 +26,9 @@ glmnet(x, y, family=c("gaussian","binomial","poisson","multinomial","cox","mgaus
   \item{y}{response variable. Quantitative for \code{family="gaussian"},
   or \code{family="poisson"} (non-negative counts). For
   \code{family="binomial"} should be either a factor with two levels, or
-  a two-column matrix of counts or proportions. For
+  a two-column matrix of counts or proportions (the second column is
+  treated as the target class; for a factor, the last level in
+  alphabetical order is the target class). For
   \code{family="multinomial"}, can be a \code{nc>=2} level factor, or a
   matrix with \code{nc} columns of counts or proportions. For
   \code{family="cox"}, \code{y} should be a two-column matrix with
@@ -158,7 +160,11 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
       length(lambda)} matrix of coefficients, stored in sparse column
     format (\code{"CsparseMatrix"}). For \code{"multnet"} and \code{"mgaussian"}, a list of \code{nc} such
     matrices, one for each class.}
-  \item{lambda}{The actual sequence of \code{lambda} values used}
+  \item{lambda}{The actual sequence of \code{lambda} values used. When
+  \code{alpha=0}, the largest lambda reported does not quite give the
+  zero coefficients reported (\code{lambda=inf} would in principle). Instead, the
+  largest \code{lambda} for \code{alpha=0.001} is used, and the sequence
+  of \code{lambda} values is derived from this.}
   \item{dev.ratio}{The fraction of (null) deviance explained (for \code{"elnet"}, this
       is the R-square). The deviance calculations incorporate weights if
   present in the model. The deviance is defined to be 2*(loglike_sat -
@@ -190,10 +196,12 @@ An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
     1-13}\cr
   \url{http://www.jstatsoft.org/v39/i05/}\cr
   Tibshirani, Robert., Bien, J., Friedman, J.,Hastie, T.,Simon,
-  N.,Taylor, J. and Tibshirani, Ryan. (2010)
-  \emph{Strong Rules for Discarding Predictors in Lasso-type Problems},\cr
+  N.,Taylor, J. and Tibshirani, Ryan. (2012)
+  \emph{Strong Rules for Discarding Predictors in Lasso-type Problems,
+  JRSSB vol 74},\cr
   \url{http://www-stat.stanford.edu/~tibs/ftp/strong.pdf}\cr
-  \emph{Stanford Statistics Technical Report}
+  \emph{Stanford Statistics Technical Report}\cr
+    \emph{Glmnet Vignette} \url{http://www.stanford.edu/~hastie/glmnet/glmnet_alpha.html}
   }
 \author{Jerome Friedman, Trevor Hastie, Noah Simon and Rob Tibshirani\cr 
 Maintainer: Trevor Hastie \email{hastie@stanford.edu}}

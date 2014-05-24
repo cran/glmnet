@@ -15,24 +15,24 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
     nc=as.integer(nc[2])
     classnames=colnames(y)
   }
+
+
+  if(!missing(weights)) y=y*weights
+### check if any rows of y sum to zero, and if so deal with them
+  weights=drop(y%*%rep(1,nc))
+  o=weights>0
+  if(!all(o)){ #subset the data
+    y=y[o,]
+    x=x[o,,drop=FALSE]
+    nobs=sum(o)
+  }else o=NULL
+    
+
   if(family=="binomial"){
     if(nc>2)stop("More than two classes; use multinomial family instead in call to glmnet",call.=FALSE)
     nc=as.integer(1) # for calling lognet
     y=y[,c(2,1)]#fortran lognet models the first column; we prefer the second (for 0/1 data)
   }
-  o=NULL
-  if(!missing(weights)){
-### check if any are zero
-    o=weights>0
-    if(!all(o)){ #subset the data
-      y=y[o,]
-      x=x[o,,drop=FALSE]
-      weights=weights[o]
-      nobs=sum(o)
-    }else o=NULL
-    y=y*weights
-  }
-    
 
   
     storage.mode(y)="double"
@@ -89,7 +89,7 @@ if(fit$jerr!=0){
  dev=fit$dev[seq(fit$lmu)]
 outlist=c(outlist,list(dev.ratio=dev,nulldev=fit$nulldev,npasses=fit$nlp,jerr=fit$jerr,offset=is.offset,classnames=classnames))
 if(family=="multinomial"){
-  if(kopt==3)grouped=TRUE else grouped =FALSE
+  if(kopt==2)grouped=TRUE else grouped =FALSE
   outlist$grouped=grouped
 }
   class(outlist)=switch(family,

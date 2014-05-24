@@ -39,7 +39,14 @@ Maintainer: Trevor Hastie  <hastie@stanford.edu>
   \emph{Regularization Paths for Cox's Proportional Hazards Model via
     Coordinate Descent, Journal of Statistical Software, Vol. 39(5)
     1-13}\cr
-  \url{http://www.jstatsoft.org/v39/i05/}
+  \url{http://www.jstatsoft.org/v39/i05/}\cr
+  Tibshirani, Robert., Bien, J., Friedman, J.,Hastie, T.,Simon,
+  N.,Taylor, J. and Tibshirani, Ryan. (2012)
+  \emph{Strong Rules for Discarding Predictors in Lasso-type Problems,
+    JRSSB, vol 74},\cr
+  \url{http://www-stat.stanford.edu/~tibs/ftp/strong.pdf}\cr
+  \emph{Stanford Statistics Technical Report}\cr
+  \emph{Glmnet Vignette} \url{http://www.stanford.edu/~hastie/glmnet/glmnet_alpha.html}
 }
 \keyword{models}
 \keyword{regression}

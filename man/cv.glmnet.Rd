@@ -66,7 +66,10 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, 
   cross-validate \code{alpha} as well, they should call \code{cv.glmnet}
   with a pre-computed vector \code{foldid}, and then use this same fold vector
   in separate calls to \code{cv.glmnet} with different values of
-  \code{alpha}. 
+  \code{alpha}. Note also that the results of \code{cv.glmnet} are
+  random, since the folds are selected at random. Users can reduce this
+  randomness by running \code{cv.glmnet} many times, and averaging the
+  error curves. 
 }
 \value{an object of class \code{"cv.glmnet"} is returned, which is a
   list with the ingredients of the cross-validation fit.

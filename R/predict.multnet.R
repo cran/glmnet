@@ -30,8 +30,8 @@ predict.multnet <-
       kbeta = rbind2(a0[i, , drop = FALSE], nbeta[[i]])
       vnames = dimnames(kbeta)[[1]]
       dimnames(kbeta) = list(NULL, NULL)
-      kbeta = kbeta[, lamlist$left, drop = FALSE] * lamlist$frac + 
-        kbeta[, lamlist$right, drop = FALSE] * (1 - lamlist$frac)
+      kbeta = kbeta[, lamlist$left, drop = FALSE] %*% Diagonal(x=lamlist$frac) + 
+        kbeta[, lamlist$right, drop = FALSE] %*% Diagonal(x=1 - lamlist$frac)
       dimnames(kbeta) = list(vnames, paste(seq(along = s)))
       nbeta[[i]] = kbeta
     }
