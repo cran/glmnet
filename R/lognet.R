@@ -5,6 +5,9 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
     ## Need to construct a y matrix, and include the weights
     y=as.factor(y)
     ntab=table(y)
+    minclass=min(ntab)
+    if(minclass<=1)stop("one multinomial or binomial class has 1 or 0 observations; not allowed")
+    if(minclass<8)warning("one multinomial or binomial class has fewer than 8  observations; dangerous ground")
     classnames=names(ntab)
     nc=as.integer(length(ntab))
     y=diag(nc)[as.numeric(y),]
@@ -15,7 +18,9 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
     nc=as.integer(nc[2])
     classnames=colnames(y)
   }
-
+#Check for size limitations
+  maxvars=.Machine$integer.max/(nlam*nc)
+  if(nx>maxvars)stop(paste("Integer overflow; num_classes*num_lambda*pmax should not exceed .Machine$integer.max. Reduce pmax to be below", trunc(maxvars)))
 
   if(!missing(weights)) y=y*weights
 ### check if any rows of y sum to zero, and if so deal with them
@@ -23,7 +28,13 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
   o=weights>0
   if(!all(o)){ #subset the data
     y=y[o,]
-    x=x[o,,drop=FALSE]
+    if(is.sparse){ # we have to subset this beast with care
+      x=sparseMatrix(i=jx,p=ix-1,x=x,dims=c(nobs,nvars))[o,,drop=FALSE]
+      ix=as.integer(x@p+1)
+      jx=as.integer(x@i+1)
+      x=as.double(x@x)
+    }
+    else x=x[o,,drop=FALSE]
     nobs=sum(o)
   }else o=NULL
     

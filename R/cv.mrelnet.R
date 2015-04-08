@@ -11,6 +11,10 @@ cv.mrelnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,groupe
   nc=ndim[2]
   nobs=ndim[1]
   if(!is.null(offset))y=y-drop(offset)
+  ##We dont want to extrapolate lambdas on the small side
+  mlami=max(sapply(outlist,function(obj)min(obj$lambda)))
+  which_lam=lambda >= mlami
+
   predmat=array(NA,c(nobs,nc,length(lambda)))
     nfolds=max(foldid)
     nlams=double(nfolds)
@@ -18,8 +22,8 @@ cv.mrelnet=function(outlist,lambda,x,y,weights,offset,foldid,type.measure,groupe
       which=foldid==i
       fitobj=outlist[[i]]
       fitobj$offset=FALSE
-      preds=predict(fitobj,x[which,,drop=FALSE])
-      nlami=length(outlist[[i]]$lambda)
+      preds=predict(fitobj,x[which,,drop=FALSE], s=lambda[which_lam])
+      nlami=sum(which_lam)
        predmat[which,,seq(nlami)]=preds
       nlams[i]=nlami
     }

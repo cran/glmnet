@@ -30,7 +30,9 @@ glmnet(x, y, family=c("gaussian","binomial","poisson","multinomial","cox","mgaus
   treated as the target class; for a factor, the last level in
   alphabetical order is the target class). For
   \code{family="multinomial"}, can be a \code{nc>=2} level factor, or a
-  matrix with \code{nc} columns of counts or proportions. For
+  matrix with \code{nc} columns of counts or proportions.
+  For either \code{"binomial"} or \code{"multinomial"}, if \code{y} is
+  presented as a vector, it will be coerced into a factor. For
   \code{family="cox"}, \code{y} should be a two-column matrix with
   columns named 'time' and 'status'. The latter is a binary variable,
   with '1' indicating death, and '0' indicating right censored. The
@@ -137,7 +139,8 @@ glmnet(x, y, family=c("gaussian","binomial","poisson","multinomial","cox","mgaus
   \code{"gaussian"}, \code{glmnet} standardizes y to have unit variance
   before computing its lambda sequence (and then unstandardizes the
   resulting coefficients); if you wish to reproduce/compare results with other
-  software, best to supply a standardized y.
+  software, best to supply a standardized y. The coefficients for any  predictor variables
+  with zero variance are set to zero for all values of lambda.
   The latest two features in glmnet are the \code{family="mgaussian"}
   family and the \code{type.multinomial="grouped"} option for
   multinomial fitting. The former allows a multi-response gaussian model

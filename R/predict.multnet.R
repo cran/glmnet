@@ -48,6 +48,8 @@ predict.multnet <-
       return(lapply(nbeta, function(x) nonzeroCoef(x[-1, , 
                                                    drop = FALSE], bystep = TRUE)))
   dd = dim(newx)
+   if (inherits(newx, "sparseMatrix")) 
+    newx = as(newx, "dgCMatrix")
   npred = dd[[1]]
   dn = list(names(nbeta), dimnames(nbeta[[1]])[[2]], dimnames(newx)[[1]])
    dp = array(0, c(nclass, nlambda, npred), dimnames = dn)

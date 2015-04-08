@@ -1,3 +1,8 @@
+2015-04-07 Trevor Hastie <hastie@stanford.edu> version 2.0-1
+	* Major upgrade to CV; let each model use its own lambdas, then predict at original set. 
+	* fixed some minor bugs	
+2014-07-30  Trevor Hastie <hastie@stanford.edu> version 1.9-9
+	* fixed subsetting bug in lognet when some weights are zero and x is sparse
 2014-05-23  Trevor Hastie <hastie@stanford.edu> version 1.9-8
 	* fixed bug in multivariate response model (uninitialized variable), leading to valgrind issues
 	* fixed issue with multinomial response matrix and zeros
