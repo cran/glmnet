@@ -62,15 +62,26 @@ predict(fit, newx = x[1:5,], type = "response", s = 0.05)
 ## ------------------------------------------------------------------------
 cvfit = cv.glmnet(x, y, type.measure = "mse", nfolds = 20)
 
-## ------------------------------------------------------------------------
-require(doMC)
-registerDoMC(cores=2)
-X = matrix(rnorm(1e4 * 200), 1e4, 200)
-Y = rnorm(1e4)
+## ----, eval=FALSE--------------------------------------------------------
+#  require(doMC)
+#  registerDoMC(cores=2)
+#  X = matrix(rnorm(1e4 * 200), 1e4, 200)
+#  Y = rnorm(1e4)
 
-## ------------------------------------------------------------------------
-system.time(cv.glmnet(X, Y))
-system.time(cv.glmnet(X, Y, parallel = TRUE))
+## ----, eval=FALSE--------------------------------------------------------
+#  system.time(cv.glmnet(X, Y))
+
+## ----, echo=FALSE--------------------------------------------------------
+structure(c(2.44, 0.08, 2.518, 0, 0), class = "proc_time", .Names = c("user.self", 
+"sys.self", "elapsed", "user.child", "sys.child"))
+
+## ----, eval=FALSE--------------------------------------------------------
+#  system.time(cv.glmnet(X, Y, parallel = TRUE))
+
+## ----, echo=FALSE--------------------------------------------------------
+structure(c(0.508999999999999, 0.057, 1.56699999999999, 1.941, 
+0.1), class = "proc_time", .Names = c("user.self", "sys.self", 
+"elapsed", "user.child", "sys.child"))
 
 ## ------------------------------------------------------------------------
 cvfit$lambda.min
