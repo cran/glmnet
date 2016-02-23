@@ -3,7 +3,7 @@ output: html_document
 ---
 
 <!-- 
-%\VignetteEngine{knitr::knitr} 
+%\VignetteEngine{knitr::rmarkdown} 
 %\VignetteIndexEntry{An Introduction to Glmnet}
 --> 
 
@@ -69,7 +69,7 @@ Users may change the `repos` options depending on their locations and preference
 
 Here the R package has been downloaded and installed to the default directories.
 
-Alternatively, users can download the package source at http://cran.r-project.org/web/packages/glmnet/index.html and type Unix commands to install it to the desired location.
+Alternatively, users can download the package source at http://cran.r-project.org/package=glmnet and type Unix commands to install it to the desired location.
 
 [Back to Top](#top)
 

@@ -9,7 +9,7 @@ predict.coxnet=function(object,newx,s=NULL,type=c("link","response","coefficient
     which=match(s,lambda,FALSE)
     if(!all(which>0)){
       lambda=unique(rev(sort(c(s,lambda))))
-      object=update(object,lambda=lambda)
+      object=tryCatch(update(object,lambda=lambda,...),error=function(e)stop("problem with predict.glmnet() or coef.glmnet(): unable to refit the glmnet object to compute exact coefficients; please supply original data by name, such as x and y, plus any weights, offsets etc.",call.=FALSE))
     }
   }
 

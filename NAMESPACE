@@ -1,5 +1,11 @@
 useDynLib("glmnet")
 importFrom(utils,head,tail,packageDescription)
+importFrom("graphics", "abline", "axis", "matplot", "points",
+     "segments", "text")
+importFrom("methods", "as", "new")
+importFrom("stats", "approx", "coef", "median", "predict", "rmultinom",
+     "runif", "weighted.mean")
+
 import(Matrix)
 import(foreach)
 export(glmnet,

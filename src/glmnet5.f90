@@ -2516,8 +2516,9 @@ c
       jerr=jerr+ierr                                                       1692
       allocate(w(1:n),stat=ierr)                                           1692
       jerr=jerr+ierr                                                       1693
-      if(jerr.ne.0) return                                                 1694
       az=0.0                                                               1694
+      azero=0.0                                                            1694
+      if(jerr.ne.0) return                                                 1694
       e=exp(-g)                                                            1694
       qy=dot_product(q,y)                                                  1694
       p=1.0/(1.0+e)                                                        1695
@@ -6124,10 +6125,12 @@ c
       if(it.ge.mxit) jerr=90000                                            3400
       return                                                               3401
       entry chg_bnorm(arg,irg)                                             3401
+      chg_bnorm=0.0                                                        3401
       thr=arg                                                              3401
       mxit=irg                                                             3401
       return                                                               3402
       entry get_bnorm(arg,irg)                                             3402
+      bnorm=0.0                                                            3401
       arg=thr                                                              3402
       irg=mxit                                                             3402
       return                                                               3403
