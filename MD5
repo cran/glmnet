@@ -1,5 +1,5 @@
 5ca54e468e94d92b8c58ef953d145f77 *ChangeLog
-73d90d84758da3242c52b34634106741 *DESCRIPTION
+eeec10194647f66ea110cefd78b4f6f8 *DESCRIPTION
 68658af28df01dd57bacb509f635b5f3 *NAMESPACE
 dfe9c97d146f93a159830f9cf0c8cf34 *R/auc.R
 8cd96999dce298c1d81ce51ea2f6d2a3 *R/auc.mat.R
@@ -48,10 +48,10 @@ e2297b80b56869380d102c52fcda8384 *R/predict.coxnet.R
 4b2aa41adb3d2df3293901edb52e5942 *R/predict.cv.glmnet.R
 9d94cbb290468b9e357ab1f67fe65831 *R/predict.elnet.R
 f794a6242fe4cb70c3334e30f61a7688 *R/predict.fishnet.R
-1aa31f9e7252498bb73793bedcd8c9a3 *R/predict.glmnet.R
+4025ca6002935097d1b3f2689436bdb7 *R/predict.glmnet.R
 f714df69858c8be76c72bab054cb72bb *R/predict.lognet.R
 ad0ca203157a930229fcf370db2fbba1 *R/predict.mrelnet.R
-278880e0d5c9192d44dd29803e9e91db *R/predict.multnet.R
+bc5a82d2d7be42187fdf415d033de628 *R/predict.multnet.R
 ea696d8bc26ce7a5900ec3e52cad8ccb *R/print.glmnet.R
 029f53c8146a7f2e945540ca698e429d *R/response.coxnet.R
 8b945ab1cb9a14d10fed2265eb839876 *R/rmult.R
@@ -71,11 +71,11 @@ beaffe6c0ae597f8803216e3bbd4a2d1 *data/QuickStartExample.RData
 7056d5f98a624c060d0522045f1b68f8 *data/SparseExample.RData
 c22d19c217bc163a2c38b84add608c31 *inst/CITATION
 f486f9f7f486424fa8d8e05a38e9e6d5 *inst/doc/Coxnet.R
-584428b82ae2ee4b5e0a792dc887b79f *inst/doc/Coxnet.pdf
+a9281188f285d532abff11ba9c86d6e1 *inst/doc/Coxnet.pdf
 89bb275bc27d5cebcf61d4f0517fb5d5 *inst/doc/Coxnet.rnw
 bbb443b3be7089c5f2b97f20bc0bef4d *inst/doc/glmnet_beta.R
 99c32ce3ac28a16fce07ac7727b6ac96 *inst/doc/glmnet_beta.Rmd
-17379217e2a0c7fba790ccf422bcd6a6 *inst/doc/glmnet_beta.html
+6ca690c925568149e6f6097530747656 *inst/doc/glmnet_beta.html
 bc3890905a7f0bfbee2c8d48b2840d45 *inst/mortran/glmnet5.m
 4b562f8e16199091b797e15c24b6b258 *man/beta_CVX.Rd
 dbb4b006dbce1f9ae0a740ce47158fb5 *man/cv.glmnet.Rd

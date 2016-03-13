@@ -14,7 +14,7 @@ predict.glmnet=function(object,newx,s=NULL,type=c("link","response","coefficient
   } 
   a0=t(as.matrix(object$a0))
   rownames(a0)="(Intercept)"
-  nbeta=rbind2(a0,object$beta)
+  nbeta=rbind2(a0,object$beta)#was rbind2
   if(!is.null(s)){
     vnames=dimnames(nbeta)[[1]]
     dimnames(nbeta)=list(NULL,NULL)

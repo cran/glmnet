@@ -28,7 +28,7 @@ predict.multnet <-
     lambda = object$lambda
     lamlist = lambda.interp(lambda, s)
     for (i in seq(nclass)) {
-      kbeta = rbind2(a0[i, , drop = FALSE], nbeta[[i]])
+      kbeta = rbind(a0[i, , drop = FALSE], nbeta[[i]])#was rbind2
       vnames = dimnames(kbeta)[[1]]
       dimnames(kbeta) = list(NULL, NULL)
       kbeta = kbeta[, lamlist$left, drop = FALSE] %*% Diagonal(x=lamlist$frac) + 
@@ -38,7 +38,7 @@ predict.multnet <-
     }
   }
   else {
-    for (i in seq(nclass)) nbeta[[i]] = rbind2(a0[i, ], nbeta[[i]])
+    for (i in seq(nclass)) nbeta[[i]] = rbind(a0[i, ], nbeta[[i]])#was rbind2
     nlambda=length(object$lambda)
   }
   if (type == "coefficients") 
