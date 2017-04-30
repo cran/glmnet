@@ -37,7 +37,7 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
     else x=x[o,,drop=FALSE]
     nobs=sum(o)
   }else o=NULL
-    
+
 
   if(family=="binomial"){
     if(nc>2)stop("More than two classes; use multinomial family instead in call to glmnet",call.=FALSE)
@@ -45,14 +45,14 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
     y=y[,c(2,1)]#fortran lognet models the first column; we prefer the second (for 0/1 data)
   }
 
-  
+
     storage.mode(y)="double"
     if(is.null(offset)){
       offset=y*0 #keeps the shape of y
       is.offset=FALSE}
     else{
       offset=as.matrix(offset)
-      if(!is.null(o))offset=offset[o,]# we might have zero weights
+      if(!is.null(o))offset=offset[o,,drop=FALSE]# we might have zero weights
       do=dim(offset)
       if(do[[1]]!=nobs)stop("offset should have the same number of values as observations in binomial/multinomial call to glmnet",call.=FALSE)
       if((do[[2]]==1)&(nc==1))offset=cbind(offset,-offset)
@@ -80,7 +80,7 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
           ca=double(nx*nlam*nc),
           ia=integer(nx),
           nin=integer(nlam),
-          nulldev=double(1),      
+          nulldev=double(1),
           dev=double(nlam),
           alm=double(nlam),
           nlp=integer(1),

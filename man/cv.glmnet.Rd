@@ -30,7 +30,7 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, 
     two-class logistic regression only, and gives area under the ROC
     curve. \code{type.measure="mse"} or \code{type.measure="mae"} (mean absolute error)
     can be used by all models except the \code{"cox"}; they measure the
-    deviation from the fitted mean to the response.} 
+    deviation from the fitted mean to the response.}
     \item{grouped}{This is an experimental argument, with default
       \code{TRUE}, and can be ignored by most users. For all models
       except the \code{"cox"}, this refers to computing \code{nfolds}
@@ -59,7 +59,7 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, 
   first to get the \code{lambda} sequence, and then the remainder to
   compute the fit with each of the folds omitted. The error is
   accumulated, and the average error and standard deviation over the
-  folds is computed. 
+  folds is computed.
   Note that \code{cv.glmnet} does NOT search for
   values for \code{alpha}. A specific value should be supplied, else
   \code{alpha=1} is assumed by default. If users would like to
@@ -69,7 +69,7 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, 
   \code{alpha}. Note also that the results of \code{cv.glmnet} are
   random, since the folds are selected at random. Users can reduce this
   randomness by running \code{cv.glmnet} many times, and averaging the
-  error curves. 
+  error curves.
 }
 \value{an object of class \code{"cv.glmnet"} is returned, which is a
   list with the ingredients of the cross-validation fit.
@@ -103,7 +103,7 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, 
     1-13}\cr
   \url{http://www.jstatsoft.org/v39/i05/}
 }
-\author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr 
+\author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr
   Noah Simon helped develop the 'coxnet' function.\cr
   Jeffrey Wong and B. Narasimhan helped with the parallel option\cr
 Maintainer: Trevor Hastie \email{hastie@stanford.edu}}

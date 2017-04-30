@@ -1,5 +1,5 @@
 ## ---- eval=FALSE---------------------------------------------------------
-#  install.packages("glmnet", repos = "http://cran.us.r-project.org")
+#  install.packages("glmnet", repos = "https://cran.us.r-project.org")
 
 ## ------------------------------------------------------------------------
 library(glmnet)
@@ -72,15 +72,15 @@ cvfit = cv.glmnet(x, y, type.measure = "mse", nfolds = 20)
 #  system.time(cv.glmnet(X, Y))
 
 ## ---- echo=FALSE---------------------------------------------------------
-structure(c(2.44, 0.08, 2.518, 0, 0), class = "proc_time", .Names = c("user.self", 
+structure(c(2.44, 0.08, 2.518, 0, 0), class = "proc_time", .Names = c("user.self",
 "sys.self", "elapsed", "user.child", "sys.child"))
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  system.time(cv.glmnet(X, Y, parallel = TRUE))
 
 ## ---- echo=FALSE---------------------------------------------------------
-structure(c(0.508999999999999, 0.057, 1.56699999999999, 1.941, 
-0.1), class = "proc_time", .Names = c("user.self", "sys.self", 
+structure(c(0.508999999999999, 0.057, 1.56699999999999, 1.941,
+0.1), class = "proc_time", .Names = c("user.self", "sys.self",
 "elapsed", "user.child", "sys.child"))
 
 ## ------------------------------------------------------------------------
@@ -125,7 +125,7 @@ par(mar=c(4.5,4.5,1,4))
 plot(fit)
 vnat=coef(fit)
 vnat=vnat[-1,ncol(vnat)] # remove the intercept, and get the coefficients at the end of the path
-axis(4, at=vnat,line=-.5,label=vn,las=1,tick=FALSE, cex.axis=0.5) 
+axis(4, at=vnat,line=-.5,label=vn,las=1,tick=FALSE, cex.axis=0.5)
 
 ## ------------------------------------------------------------------------
 data(MultiGaussianExample)

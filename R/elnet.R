@@ -4,6 +4,7 @@ elnet=function(x,is.sparse,ix,jx,y,weights,offset,type.gaussian=c("covariance","
 ### compute the null deviance
   ybar=weighted.mean(y,weights)
   nulldev=sum(weights* (y-ybar)^2)
+if(nulldev==0)stop("y is constant; gaussian glmnet fails at standardization step")
   type.gaussian=match.arg(type.gaussian)
 
   ka=as.integer(switch(type.gaussian,

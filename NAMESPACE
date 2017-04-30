@@ -2,7 +2,7 @@ useDynLib("glmnet")
 importFrom(utils,head,tail,packageDescription)
 importFrom("graphics", "abline", "axis", "matplot", "points",
      "segments", "text")
-importFrom("methods", "as", "new")
+import("methods")
 importFrom("stats", "approx", "coef", "median", "predict", "rmultinom",
      "runif", "weighted.mean")
 

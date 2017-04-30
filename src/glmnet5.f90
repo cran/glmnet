@@ -679,9 +679,9 @@ c call get_int_parms(fdev,eps,big,mnlam,devmax,pmin,exmx)
 c call get_bnorm(prec,mxit);
 c
 c
-c             
+c
       subroutine get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)          772
-      data sml0,eps0,big0,mnlam0,rsqmax0,pmin0,exmx0  /1.0e-5,1.0e-6,9.9    774 
+      data sml0,eps0,big0,mnlam0,rsqmax0,pmin0,exmx0  /1.0e-5,1.0e-6,9.9    774
      *e35,5,0.999,1.0e-9,250.0/
       sml=sml0                                                              774
       eps=eps0                                                              774
@@ -713,12 +713,12 @@ c
       exmx0=arg                                                             783
       return                                                                784
       end                                                                   785
-      subroutine elnet  (ka,parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,u    788 
+      subroutine elnet  (ka,parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,u    788
      *lam,thr,isd,intr,maxit,  lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
       real x(no,ni),y(no),w(no),vp(ni),ca(nx,nlam),cl(2,ni)                 789
       real ulam(nlam),a0(nlam),rsq(nlam),alm(nlam)                          790
       integer jd(*),ia(nx),nin(nlam)                                        791
-      real, dimension (:), allocatable :: vq;                                   
+      real, dimension (:), allocatable :: vq;
       if(maxval(vp) .gt. 0.0)goto 10021                                     794
       jerr=10000                                                            794
       return                                                                794
@@ -728,24 +728,24 @@ c
       vq=max(0.0,vp)                                                        796
       vq=vq*ni/sum(vq)                                                      797
       if(ka .ne. 1)goto 10041                                               798
-      call elnetu  (parm,no,ni,x,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,    801 
+      call elnetu  (parm,no,ni,x,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,    801
      *isd,intr,maxit,  lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
       goto 10051                                                            802
 10041 continue                                                              803
-      call elnetn (parm,no,ni,x,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,i    806 
+      call elnetn (parm,no,ni,x,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,i    806
      *sd,intr,maxit,  lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
 10051 continue                                                              807
 10031 continue                                                              807
       deallocate(vq)                                                        808
       return                                                                809
       end                                                                   810
-      subroutine elnetu  (parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ula    813 
+      subroutine elnetu  (parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ula    813
      *m,thr,isd,intr,maxit,  lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
       real x(no,ni),y(no),w(no),vp(ni),ulam(nlam),cl(2,ni)                  814
       real ca(nx,nlam),a0(nlam),rsq(nlam),alm(nlam)                         815
       integer jd(*),ia(nx),nin(nlam)                                        816
-      real, dimension (:), allocatable :: xm,xs,g,xv,vlam                       
-      integer, dimension (:), allocatable :: ju                                 
+      real, dimension (:), allocatable :: xm,xs,g,xv,vlam
+      integer, dimension (:), allocatable :: ju
       allocate(g(1:ni),stat=jerr)                                           821
       allocate(xm(1:ni),stat=ierr)                                          821
       jerr=jerr+ierr                                                        822
@@ -774,7 +774,7 @@ c
 10102 continue                                                              832
 10091 continue                                                              833
       if(flmin.ge.1.0) vlam=ulam/ys                                         834
-      call elnet1(parm,ni,ju,vp,cl,g,no,ne,nx,x,nlam,flmin,vlam,thr,maxi    836 
+      call elnet1(parm,ni,ju,vp,cl,g,no,ne,nx,x,nlam,flmin,vlam,thr,maxi    836
      *t,xv,  lmu,ca,ia,nin,rsq,alm,nlp,jerr)
       if(jerr.gt.0) return                                                  837
 10110 do 10111 k=1,lmu                                                      837
@@ -791,11 +791,11 @@ c
       deallocate(xm,xs,g,ju,xv,vlam)                                        842
       return                                                                843
       end                                                                   844
-      subroutine standard (no,ni,x,y,w,isd,intr,ju,g,xm,xs,ym,ys,xv,jerr    845 
+      subroutine standard (no,ni,x,y,w,isd,intr,ju,g,xm,xs,ym,ys,xv,jerr    845
      *)
       real x(no,ni),y(no),w(no),g(ni),xm(ni),xs(ni),xv(ni)                  845
       integer ju(ni)                                                        846
-      real, dimension (:), allocatable :: v                                     
+      real, dimension (:), allocatable :: v
       allocate(v(1:no),stat=jerr)                                           849
       if(jerr.ne.0) return                                                  850
       w=w/sum(w)                                                            850
@@ -859,16 +859,16 @@ c
       deallocate(v)                                                         875
       return                                                                876
       end                                                                   877
-      subroutine elnet1 (beta,ni,ju,vp,cl,g,no,ne,nx,x,nlam,flmin,ulam,t    879 
+      subroutine elnet1 (beta,ni,ju,vp,cl,g,no,ne,nx,x,nlam,flmin,ulam,t    879
      *hr,maxit,xv,  lmu,ao,ia,kin,rsqo,almo,nlp,jerr)
-      real vp(ni),g(ni),x(no,ni),ulam(nlam),ao(nx,nlam),rsqo(nlam),almo(    880 
+      real vp(ni),g(ni),x(no,ni),ulam(nlam),ao(nx,nlam),rsqo(nlam),almo(    880
      *nlam),xv(ni)
       real cl(2,ni)                                                         881
       integer ju(ni),ia(nx),kin(nlam)                                       882
-      real, dimension (:), allocatable :: a,da                                  
-      integer, dimension (:), allocatable :: mm                                 
-      real, dimension (:,:), allocatable :: c                                   
-      allocate(c(1:ni,1:nx),stat=jerr)                                          
+      real, dimension (:), allocatable :: a,da
+      integer, dimension (:), allocatable :: mm
+      real, dimension (:,:), allocatable :: c
+      allocate(c(1:ni,1:nx),stat=jerr)
       call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)                889
       allocate(a(1:ni),stat=ierr)                                           889
       jerr=jerr+ierr                                                        890
@@ -926,7 +926,7 @@ c
       u=g(k)+ak*xv(k)                                                       909
       v=abs(u)-vp(k)*ab                                                     909
       a(k)=0.0                                                              911
-      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d    912 
+      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d    912
      *em)))
       if(a(k).eq.ak)goto 10371                                              913
       if(mm(k) .ne. 0)goto 10391                                            913
@@ -976,7 +976,7 @@ c
       u=g(k)+ak*xv(k)                                                       929
       v=abs(u)-vp(k)*ab                                                     930
       a(k)=0.0                                                              932
-      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d    933 
+      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d    933
      *em)))
       if(a(k).eq.ak)goto 10491                                              934
       del=a(k)-ak                                                           934
@@ -1028,13 +1028,13 @@ c
       deallocate(a,mm,c,da)                                                 954
       return                                                                955
       end                                                                   956
-      subroutine elnetn (parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam    958 
+      subroutine elnetn (parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam    958
      *,thr,isd,  intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
       real vp(ni),x(no,ni),y(no),w(no),ulam(nlam),cl(2,ni)                  959
       real ca(nx,nlam),a0(nlam),rsq(nlam),alm(nlam)                         960
       integer jd(*),ia(nx),nin(nlam)                                        961
-      real, dimension (:), allocatable :: xm,xs,xv,vlam                         
-      integer, dimension (:), allocatable :: ju                                 
+      real, dimension (:), allocatable :: xm,xs,xv,vlam
+      integer, dimension (:), allocatable :: ju
       allocate(xm(1:ni),stat=jerr)                                          966
       allocate(xs(1:ni),stat=ierr)                                          966
       jerr=jerr+ierr                                                        967
@@ -1061,7 +1061,7 @@ c
 10612 continue                                                              976
 10601 continue                                                              977
       if(flmin.ge.1.0) vlam=ulam/ys                                         978
-      call elnet2(parm,ni,ju,vp,cl,y,no,ne,nx,x,nlam,flmin,vlam,thr,maxi    980 
+      call elnet2(parm,ni,ju,vp,cl,y,no,ne,nx,x,nlam,flmin,vlam,thr,maxi    980
      *t,xv,  lmu,ca,ia,nin,rsq,alm,nlp,jerr)
       if(jerr.gt.0) return                                                  981
 10620 do 10621 k=1,lmu                                                      981
@@ -1081,7 +1081,7 @@ c
       subroutine standard1 (no,ni,x,y,w,isd,intr,ju,xm,xs,ym,ys,xv,jerr)    989
       real x(no,ni),y(no),w(no),xm(ni),xs(ni),xv(ni)                        989
       integer ju(ni)                                                        990
-      real, dimension (:), allocatable :: v                                     
+      real, dimension (:), allocatable :: v
       allocate(v(1:no),stat=jerr)                                           993
       if(jerr.ne.0) return                                                  994
       w=w/sum(w)                                                            994
@@ -1139,14 +1139,14 @@ c
       deallocate(v)                                                        1016
       return                                                               1017
       end                                                                  1018
-      subroutine elnet2(beta,ni,ju,vp,cl,y,no,ne,nx,x,nlam,flmin,ulam,th   1020 
+      subroutine elnet2(beta,ni,ju,vp,cl,y,no,ne,nx,x,nlam,flmin,ulam,th   1020
      *r,maxit,xv,  lmu,ao,ia,kin,rsqo,almo,nlp,jerr)
-      real vp(ni),y(no),x(no,ni),ulam(nlam),ao(nx,nlam),rsqo(nlam),almo(   1021 
+      real vp(ni),y(no),x(no,ni),ulam(nlam),ao(nx,nlam),rsqo(nlam),almo(   1021
      *nlam),xv(ni)
       real cl(2,ni)                                                        1022
       integer ju(ni),ia(nx),kin(nlam)                                      1023
-      real, dimension (:), allocatable :: a,g                                   
-      integer, dimension (:), allocatable :: mm,ix                              
+      real, dimension (:), allocatable :: a,g
+      integer, dimension (:), allocatable :: mm,ix
       call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)               1028
       allocate(a(1:ni),stat=jerr)                                          1029
       allocate(mm(1:ni),stat=ierr)                                         1029
@@ -1222,7 +1222,7 @@ c
       u=gk+ak*xv(k)                                                        1053
       v=abs(u)-vp(k)*ab                                                    1053
       a(k)=0.0                                                             1055
-      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d   1056 
+      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d   1056
      *em)))
       if(a(k).eq.ak)goto 10891                                             1057
       if(mm(k) .ne. 0)goto 10911                                           1057
@@ -1270,7 +1270,7 @@ c
       u=gk+ak*xv(k)                                                        1076
       v=abs(u)-vp(k)*ab                                                    1076
       a(k)=0.0                                                             1078
-      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d   1079 
+      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d   1079
      *em)))
       if(a(k).eq.ak)goto 11001                                             1080
       del=a(k)-ak                                                          1080
@@ -1347,13 +1347,13 @@ c
 11082 continue                                                             1113
       return                                                               1114
       end                                                                  1115
-      subroutine spelnet  (ka,parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam   1118 
+      subroutine spelnet  (ka,parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam   1118
      *,flmin,ulam,thr,isd,intr,  maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr
      *)
       real x(*),y(no),w(no),vp(ni),ulam(nlam),cl(2,ni)                     1119
       real ca(nx,nlam),a0(nlam),rsq(nlam),alm(nlam)                        1120
       integer ix(*),jx(*),jd(*),ia(nx),nin(nlam)                           1121
-      real, dimension (:), allocatable :: vq;                                   
+      real, dimension (:), allocatable :: vq;
       if(maxval(vp) .gt. 0.0)goto 11101                                    1124
       jerr=10000                                                           1124
       return                                                               1124
@@ -1363,24 +1363,24 @@ c
       vq=max(0.0,vp)                                                       1126
       vq=vq*ni/sum(vq)                                                     1127
       if(ka .ne. 1)goto 11121                                              1128
-      call spelnetu  (parm,no,ni,x,ix,jx,y,w,jd,vq,cl,ne,nx,nlam,flmin,u   1131 
+      call spelnetu  (parm,no,ni,x,ix,jx,y,w,jd,vq,cl,ne,nx,nlam,flmin,u   1131
      *lam,thr,isd,  intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
       goto 11131                                                           1132
 11121 continue                                                             1133
-      call spelnetn (parm,no,ni,x,ix,jx,y,w,jd,vq,cl,ne,nx,nlam,flmin,ul   1136 
+      call spelnetn (parm,no,ni,x,ix,jx,y,w,jd,vq,cl,ne,nx,nlam,flmin,ul   1136
      *am,thr,isd,intr,  maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
 11131 continue                                                             1137
 11111 continue                                                             1137
       deallocate(vq)                                                       1138
       return                                                               1139
       end                                                                  1140
-      subroutine spelnetu  (parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,f   1143 
+      subroutine spelnetu  (parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,f   1143
      *lmin,ulam,thr,isd,intr,  maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
       real x(*),y(no),w(no),vp(ni),ulam(nlam),cl(2,ni)                     1144
       real ca(nx,nlam),a0(nlam),rsq(nlam),alm(nlam)                        1145
       integer ix(*),jx(*),jd(*),ia(nx),nin(nlam)                           1146
-      real, dimension (:), allocatable :: xm,xs,g,xv,vlam                       
-      integer, dimension (:), allocatable :: ju                                 
+      real, dimension (:), allocatable :: xm,xs,g,xv,vlam
+      integer, dimension (:), allocatable :: ju
       allocate(g(1:ni),stat=jerr)                                          1151
       allocate(xm(1:ni),stat=ierr)                                         1151
       jerr=jerr+ierr                                                       1152
@@ -1399,7 +1399,7 @@ c
       jerr=7777                                                            1159
       return                                                               1159
 11151 continue                                                             1160
-      call spstandard(no,ni,x,ix,jx,y,w,ju,isd,intr,g,xm,xs,ym,ys,xv,jer   1161 
+      call spstandard(no,ni,x,ix,jx,y,w,ju,isd,intr,g,xm,xs,ym,ys,xv,jer   1161
      *r)
       if(jerr.ne.0) return                                                 1162
       cl=cl/ys                                                             1162
@@ -1410,7 +1410,7 @@ c
 11182 continue                                                             1162
 11171 continue                                                             1163
       if(flmin.ge.1.0) vlam=ulam/ys                                        1164
-      call spelnet1(parm,ni,g,no,w,ne,nx,x,ix,jx,ju,vp,cl,nlam,flmin,vla   1166 
+      call spelnet1(parm,ni,g,no,w,ne,nx,x,ix,jx,ju,vp,cl,nlam,flmin,vla   1166
      *m,thr,maxit,  xm,xs,xv,lmu,ca,ia,nin,rsq,alm,nlp,jerr)
       if(jerr.gt.0) return                                                 1167
 11190 do 11191 k=1,lmu                                                     1167
@@ -1427,7 +1427,7 @@ c
       deallocate(xm,xs,g,ju,xv,vlam)                                       1172
       return                                                               1173
       end                                                                  1174
-      subroutine spstandard (no,ni,x,ix,jx,y,w,ju,isd,intr,g,xm,xs,ym,ys   1175 
+      subroutine spstandard (no,ni,x,ix,jx,y,w,ju,isd,intr,g,xm,xs,ym,ys   1175
      *,xv,jerr)
       real x(*),y(no),w(no),g(ni),xm(ni),xs(ni),xv(ni)                     1175
       integer ix(*),jx(*),ju(ni)                                           1176
@@ -1488,16 +1488,16 @@ c
 11322 continue                                                             1200
       return                                                               1201
       end                                                                  1202
-      subroutine spelnet1(beta,ni,g,no,w,ne,nx,x,ix,jx,ju,vp,cl,nlam,flm   1204 
+      subroutine spelnet1(beta,ni,g,no,w,ne,nx,x,ix,jx,ju,vp,cl,nlam,flm   1204
      *in,ulam,  thr,maxit,xm,xs,xv,lmu,ao,ia,kin,rsqo,almo,nlp,jerr)
       real g(ni),vp(ni),x(*),ulam(nlam),w(no)                              1205
-      real ao(nx,nlam),rsqo(nlam),almo(nlam),xm(ni),xs(ni),xv(ni),cl(2,n   1206 
+      real ao(nx,nlam),rsqo(nlam),almo(nlam),xm(ni),xs(ni),xv(ni),cl(2,n   1206
      *i)
       integer ix(*),jx(*),ju(ni),ia(nx),kin(nlam)                          1207
-      real, dimension (:), allocatable :: a,da                                  
-      integer, dimension (:), allocatable :: mm                                 
-      real, dimension (:,:), allocatable :: c                                   
-      allocate(c(1:ni,1:nx),stat=jerr)                                          
+      real, dimension (:), allocatable :: a,da
+      integer, dimension (:), allocatable :: mm
+      real, dimension (:,:), allocatable :: c
+      allocate(c(1:ni,1:nx),stat=jerr)
       call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)               1214
       allocate(a(1:ni),stat=ierr)                                          1214
       jerr=jerr+ierr                                                       1215
@@ -1555,7 +1555,7 @@ c
       u=g(k)+ak*xv(k)                                                      1234
       v=abs(u)-vp(k)*ab                                                    1234
       a(k)=0.0                                                             1236
-      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d   1237 
+      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d   1237
      *em)))
       if(a(k).eq.ak)goto 11431                                             1238
       if(mm(k) .ne. 0)goto 11451                                           1238
@@ -1605,7 +1605,7 @@ c
       u=g(k)+ak*xv(k)                                                      1256
       v=abs(u)-vp(k)*ab                                                    1256
       a(k)=0.0                                                             1258
-      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d   1259 
+      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d   1259
      *em)))
       if(a(k).eq.ak)goto 11551                                             1260
       del=a(k)-ak                                                          1260
@@ -1657,13 +1657,13 @@ c
       deallocate(a,mm,c,da)                                                1280
       return                                                               1281
       end                                                                  1282
-      subroutine spelnetn(parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flm   1284 
+      subroutine spelnetn(parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flm   1284
      *in,ulam,  thr,isd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
       real x(*),vp(ni),y(no),w(no),ulam(nlam),cl(2,ni)                     1285
       real ca(nx,nlam),a0(nlam),rsq(nlam),alm(nlam)                        1286
       integer ix(*),jx(*),jd(*),ia(nx),nin(nlam)                           1287
-      real, dimension (:), allocatable :: xm,xs,xv,vlam                         
-      integer, dimension (:), allocatable :: ju                                 
+      real, dimension (:), allocatable :: xm,xs,xv,vlam
+      integer, dimension (:), allocatable :: ju
       allocate(xm(1:ni),stat=jerr)                                         1292
       allocate(xs(1:ni),stat=ierr)                                         1292
       jerr=jerr+ierr                                                       1293
@@ -1680,7 +1680,7 @@ c
       jerr=7777                                                            1299
       return                                                               1299
 11641 continue                                                             1300
-      call spstandard1(no,ni,x,ix,jx,y,w,ju,isd,intr,xm,xs,ym,ys,xv,jerr   1301 
+      call spstandard1(no,ni,x,ix,jx,y,w,ju,isd,intr,xm,xs,ym,ys,xv,jerr   1301
      *)
       if(jerr.ne.0) return                                                 1302
       cl=cl/ys                                                             1302
@@ -1691,7 +1691,7 @@ c
 11672 continue                                                             1302
 11661 continue                                                             1303
       if(flmin.ge.1.0) vlam=ulam/ys                                        1304
-      call spelnet2(parm,ni,y,w,no,ne,nx,x,ix,jx,ju,vp,cl,nlam,flmin,vla   1306 
+      call spelnet2(parm,ni,y,w,no,ne,nx,x,ix,jx,ju,vp,cl,nlam,flmin,vla   1306
      *m,thr,maxit,  xm,xs,xv,lmu,ca,ia,nin,rsq,alm,nlp,jerr)
       if(jerr.gt.0) return                                                 1307
 11680 do 11681 k=1,lmu                                                     1307
@@ -1708,7 +1708,7 @@ c
       deallocate(xm,xs,ju,xv,vlam)                                         1312
       return                                                               1313
       end                                                                  1314
-      subroutine spstandard1 (no,ni,x,ix,jx,y,w,ju,isd,intr,xm,xs,ym,ys,   1315 
+      subroutine spstandard1 (no,ni,x,ix,jx,y,w,ju,isd,intr,xm,xs,ym,ys,   1315
      *xv,jerr)
       real x(*),y(no),w(no),xm(ni),xs(ni),xv(ni)                           1315
       integer ix(*),jx(*),ju(ni)                                           1316
@@ -1759,13 +1759,13 @@ c
       y=y/ys                                                               1335
       return                                                               1336
       end                                                                  1337
-      subroutine spelnet2(beta,ni,y,w,no,ne,nx,x,ix,jx,ju,vp,cl,nlam,flm   1339 
+      subroutine spelnet2(beta,ni,y,w,no,ne,nx,x,ix,jx,ju,vp,cl,nlam,flm   1339
      *in,ulam,  thr,maxit,xm,xs,xv,lmu,ao,ia,kin,rsqo,almo,nlp,jerr)
       real y(no),w(no),x(*),vp(ni),ulam(nlam),cl(2,ni)                     1340
       real ao(nx,nlam),rsqo(nlam),almo(nlam),xm(ni),xs(ni),xv(ni)          1341
       integer ix(*),jx(*),ju(ni),ia(nx),kin(nlam)                          1342
-      real, dimension (:), allocatable :: a,g                                   
-      integer, dimension (:), allocatable :: mm,iy                              
+      real, dimension (:), allocatable :: a,g
+      integer, dimension (:), allocatable :: mm,iy
       call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)               1347
       allocate(a(1:ni),stat=jerr)                                          1348
       allocate(mm(1:ni),stat=ierr)                                         1348
@@ -1846,7 +1846,7 @@ c
       u=gk+ak*xv(k)                                                        1376
       v=abs(u)-vp(k)*ab                                                    1376
       a(k)=0.0                                                             1378
-      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d   1379 
+      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d   1379
      *em)))
       if(a(k).eq.ak)goto 11921                                             1380
       if(mm(k) .ne. 0)goto 11941                                           1380
@@ -1899,7 +1899,7 @@ c
       u=gk+ak*xv(k)                                                        1402
       v=abs(u)-vp(k)*ab                                                    1402
       a(k)=0.0                                                             1404
-      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d   1405 
+      if(v.gt.0.0) a(k)=max(cl(1,k),min(cl(2,k),sign(v,u)/(xv(k)+vp(k)*d   1405
      *em)))
       if(a(k).eq.ak)goto 12031                                             1406
       del=a(k)-ak                                                          1406
@@ -1990,7 +1990,7 @@ c
       function row_prod(i,j,ia,ja,ra,w)                                    1442
       integer ia(*),ja(*)                                                  1442
       real ra(*),w(*)                                                      1443
-      row_prod=dot(ra(ia(i)),ra(ia(j)),ja(ia(i)),ja(ia(j)),  ia(i+1)-ia(   1445 
+      row_prod=dot(ra(ia(i)),ra(ia(j)),ja(ia(i)),ja(ia(j)),  ia(i+1)-ia(   1445
      *i),ia(j+1)-ia(j),w)
       return                                                               1446
       end                                                                  1447
@@ -2029,14 +2029,14 @@ c
       dot=s                                                                1459
       return                                                               1460
       end                                                                  1461
-      subroutine lognet (parm,no,ni,nc,x,y,g,jd,vp,cl,ne,nx,nlam,flmin,u   1463 
+      subroutine lognet (parm,no,ni,nc,x,y,g,jd,vp,cl,ne,nx,nlam,flmin,u   1463
      *lam,thr,  isd,intr,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,je
      *rr)
       real x(no,ni),y(no,max(2,nc)),g(no,nc),vp(ni),ulam(nlam)             1464
       real ca(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam),cl(2,ni)         1465
       integer jd(*),ia(nx),nin(nlam)                                       1466
-      real, dimension (:), allocatable :: xm,xs,ww,vq,xv                        
-      integer, dimension (:), allocatable :: ju                                 
+      real, dimension (:), allocatable :: xm,xs,ww,vq,xv
+      integer, dimension (:), allocatable :: ju
       if(maxval(vp) .gt. 0.0)goto 12221                                    1470
       jerr=10000                                                           1470
       return                                                               1470
@@ -2080,7 +2080,7 @@ c
 12341 continue                                                             1485
 12342 continue                                                             1485
 12331 continue                                                             1486
-      call lognet2n(parm,no,ni,x,y(:,1),g(:,1),ww,ju,vq,cl,ne,nx,nlam,fl   1488 
+      call lognet2n(parm,no,ni,x,y(:,1),g(:,1),ww,ju,vq,cl,ne,nx,nlam,fl   1488
      *min,ulam,  thr,isd,intr,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,n
      *lp,jerr)
       goto 12301                                                           1489
@@ -2092,7 +2092,7 @@ c
 12381 continue                                                             1490
 12382 continue                                                             1490
 12371 continue                                                             1491
-      call multlognetn(parm,no,ni,nc,x,y,g,ww,ju,vq,cl,ne,nx,nlam,flmin,   1493 
+      call multlognetn(parm,no,ni,nc,x,y,g,ww,ju,vq,cl,ne,nx,nlam,flmin,   1493
      *ulam,thr,  intr,maxit,xv,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr)
       goto 12391                                                           1494
 12351 continue                                                             1494
@@ -2103,7 +2103,7 @@ c
 12421 continue                                                             1495
 12422 continue                                                             1495
 12411 continue                                                             1496
-      call lognetn(parm,no,ni,nc,x,y,g,ww,ju,vq,cl,ne,nx,nlam,flmin,ulam   1498 
+      call lognetn(parm,no,ni,nc,x,y,g,ww,ju,vq,cl,ne,nx,nlam,flmin,ulam   1498
      *,thr,  isd,intr,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr)
 12391 continue                                                             1499
 12301 continue                                                             1499
@@ -2195,14 +2195,14 @@ c
 12642 continue                                                             1542
       return                                                               1543
       end                                                                  1544
-      subroutine lognet2n(parm,no,ni,x,y,g,w,ju,vp,cl,ne,nx,nlam,flmin,u   1546 
+      subroutine lognet2n(parm,no,ni,x,y,g,w,ju,vp,cl,ne,nx,nlam,flmin,u   1546
      *lam,shri,  isd,intr,maxit,kopt,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jer
      *r)
       real x(no,ni),y(no),g(no),w(no),vp(ni),ulam(nlam),cl(2,ni)           1547
       real a(nx,nlam),a0(nlam),dev(nlam),alm(nlam)                         1548
       integer ju(ni),m(nx),kin(nlam)                                       1549
-      real, dimension (:), allocatable :: b,bs,v,r,xv,q,ga                      
-      integer, dimension (:), allocatable :: mm,ixx                             
+      real, dimension (:), allocatable :: b,bs,v,r,xv,q,ga
+      integer, dimension (:), allocatable :: mm,ixx
       call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)               1554
       allocate(b(0:ni),stat=jerr)                                          1555
       allocate(xv(1:ni),stat=ierr)                                         1555
@@ -2510,7 +2510,7 @@ c
       function azero(n,y,g,q,jerr)                                         1685
       parameter(eps=1.0e-7)                                                1686
       real y(n),g(n),q(n)                                                  1687
-      real, dimension (:), allocatable :: e,p,w                                 
+      real, dimension (:), allocatable :: e,p,w
       allocate(e(1:n),stat=jerr)                                           1691
       allocate(p(1:n),stat=ierr)                                           1691
       jerr=jerr+ierr                                                       1692
@@ -2536,21 +2536,21 @@ c
       deallocate(e,p,w)                                                    1701
       return                                                               1702
       end                                                                  1703
-      subroutine lognetn(parm,no,ni,nc,x,y,g,w,ju,vp,cl,ne,nx,nlam,flmin   1705 
+      subroutine lognetn(parm,no,ni,nc,x,y,g,w,ju,vp,cl,ne,nx,nlam,flmin   1705
      *,ulam,shri,  isd,intr,maxit,kopt,lmu,a0,a,m,kin,dev0,dev,alm,nlp,j
      *err)
       real x(no,ni),y(no,nc),g(no,nc),w(no),vp(ni),ulam(nlam)              1706
       real a(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam),cl(2,ni)          1707
       integer ju(ni),m(nx),kin(nlam)                                       1708
-      real, dimension (:,:), allocatable :: q                                   
-      real, dimension (:), allocatable :: sxp,sxpl                              
-      real, dimension (:), allocatable :: di,v,r,ga                             
-      real, dimension (:,:), allocatable :: b,bs,xv                             
-      integer, dimension (:), allocatable :: mm,is,ixx                          
-      allocate(b(0:ni,1:nc),stat=jerr)                                          
-      allocate(xv(1:ni,1:nc),stat=ierr); jerr=jerr+ierr                         
-      allocate(bs(0:ni,1:nc),stat=ierr); jerr=jerr+ierr                         
-      allocate(q(1:no,1:nc),stat=ierr); jerr=jerr+ierr                          
+      real, dimension (:,:), allocatable :: q
+      real, dimension (:), allocatable :: sxp,sxpl
+      real, dimension (:), allocatable :: di,v,r,ga
+      real, dimension (:,:), allocatable :: b,bs,xv
+      integer, dimension (:), allocatable :: mm,is,ixx
+      allocate(b(0:ni,1:nc),stat=jerr)
+      allocate(xv(1:ni,1:nc),stat=ierr); jerr=jerr+ierr
+      allocate(bs(0:ni,1:nc),stat=ierr); jerr=jerr+ierr
+      allocate(q(1:no,1:nc),stat=ierr); jerr=jerr+ierr
       call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)               1719
       exmn=-exmx                                                           1720
       allocate(r(1:no),stat=ierr)                                          1720
@@ -2766,7 +2766,7 @@ c
       b(k,ic)=0.0                                                          1798
       goto 13881                                                           1799
 13871 continue                                                             1800
-      b(k,ic)=max(cl(1,k),min(cl(2,k),sign(au,u)/  (xv(k,ic)+vp(k)*al2))   1802 
+      b(k,ic)=max(cl(1,k),min(cl(2,k),sign(au,u)/  (xv(k,ic)+vp(k)*al2))   1802
      *)
 13881 continue                                                             1803
 13861 continue                                                             1803
@@ -2812,7 +2812,7 @@ c
       b(k,ic)=0.0                                                          1819
       goto 14011                                                           1820
 14001 continue                                                             1821
-      b(k,ic)=max(cl(1,k),min(cl(2,k),sign(au,u)/  (xv(k,ic)+vp(k)*al2))   1823 
+      b(k,ic)=max(cl(1,k),min(cl(2,k),sign(au,u)/  (xv(k,ic)+vp(k)*al2))   1823
      *)
 14011 continue                                                             1824
 13991 continue                                                             1824
@@ -2954,9 +2954,9 @@ c
       subroutine kazero(kk,n,y,g,q,az,jerr)                                1889
       parameter(eps=1.0e-7)                                                1890
       real y(n,kk),g(n,kk),q(n),az(kk)                                     1891
-      real, dimension (:), allocatable :: s                                     
-      real, dimension (:,:), allocatable :: e                                   
-      allocate(e(1:n,1:kk),stat=jerr)                                           
+      real, dimension (:), allocatable :: s
+      real, dimension (:,:), allocatable :: e
+      allocate(e(1:n,1:kk),stat=jerr)
       allocate(s(1:n),stat=ierr)                                           1896
       jerr=jerr+ierr                                                       1897
       if(jerr.ne.0) return                                                 1898
@@ -3110,7 +3110,7 @@ c
 14590 do 14591 i=1,nt                                                      1953
 14600 do 14601 ic=1,nc                                                     1953
       ans(ic,i)=a0(ic)                                                     1955
-      if(nin.gt.0) ans(ic,i)=ans(ic,i)+dot_product(ca(1:nin,ic),x(i,ia(1   1956 
+      if(nin.gt.0) ans(ic,i)=ans(ic,i)+dot_product(ca(1:nin,ic),x(i,ia(1   1956
      *:nin)))
 14601 continue                                                             1956
 14602 continue                                                             1956
@@ -3118,14 +3118,14 @@ c
 14592 continue                                                             1957
       return                                                               1958
       end                                                                  1959
-      subroutine splognet (parm,no,ni,nc,x,ix,jx,y,g,jd,vp,cl,ne,nx,nlam   1961 
+      subroutine splognet (parm,no,ni,nc,x,ix,jx,y,g,jd,vp,cl,ne,nx,nlam   1961
      *,flmin,  ulam,thr,isd,intr,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,al
      *m,nlp,jerr)
       real x(*),y(no,max(2,nc)),g(no,nc),vp(ni),ulam(nlam)                 1962
       real ca(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam),cl(2,ni)         1963
       integer ix(*),jx(*),jd(*),ia(nx),nin(nlam)                           1964
-      real, dimension (:), allocatable :: xm,xs,ww,vq,xv                        
-      integer, dimension (:), allocatable :: ju                                 
+      real, dimension (:), allocatable :: xm,xs,ww,vq,xv
+      integer, dimension (:), allocatable :: ju
       if(maxval(vp) .gt. 0.0)goto 14621                                    1968
       jerr=10000                                                           1968
       return                                                               1968
@@ -3167,7 +3167,7 @@ c
 14721 continue                                                             1983
 14722 continue                                                             1983
 14711 continue                                                             1984
-      call sprlognet2n(parm,no,ni,x,ix,jx,y(:,1),g(:,1),ww,ju,vq,cl,ne,n   1987 
+      call sprlognet2n(parm,no,ni,x,ix,jx,y(:,1),g(:,1),ww,ju,vq,cl,ne,n   1987
      *x,nlam,  flmin,ulam,thr,isd,intr,maxit,kopt,xm,xs,lmu,a0,ca,ia,nin
      *,dev0,dev,  alm,nlp,jerr)
       goto 14681                                                           1988
@@ -3179,7 +3179,7 @@ c
 14761 continue                                                             1990
 14762 continue                                                             1990
 14751 continue                                                             1991
-      call multsprlognetn(parm,no,ni,nc,x,ix,jx,y,g,ww,ju,vq,cl,ne,nx,nl   1993 
+      call multsprlognetn(parm,no,ni,nc,x,ix,jx,y,g,ww,ju,vq,cl,ne,nx,nl   1993
      *am,flmin,  ulam,thr,intr,maxit,xv,xm,xs,lmu,a0,ca,ia,nin,dev0,dev,
      *alm,nlp,jerr)
       goto 14771                                                           1994
@@ -3191,7 +3191,7 @@ c
 14801 continue                                                             1995
 14802 continue                                                             1995
 14791 continue                                                             1996
-      call sprlognetn(parm,no,ni,nc,x,ix,jx,y,g,ww,ju,vq,cl,ne,nx,nlam,f   1999 
+      call sprlognetn(parm,no,ni,nc,x,ix,jx,y,g,ww,ju,vq,cl,ne,nx,nlam,f   1999
      *lmin,  ulam,thr,isd,intr,maxit,kopt,xm,xs,lmu,a0,ca,  ia,nin,dev0,
      *dev,alm,nlp,jerr)
 14771 continue                                                             2000
@@ -3271,7 +3271,7 @@ c
       jb=ix(j)                                                             2033
       je=ix(j+1)-1                                                         2034
       if(isd .eq. 0)goto 15021                                             2035
-      vc=dot_product(w(jx(jb:je)),x(jb:je)**2)  -dot_product(w(jx(jb:je)   2037 
+      vc=dot_product(w(jx(jb:je)),x(jb:je)**2)  -dot_product(w(jx(jb:je)   2037
      *),x(jb:je))**2
       xs(j)=sqrt(vc)                                                       2038
       goto 15031                                                           2039
@@ -3288,22 +3288,22 @@ c
       jb=ix(j)                                                             2043
       je=ix(j+1)-1                                                         2044
       xm(j)=dot_product(w(jx(jb:je)),x(jb:je))                             2045
-      if(isd.ne.0) xs(j)=sqrt(dot_product(w(jx(jb:je)),x(jb:je)**2)-xm(j   2046 
+      if(isd.ne.0) xs(j)=sqrt(dot_product(w(jx(jb:je)),x(jb:je)**2)-xm(j   2046
      *)**2)
 15041 continue                                                             2047
 15042 continue                                                             2047
       if(isd.eq.0) xs=1.0                                                  2048
       return                                                               2049
       end                                                                  2050
-      subroutine sprlognet2n (parm,no,ni,x,ix,jx,y,g,w,ju,vp,cl,ne,nx,nl   2053 
+      subroutine sprlognet2n (parm,no,ni,x,ix,jx,y,g,w,ju,vp,cl,ne,nx,nl   2053
      *am,  flmin,ulam,shri,isd,intr,maxit,kopt,xb,xs,  lmu,a0,a,m,kin,de
      *v0,dev,alm,nlp,jerr)
       real x(*),y(no),g(no),w(no),vp(ni),ulam(nlam),cl(2,ni)               2054
       real a(nx,nlam),a0(nlam),dev(nlam),alm(nlam)                         2055
       real xb(ni),xs(ni)                                                   2055
       integer ix(*),jx(*),ju(ni),m(nx),kin(nlam)                           2056
-      real, dimension (:), allocatable :: xm,b,bs,v,r,sc,xv,q,ga                
-      integer, dimension (:), allocatable :: mm,ixx                             
+      real, dimension (:), allocatable :: xm,b,bs,v,r,sc,xv,q,ga
+      integer, dimension (:), allocatable :: mm,ixx
       call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)               2061
       allocate(b(0:ni),stat=jerr)                                          2062
       allocate(xm(0:ni),stat=ierr)                                         2062
@@ -3653,21 +3653,21 @@ c
       deallocate(xm,b,bs,v,r,sc,xv,q,mm,ga,ixx)                            2223
       return                                                               2224
       end                                                                  2225
-      subroutine sprlognetn(parm,no,ni,nc,x,ix,jx,y,g,w,ju,vp,cl,ne,nx,n   2227 
+      subroutine sprlognetn(parm,no,ni,nc,x,ix,jx,y,g,w,ju,vp,cl,ne,nx,n   2227
      *lam,flmin,  ulam,shri,isd,intr,maxit,kopt,xb,xs,lmu,a0,a,m,kin,dev
      *0,dev,alm,nlp,jerr)
       real x(*),y(no,nc),g(no,nc),w(no),vp(ni),ulam(nlam),xb(ni),xs(ni)    2228
       real a(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam),cl(2,ni)          2229
       integer ix(*),jx(*),ju(ni),m(nx),kin(nlam)                           2230
-      real, dimension (:,:), allocatable :: q                                   
-      real, dimension (:), allocatable :: sxp,sxpl                              
-      real, dimension (:), allocatable :: sc,xm,v,r,ga                          
-      real, dimension (:,:), allocatable :: b,bs,xv                             
-      integer, dimension (:), allocatable :: mm,is,iy                           
-      allocate(b(0:ni,1:nc),stat=jerr)                                          
-      allocate(xv(1:ni,1:nc),stat=ierr); jerr=jerr+ierr                         
-      allocate(bs(0:ni,1:nc),stat=ierr); jerr=jerr+ierr                         
-      allocate(q(1:no,1:nc),stat=ierr); jerr=jerr+ierr                          
+      real, dimension (:,:), allocatable :: q
+      real, dimension (:), allocatable :: sxp,sxpl
+      real, dimension (:), allocatable :: sc,xm,v,r,ga
+      real, dimension (:,:), allocatable :: b,bs,xv
+      integer, dimension (:), allocatable :: mm,is,iy
+      allocate(b(0:ni,1:nc),stat=jerr)
+      allocate(xv(1:ni,1:nc),stat=ierr); jerr=jerr+ierr
+      allocate(bs(0:ni,1:nc),stat=ierr); jerr=jerr+ierr
+      allocate(q(1:no,1:nc),stat=ierr); jerr=jerr+ierr
       call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)               2241
       exmn=-exmx                                                           2242
       allocate(xm(0:ni),stat=ierr)                                         2242
@@ -3908,7 +3908,7 @@ c
       b(k,ic)=0.0                                                          2338
       goto 16241                                                           2339
 16231 continue                                                             2340
-      b(k,ic)=max(cl(1,k),min(cl(2,k),sign(au,u)/  (xv(k,ic)+vp(k)*al2))   2342 
+      b(k,ic)=max(cl(1,k),min(cl(2,k),sign(au,u)/  (xv(k,ic)+vp(k)*al2))   2342
      *)
 16241 continue                                                             2343
 16221 continue                                                             2343
@@ -3963,7 +3963,7 @@ c
       b(k,ic)=0.0                                                          2367
       goto 16371                                                           2368
 16361 continue                                                             2369
-      b(k,ic)=max(cl(1,k),min(cl(2,k),sign(au,u)/  (xv(k,ic)+vp(k)*al2))   2371 
+      b(k,ic)=max(cl(1,k),min(cl(2,k),sign(au,u)/  (xv(k,ic)+vp(k)*al2))   2371
      *)
 16371 continue                                                             2372
 16351 continue                                                             2372
@@ -4141,13 +4141,13 @@ c
 16672 continue                                                             2453
       return                                                               2454
       end                                                                  2455
-      subroutine coxnet (parm,no,ni,x,y,d,g,w,jd,vp,cl,ne,nx,nlam,flmin,   2457 
+      subroutine coxnet (parm,no,ni,x,y,d,g,w,jd,vp,cl,ne,nx,nlam,flmin,   2457
      *ulam,thr,  maxit,isd,lmu,ca,ia,nin,dev0,dev,alm,nlp,jerr)
       real x(no,ni),y(no),d(no),g(no),w(no),vp(ni),ulam(nlam)              2458
       real ca(nx,nlam),dev(nlam),alm(nlam),cl(2,ni)                        2459
       integer jd(*),ia(nx),nin(nlam)                                       2460
-      real, dimension (:), allocatable :: xs,ww,vq                              
-      integer, dimension (:), allocatable :: ju                                 
+      real, dimension (:), allocatable :: xs,ww,vq
+      integer, dimension (:), allocatable :: ju
       if(maxval(vp) .gt. 0.0)goto 16701                                    2464
       jerr=10000                                                           2464
       return                                                               2464
@@ -4184,7 +4184,7 @@ c
 16791 continue                                                             2477
 16792 continue                                                             2477
 16781 continue                                                             2478
-      call coxnet1(parm,no,ni,x,y,d,g,ww,ju,vq,cl,ne,nx,nlam,flmin,ulam,   2480 
+      call coxnet1(parm,no,ni,x,y,d,g,ww,ju,vq,cl,ne,nx,nlam,flmin,ulam,   2480
      *thr,  isd,maxit,lmu,ca,ia,nin,dev0,dev,alm,nlp,jerr)
       if(jerr.gt.0) return                                                 2480
       dev0=2.0*sw*dev0                                                     2481
@@ -4214,14 +4214,14 @@ c
 16832 continue                                                             2491
       return                                                               2492
       end                                                                  2493
-      subroutine coxnet1(parm,no,ni,x,y,d,g,q,ju,vp,cl,ne,nx,nlam,flmin,   2495 
+      subroutine coxnet1(parm,no,ni,x,y,d,g,q,ju,vp,cl,ne,nx,nlam,flmin,   2495
      *ulam,cthri,  isd,maxit,lmu,ao,m,kin,dev0,dev,alm,nlp,jerr)
       real x(no,ni),y(no),q(no),d(no),g(no),vp(ni),ulam(nlam)              2496
       real ao(nx,nlam),dev(nlam),alm(nlam),cl(2,ni)                        2497
       integer ju(ni),m(nx),kin(nlam)                                       2498
-      real, dimension (:), allocatable :: w,dk,v,xs,wr,a,as,f,dq                
-      real, dimension (:), allocatable :: e,uu,ga                               
-      integer, dimension (:), allocatable :: jp,kp,mm,ixx                       
+      real, dimension (:), allocatable :: w,dk,v,xs,wr,a,as,f,dq
+      real, dimension (:), allocatable :: e,uu,ga
+      integer, dimension (:), allocatable :: jp,kp,mm,ixx
       call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)               2504
       sml=sml*100.0                                                        2504
       devmax=devmax*0.99/0.999                                             2505
@@ -4353,7 +4353,7 @@ c
       at=0.0                                                               2557
       goto 17081                                                           2558
 17071 continue                                                             2558
-      at=max(cl(1,j),min(cl(2,j),sign(abs(u)-vp(j)*sa,u)/  (v(j)+vp(j)*o   2560 
+      at=max(cl(1,j),min(cl(2,j),sign(abs(u)-vp(j)*sa,u)/  (v(j)+vp(j)*o   2560
      *mal)))
 17081 continue                                                             2561
 17061 continue                                                             2561
@@ -4389,7 +4389,7 @@ c
       at=0.0                                                               2573
       goto 17191                                                           2574
 17181 continue                                                             2574
-      at=max(cl(1,j),min(cl(2,j),sign(abs(u)-vp(j)*sa,u)/  (v(j)+vp(j)*o   2576 
+      at=max(cl(1,j),min(cl(2,j),sign(abs(u)-vp(j)*sa,u)/  (v(j)+vp(j)*o   2576
      *mal)))
 17191 continue                                                             2577
 17171 continue                                                             2577
@@ -4636,9 +4636,9 @@ c
       end                                                                  2686
       subroutine loglike(no,ni,x,y,d,g,w,nlam,a,flog,jerr)                 2687
       real x(no,ni),y(no),d(no),g(no),w(no),a(ni,nlam),flog(nlam)          2688
-      real, dimension (:), allocatable :: dk,f,xm,dq,q                          
-      real, dimension (:), allocatable :: e,uu                                  
-      integer, dimension (:), allocatable :: jp,kp                              
+      real, dimension (:), allocatable :: dk,f,xm,dq,q
+      real, dimension (:), allocatable :: e,uu
+      integer, dimension (:), allocatable :: jp,kp
       allocate(e(1:no),stat=jerr)                                          2694
       allocate(q(1:no),stat=ierr)                                          2694
       jerr=jerr+ierr                                                       2695
@@ -4686,13 +4686,13 @@ c
       deallocate(e,uu,dk,f,jp,kp,dq)                                       2716
       return                                                               2717
       end                                                                  2718
-      subroutine fishnet (parm,no,ni,x,y,g,w,jd,vp,cl,ne,nx,nlam,flmin,u   2720 
+      subroutine fishnet (parm,no,ni,x,y,g,w,jd,vp,cl,ne,nx,nlam,flmin,u   2720
      *lam,thr,  isd,intr,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr)
       real x(no,ni),y(no),g(no),w(no),vp(ni),ulam(nlam)                    2721
       real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam),cl(2,ni)               2722
       integer jd(*),ia(nx),nin(nlam)                                       2723
-      real, dimension (:), allocatable :: xm,xs,ww,vq                           
-      integer, dimension (:), allocatable :: ju                                 
+      real, dimension (:), allocatable :: xm,xs,ww,vq
+      integer, dimension (:), allocatable :: ju
       if(maxval(vp) .gt. 0.0)goto 17701                                    2727
       jerr=10000                                                           2727
       return                                                               2727
@@ -4735,7 +4735,7 @@ c
 17811 continue                                                             2742
 17812 continue                                                             2742
 17801 continue                                                             2743
-      call fishnet1(parm,no,ni,x,y,g,ww,ju,vq,cl,ne,nx,nlam,flmin,ulam,t   2745 
+      call fishnet1(parm,no,ni,x,y,g,ww,ju,vq,cl,ne,nx,nlam,flmin,ulam,t   2745
      *hr,  isd,intr,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr)
       if(jerr.gt.0) go to 12180                                            2745
       dev0=2.0*sw*dev0                                                     2746
@@ -4756,13 +4756,13 @@ c
       if(isd.gt.0) deallocate(xs)                                          2752
       return                                                               2753
       end                                                                  2754
-      subroutine fishnet1(parm,no,ni,x,y,g,q,ju,vp,cl,ne,nx,nlam,flmin,u   2756 
+      subroutine fishnet1(parm,no,ni,x,y,g,q,ju,vp,cl,ne,nx,nlam,flmin,u   2756
      *lam,shri,  isd,intr,maxit,lmu,a0,ca,m,kin,dev0,dev,alm,nlp,jerr)
       real x(no,ni),y(no),g(no),q(no),vp(ni),ulam(nlam)                    2757
       real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam),cl(2,ni)               2758
       integer ju(ni),m(nx),kin(nlam)                                       2759
-      real, dimension (:), allocatable :: t,w,wr,v,a,f,as,ga                    
-      integer, dimension (:), allocatable :: mm,ixx                             
+      real, dimension (:), allocatable :: t,w,wr,v,a,f,as,ga
+      integer, dimension (:), allocatable :: mm,ixx
       call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)               2763
       sml=sml*10.0                                                         2764
       allocate(a(1:ni),stat=jerr)                                          2765
@@ -5062,7 +5062,7 @@ c
       end                                                                  2886
       subroutine deviance(no,ni,x,y,g,q,nlam,a0,a,flog,jerr)               2887
       real x(no,ni),y(no),g(no),q(no),a(ni,nlam),a0(nlam),flog(nlam)       2888
-      real, dimension (:), allocatable :: w                                     
+      real, dimension (:), allocatable :: w
       if(minval(y) .ge. 0.0)goto 18461                                     2891
       jerr=8888                                                            2891
       return                                                               2891
@@ -5092,14 +5092,14 @@ c
       deallocate(w)                                                        2903
       return                                                               2904
       end                                                                  2905
-      subroutine spfishnet (parm,no,ni,x,ix,jx,y,g,w,jd,vp,cl,ne,nx,nlam   2907 
+      subroutine spfishnet (parm,no,ni,x,ix,jx,y,g,w,jd,vp,cl,ne,nx,nlam   2907
      *,flmin,  ulam,thr,isd,intr,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp
      *,jerr)
       real x(*),y(no),g(no),w(no),vp(ni),ulam(nlam),cl(2,ni)               2908
       real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam)                        2909
       integer ix(*),jx(*),jd(*),ia(nx),nin(nlam)                           2910
-      real, dimension (:), allocatable :: xm,xs,ww,vq                           
-      integer, dimension (:), allocatable :: ju                                 
+      real, dimension (:), allocatable :: xm,xs,ww,vq
+      integer, dimension (:), allocatable :: ju
       if(maxval(vp) .gt. 0.0)goto 18521                                    2914
       jerr=10000                                                           2914
       return                                                               2914
@@ -5140,7 +5140,7 @@ c
 18611 continue                                                             2929
 18612 continue                                                             2929
 18601 continue                                                             2930
-      call spfishnet1(parm,no,ni,x,ix,jx,y,g,ww,ju,vq,cl,ne,nx,nlam,flmi   2932 
+      call spfishnet1(parm,no,ni,x,ix,jx,y,g,ww,ju,vq,cl,ne,nx,nlam,flmi   2932
      *n,ulam,thr,  isd,intr,maxit,xm,xs,lmu,a0,ca,ia,nin,dev0,dev,alm,nl
      *p,jerr)
       if(jerr.gt.0) go to 12180                                            2932
@@ -5161,14 +5161,14 @@ c
       deallocate(ww,ju,vq,xm,xs)                                           2939
       return                                                               2940
       end                                                                  2941
-      subroutine spfishnet1(parm,no,ni,x,ix,jx,y,g,q,ju,vp,cl,ne,nx,nlam   2943 
+      subroutine spfishnet1(parm,no,ni,x,ix,jx,y,g,q,ju,vp,cl,ne,nx,nlam   2943
      *,flmin,ulam,  shri,isd,intr,maxit,xb,xs,lmu,a0,ca,m,kin,dev0,dev,a
      *lm,nlp,jerr)
       real x(*),y(no),g(no),q(no),vp(ni),ulam(nlam),xb(ni),xs(ni)          2944
       real ca(nx,nlam),a0(nlam),dev(nlam),alm(nlam),cl(2,ni)               2945
       integer ix(*),jx(*),ju(ni),m(nx),kin(nlam)                           2946
-      real, dimension (:), allocatable :: qy,t,w,wr,v,a,as,xm,ga                
-      integer, dimension (:), allocatable :: mm,ixx                             
+      real, dimension (:), allocatable :: qy,t,w,wr,v,a,as,xm,ga
+      integer, dimension (:), allocatable :: mm,ixx
       call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)               2950
       sml=sml*10.0                                                         2951
       allocate(a(1:ni),stat=jerr)                                          2952
@@ -5271,7 +5271,7 @@ c
       if(ju(j).eq.0)goto 18791                                             2986
       jb=ix(j)                                                             2986
       je=ix(j+1)-1                                                         2987
-      ga(j)=abs(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(j)-ww*xb(j)   2989 
+      ga(j)=abs(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(j)-ww*xb(j)   2989
      *)-xb(j)*tt)/xs(j)
 18791 continue                                                             2990
 18792 continue                                                             2990
@@ -5316,7 +5316,7 @@ c
       jb=ix(j)                                                             3005
       je=ix(j+1)-1                                                         3006
       xm(j)=dot_product(w(jx(jb:je)),x(jb:je))                             3007
-      v(j)=(dot_product(w(jx(jb:je)),x(jb:je)**2)  -2.0*xb(j)*xm(j)+ww*x   3009 
+      v(j)=(dot_product(w(jx(jb:je)),x(jb:je)**2)  -2.0*xb(j)*xm(j)+ww*x   3009
      *b(j)**2)/xs(j)**2
 18891 continue                                                             3010
 18892 continue                                                             3010
@@ -5329,7 +5329,7 @@ c
       jb=ix(k)                                                             3012
       je=ix(k+1)-1                                                         3012
       ak=a(k)                                                              3013
-      u=(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(k)-ww*xb(k))-xb(k)   3015 
+      u=(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(k)-ww*xb(k))-xb(k)   3015
      **tt)/xs(k)+v(k)*ak
       au=abs(u)-vp(k)*al1                                                  3016
       if(au .gt. 0.0)goto 18931                                            3016
@@ -5376,7 +5376,7 @@ c
       jb=ix(k)                                                             3036
       je=ix(k+1)-1                                                         3036
       ak=a(k)                                                              3037
-      u=(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(k)-ww*xb(k))-xb(k)   3039 
+      u=(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(k)-ww*xb(k))-xb(k)   3039
      **tt)/xs(k)+v(k)*ak
       au=abs(u)-vp(k)*al1                                                  3040
       if(au .gt. 0.0)goto 19041                                            3040
@@ -5433,7 +5433,7 @@ c
       jb=ix(j)                                                             3065
       je=ix(j+1)-1                                                         3066
       xm(j)=dot_product(w(jx(jb:je)),x(jb:je))                             3067
-      ga(j)=abs(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(j)-ww*xb(j)   3069 
+      ga(j)=abs(dot_product(wr(jx(jb:je)),x(jb:je))  -uu*(xm(j)-ww*xb(j)   3069
      *)-xb(j)*tt)/xs(j)
       if(ga(j) .le. al1*vp(j))goto 19171                                   3069
       ixx(j)=1                                                             3069
@@ -5477,7 +5477,7 @@ c
       subroutine spdeviance(no,ni,x,ix,jx,y,g,q,nlam,a0,a,flog,jerr)       3090
       real x(*),y(no),g(no),q(no),a(ni,nlam),a0(nlam),flog(nlam)           3091
       integer ix(*),jx(*)                                                  3092
-      real, dimension (:), allocatable :: w,f                                   
+      real, dimension (:), allocatable :: w,f
       if(minval(y) .ge. 0.0)goto 19221                                     3095
       jerr=8888                                                            3095
       return                                                               3095
@@ -5512,11 +5512,11 @@ c
       deallocate(w,f)                                                      3110
       return                                                               3111
       end                                                                  3112
-      subroutine cspdeviance(no,x,ix,jx,y,g,q,nx,nlam,a0,ca,ia,nin,flog,   3113 
+      subroutine cspdeviance(no,x,ix,jx,y,g,q,nx,nlam,a0,ca,ia,nin,flog,   3113
      *jerr)
       real x(*),y(no),g(no),q(no),ca(nx,nlam),a0(nlam),flog(nlam)          3114
       integer ix(*),jx(*),nin(nlam),ia(nx)                                 3115
-      real, dimension (:), allocatable :: w,f                                   
+      real, dimension (:), allocatable :: w,f
       if(minval(y) .ge. 0.0)goto 19281                                     3118
       jerr=8888                                                            3118
       return                                                               3118
@@ -5551,13 +5551,13 @@ c
       deallocate(w,f)                                                      3133
       return                                                               3134
       end                                                                  3135
-      subroutine multelnet  (parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,flm   3138 
+      subroutine multelnet  (parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,flm   3138
      *in,ulam,thr,isd,jsd,intr,maxit,  lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr
      *)
       real x(no,ni),y(no,nr),w(no),vp(ni),ca(nx,nr,nlam)                   3139
       real ulam(nlam),a0(nr,nlam),rsq(nlam),alm(nlam),cl(2,ni)             3140
       integer jd(*),ia(nx),nin(nlam)                                       3141
-      real, dimension (:), allocatable :: vq;                                   
+      real, dimension (:), allocatable :: vq;
       if(maxval(vp) .gt. 0.0)goto 19341                                    3144
       jerr=10000                                                           3144
       return                                                               3144
@@ -5566,21 +5566,21 @@ c
       if(jerr.ne.0) return                                                 3146
       vq=max(0.0,vp)                                                       3146
       vq=vq*ni/sum(vq)                                                     3147
-      call multelnetn(parm,no,ni,nr,x,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam   3149 
+      call multelnetn(parm,no,ni,nr,x,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam   3149
      *,thr,isd,  jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr)
       deallocate(vq)                                                       3150
       return                                                               3151
       end                                                                  3152
-      subroutine multelnetn (parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,flm   3154 
+      subroutine multelnetn (parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,flm   3154
      *in,ulam,thr,  isd,jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr
      *)
       real vp(ni),x(no,ni),y(no,nr),w(no),ulam(nlam),cl(2,ni)              3155
       real ca(nx,nr,nlam),a0(nr,nlam),rsq(nlam),alm(nlam)                  3156
       integer jd(*),ia(nx),nin(nlam)                                       3157
-      real, dimension (:), allocatable :: xm,xs,xv,ym,ys                        
-      integer, dimension (:), allocatable :: ju                                 
-      real, dimension (:,:,:), allocatable :: clt                               
-      allocate(clt(1:2,1:nr,1:ni),stat=jerr);                                   
+      real, dimension (:), allocatable :: xm,xs,xv,ym,ys
+      integer, dimension (:), allocatable :: ju
+      real, dimension (:,:,:), allocatable :: clt
+      allocate(clt(1:2,1:nr,1:ni),stat=jerr);
       allocate(xm(1:ni),stat=ierr)                                         3163
       jerr=jerr+ierr                                                       3164
       allocate(xs(1:ni),stat=ierr)                                         3164
@@ -5600,7 +5600,7 @@ c
       jerr=7777                                                            3172
       return                                                               3172
 19361 continue                                                             3173
-      call multstandard1(no,ni,nr,x,y,w,isd,jsd,intr,ju,xm,xs,ym,ys,xv,y   3174 
+      call multstandard1(no,ni,nr,x,y,w,isd,jsd,intr,ju,xm,xs,ym,ys,xv,y   3174
      *s0,jerr)
       if(jerr.ne.0) return                                                 3175
 19370 do 19371 j=1,ni                                                      3175
@@ -5637,7 +5637,7 @@ c
 19471 continue                                                             3177
 19472 continue                                                             3177
 19461 continue                                                             3178
-      call multelnet2(parm,ni,nr,ju,vp,clt,y,no,ne,nx,x,nlam,flmin,ulam,   3180 
+      call multelnet2(parm,ni,nr,ju,vp,clt,y,no,ne,nx,x,nlam,flmin,ulam,   3180
      *thr,maxit,xv,  ys0,lmu,ca,ia,nin,rsq,alm,nlp,jerr)
       if(jerr.gt.0) return                                                 3181
 19500 do 19501 k=1,lmu                                                     3181
@@ -5661,11 +5661,11 @@ c
       deallocate(xm,xs,ym,ys,ju,xv,clt)                                    3189
       return                                                               3190
       end                                                                  3191
-      subroutine multstandard1  (no,ni,nr,x,y,w,isd,jsd,intr,ju,xm,xs,ym   3193 
+      subroutine multstandard1  (no,ni,nr,x,y,w,isd,jsd,intr,ju,xm,xs,ym   3193
      *,ys,xv,ys0,jerr)
       real x(no,ni),y(no,nr),w(no),xm(ni),xs(ni),xv(ni),ym(nr),ys(nr)      3194
       integer ju(ni)                                                       3195
-      real, dimension (:), allocatable :: v                                     
+      real, dimension (:), allocatable :: v
       allocate(v(1:no),stat=jerr)                                          3198
       if(jerr.ne.0) return                                                 3199
       w=w/sum(w)                                                           3199
@@ -5756,15 +5756,15 @@ c
       deallocate(v)                                                        3235
       return                                                               3236
       end                                                                  3237
-      subroutine multelnet2(beta,ni,nr,ju,vp,cl,y,no,ne,nx,x,nlam,flmin,   3239 
+      subroutine multelnet2(beta,ni,nr,ju,vp,cl,y,no,ne,nx,x,nlam,flmin,   3239
      *ulam,thri,  maxit,xv,ys0,lmu,ao,ia,kin,rsqo,almo,nlp,jerr)
       real vp(ni),y(no,nr),x(no,ni),ulam(nlam),ao(nx,nr,nlam)              3240
       real rsqo(nlam),almo(nlam),xv(ni),cl(2,nr,ni)                        3241
       integer ju(ni),ia(nx),kin(nlam)                                      3242
-      real, dimension (:), allocatable :: g,gk,del,gj                           
-      integer, dimension (:), allocatable :: mm,ix,isc                          
-      real, dimension (:,:), allocatable :: a                                   
-      allocate(a(1:nr,1:ni),stat=jerr)                                          
+      real, dimension (:), allocatable :: g,gk,del,gj
+      integer, dimension (:), allocatable :: mm,ix,isc
+      real, dimension (:,:), allocatable :: a
+      allocate(a(1:nr,1:ni),stat=jerr)
       call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)               3249
       allocate(gj(1:nr),stat=ierr)                                         3249
       jerr=jerr+ierr                                                       3250
@@ -5863,7 +5863,7 @@ c
       goto 19951                                                           3287
 19941 continue                                                             3287
       a(:,k)=gk*(u/(xv(k)+dem*vp(k)))                                      3288
-      call chkbnds(nr,gk,gkn,xv(k),cl(1,1,k),  dem*vp(k),ab*vp(k),a(:,k)   3290 
+      call chkbnds(nr,gk,gkn,xv(k),cl(1,1,k),  dem*vp(k),ab*vp(k),a(:,k)   3290
      *,isc,jerr)
       if(jerr.ne.0) return                                                 3291
 19951 continue                                                             3292
@@ -5932,7 +5932,7 @@ c
       goto 20121                                                           3319
 20111 continue                                                             3319
       a(:,k)=gk*(u/(xv(k)+dem*vp(k)))                                      3320
-      call chkbnds(nr,gk,gkn,xv(k),cl(1,1,k),  dem*vp(k),ab*vp(k),a(:,k)   3322 
+      call chkbnds(nr,gk,gkn,xv(k),cl(1,1,k),  dem*vp(k),ab*vp(k),a(:,k)   3322
      *,isc,jerr)
       if(jerr.ne.0) return                                                 3323
 20121 continue                                                             3324
@@ -6173,13 +6173,13 @@ c
 20542 continue                                                             3419
       return                                                               3420
       end                                                                  3421
-      subroutine multspelnet  (parm,no,ni,nr,x,ix,jx,y,w,jd,vp,cl,ne,nx,   3424 
+      subroutine multspelnet  (parm,no,ni,nr,x,ix,jx,y,w,jd,vp,cl,ne,nx,   3424
      *nlam,flmin,ulam,thr,isd,  jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,
      *nlp,jerr)
       real x(*),y(no,nr),w(no),vp(ni),ulam(nlam),cl(2,ni)                  3425
       real ca(nx,nr,nlam),a0(nr,nlam),rsq(nlam),alm(nlam)                  3426
       integer ix(*),jx(*),jd(*),ia(nx),nin(nlam)                           3427
-      real, dimension (:), allocatable :: vq;                                   
+      real, dimension (:), allocatable :: vq;
       if(maxval(vp) .gt. 0.0)goto 20571                                    3430
       jerr=10000                                                           3430
       return                                                               3430
@@ -6188,22 +6188,22 @@ c
       if(jerr.ne.0) return                                                 3432
       vq=max(0.0,vp)                                                       3432
       vq=vq*ni/sum(vq)                                                     3433
-      call multspelnetn(parm,no,ni,nr,x,ix,jx,y,w,jd,vq,cl,ne,nx,nlam,fl   3435 
+      call multspelnetn(parm,no,ni,nr,x,ix,jx,y,w,jd,vq,cl,ne,nx,nlam,fl   3435
      *min,  ulam,thr,isd,jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jer
      *r)
       deallocate(vq)                                                       3436
       return                                                               3437
       end                                                                  3438
-      subroutine multspelnetn(parm,no,ni,nr,x,ix,jx,y,w,jd,vp,cl,ne,nx,n   3440 
+      subroutine multspelnetn(parm,no,ni,nr,x,ix,jx,y,w,jd,vp,cl,ne,nx,n   3440
      *lam,flmin,  ulam,thr,isd,jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,n
      *lp,jerr)
       real x(*),vp(ni),y(no,nr),w(no),ulam(nlam),cl(2,ni)                  3441
       real ca(nx,nr,nlam),a0(nr,nlam),rsq(nlam),alm(nlam)                  3442
       integer ix(*),jx(*),jd(*),ia(nx),nin(nlam)                           3443
-      real, dimension (:), allocatable :: xm,xs,xv,ym,ys                        
-      integer, dimension (:), allocatable :: ju                                 
-      real, dimension (:,:,:), allocatable :: clt                               
-      allocate(clt(1:2,1:nr,1:ni),stat=jerr)                                    
+      real, dimension (:), allocatable :: xm,xs,xv,ym,ys
+      integer, dimension (:), allocatable :: ju
+      real, dimension (:,:,:), allocatable :: clt
+      allocate(clt(1:2,1:nr,1:ni),stat=jerr)
       allocate(xm(1:ni),stat=ierr)                                         3449
       jerr=jerr+ierr                                                       3450
       allocate(xs(1:ni),stat=ierr)                                         3450
@@ -6223,7 +6223,7 @@ c
       jerr=7777                                                            3458
       return                                                               3458
 20591 continue                                                             3459
-      call multspstandard1(no,ni,nr,x,ix,jx,y,w,ju,isd,jsd,intr,  xm,xs,   3461 
+      call multspstandard1(no,ni,nr,x,ix,jx,y,w,ju,isd,jsd,intr,  xm,xs,   3461
      *ym,ys,xv,ys0,jerr)
       if(jerr.ne.0) return                                                 3462
 20600 do 20601 j=1,ni                                                      3462
@@ -6260,7 +6260,7 @@ c
 20701 continue                                                             3464
 20702 continue                                                             3464
 20691 continue                                                             3465
-      call multspelnet2(parm,ni,nr,y,w,no,ne,nx,x,ix,jx,ju,vp,clt,nlam,f   3467 
+      call multspelnet2(parm,ni,nr,y,w,no,ne,nx,x,ix,jx,ju,vp,clt,nlam,f   3467
      *lmin,  ulam,thr,maxit,xm,xs,xv,ys0,lmu,ca,ia,nin,rsq,alm,nlp,jerr)
       if(jerr.gt.0) return                                                 3468
 20730 do 20731 k=1,lmu                                                     3468
@@ -6284,7 +6284,7 @@ c
       deallocate(xm,xs,ym,ys,ju,xv,clt)                                    3476
       return                                                               3477
       end                                                                  3478
-      subroutine multspstandard1(no,ni,nr,x,ix,jx,y,w,ju,isd,jsd,intr,     3480 
+      subroutine multspstandard1(no,ni,nr,x,ix,jx,y,w,ju,isd,jsd,intr,     3480
      *xm,xs,ym,ys,xv,ys0,jerr)
       real x(*),y(no,nr),w(no),xm(ni),xs(ni),xv(ni),ym(nr),ys(nr)          3481
       integer ix(*),jx(*),ju(ni)                                           3482
@@ -6368,16 +6368,16 @@ c
 20971 continue                                                             3514
       return                                                               3515
       end                                                                  3516
-      subroutine multspelnet2(beta,ni,nr,y,w,no,ne,nx,x,ix,jx,ju,vp,cl,n   3518 
+      subroutine multspelnet2(beta,ni,nr,y,w,no,ne,nx,x,ix,jx,ju,vp,cl,n   3518
      *lam,flmin,  ulam,thri,maxit,xm,xs,xv,ys0,lmu,ao,ia,kin,rsqo,almo,n
      *lp,jerr)
       real y(no,nr),w(no),x(*),vp(ni),ulam(nlam),cl(2,nr,ni)               3519
       real ao(nx,nr,nlam),rsqo(nlam),almo(nlam),xm(ni),xs(ni),xv(ni)       3520
       integer ix(*),jx(*),ju(ni),ia(nx),kin(nlam)                          3521
-      real, dimension (:), allocatable :: g,gj,gk,del,o                         
-      integer, dimension (:), allocatable :: mm,iy,isc                          
-      real, dimension (:,:), allocatable :: a                                   
-      allocate(a(1:nr,1:ni),stat=jerr)                                          
+      real, dimension (:), allocatable :: g,gj,gk,del,o
+      integer, dimension (:), allocatable :: mm,iy,isc
+      real, dimension (:,:), allocatable :: a
+      allocate(a(1:nr,1:ni),stat=jerr)
       call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)               3528
       allocate(mm(1:ni),stat=ierr)                                         3528
       jerr=jerr+ierr                                                       3529
@@ -6419,7 +6419,7 @@ c
       je=ix(j+1)-1                                                         3540
       g(j)=0.0                                                             3541
 21030 do 21031 k=1,nr                                                      3542
-      g(j)=g(j)+(dot_product(y(jx(jb:je),k),w(jx(jb:je))*x(jb:je))/xs(j)   3543 
+      g(j)=g(j)+(dot_product(y(jx(jb:je),k),w(jx(jb:je))*x(jb:je))/xs(j)   3543
      *)**2
 21031 continue                                                             3544
 21032 continue                                                             3544
@@ -6484,7 +6484,7 @@ c
       goto 21171                                                           3570
 21161 continue                                                             3570
       a(:,k)=gk*(u/(xv(k)+dem*vp(k)))                                      3571
-      call chkbnds(nr,gk,gkn,xv(k),cl(1,1,k),  dem*vp(k),ab*vp(k),a(:,k)   3573 
+      call chkbnds(nr,gk,gkn,xv(k),cl(1,1,k),  dem*vp(k),ab*vp(k),a(:,k)   3573
      *,isc,jerr)
       if(jerr.ne.0) return                                                 3574
 21171 continue                                                             3575
@@ -6516,7 +6516,7 @@ c
       je=ix(j+1)-1                                                         3587
       g(j)=0.0                                                             3588
 21240 do 21241 k=1,nr                                                      3588
-      g(j)=g(j)+  (dot_product(y(jx(jb:je),k)+o(k),w(jx(jb:je))*x(jb:je)   3590 
+      g(j)=g(j)+  (dot_product(y(jx(jb:je),k)+o(k),w(jx(jb:je))*x(jb:je)   3590
      *)/xs(j))**2
 21241 continue                                                             3591
 21242 continue                                                             3591
@@ -6546,7 +6546,7 @@ c
       je=ix(k+1)-1                                                         3600
       gkn=0.0                                                              3601
 21310 do 21311 j=1,nr                                                      3601
-      gj(j)=  dot_product(y(jx(jb:je),j)+o(j),w(jx(jb:je))*x(jb:je))/xs(   3603 
+      gj(j)=  dot_product(y(jx(jb:je),j)+o(j),w(jx(jb:je))*x(jb:je))/xs(   3603
      *k)
       gk(j)=gj(j)+a(j,k)*xv(k)                                             3603
       gkn=gkn+gk(j)**2                                                     3604
@@ -6560,7 +6560,7 @@ c
       goto 21341                                                           3607
 21331 continue                                                             3607
       a(:,k)=gk*(u/(xv(k)+dem*vp(k)))                                      3608
-      call chkbnds(nr,gk,gkn,xv(k),cl(1,1,k),  dem*vp(k),ab*vp(k),a(:,k)   3610 
+      call chkbnds(nr,gk,gkn,xv(k),cl(1,1,k),  dem*vp(k),ab*vp(k),a(:,k)   3610
      *,isc,jerr)
       if(jerr.ne.0) return                                                 3611
 21341 continue                                                             3612
@@ -6615,19 +6615,19 @@ c
       deallocate(a,mm,g,iy,gj,gk,del,o)                                    3631
       return                                                               3632
       end                                                                  3633
-      subroutine multlognetn(parm,no,ni,nc,x,y,g,w,ju,vp,cl,ne,nx,nlam,f   3635 
+      subroutine multlognetn(parm,no,ni,nc,x,y,g,w,ju,vp,cl,ne,nx,nlam,f   3635
      *lmin,ulam,  shri,intr,maxit,xv,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jer
      *r)
       real x(no,ni),y(no,nc),g(no,nc),w(no),vp(ni),ulam(nlam),cl(2,ni)     3636
       real a(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam),xv(ni)            3637
       integer ju(ni),m(nx),kin(nlam)                                       3638
-      real, dimension (:,:), allocatable :: q,r,b,bs                            
-      real, dimension (:), allocatable :: sxp,sxpl,ga,gk,del                    
-      integer, dimension (:), allocatable :: mm,is,ixx,isc                      
-      allocate(b(0:ni,1:nc),stat=jerr)                                          
-      allocate(bs(0:ni,1:nc),stat=ierr); jerr=jerr+ierr                         
-      allocate(q(1:no,1:nc),stat=ierr); jerr=jerr+ierr                          
-      allocate(r(1:no,1:nc),stat=ierr); jerr=jerr+ierr;                         
+      real, dimension (:,:), allocatable :: q,r,b,bs
+      real, dimension (:), allocatable :: sxp,sxpl,ga,gk,del
+      integer, dimension (:), allocatable :: mm,is,ixx,isc
+      allocate(b(0:ni,1:nc),stat=jerr)
+      allocate(bs(0:ni,1:nc),stat=ierr); jerr=jerr+ierr
+      allocate(q(1:no,1:nc),stat=ierr); jerr=jerr+ierr
+      allocate(r(1:no,1:nc),stat=ierr); jerr=jerr+ierr;
       call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)               3647
       exmn=-exmx                                                           3648
       allocate(mm(1:ni),stat=ierr)                                         3648
@@ -6830,7 +6830,7 @@ c
       goto 21881                                                           3722
 21871 continue                                                             3722
       b(k,:)=gk*(u/(xv(k)+vp(k)*al2t))                                     3723
-      call chkbnds1(nc,gk,gkn,xv(k),cl(1,k),  cl(2,k),vp(k)*al2t,alt*vp(   3725 
+      call chkbnds1(nc,gk,gkn,xv(k),cl(1,k),  cl(2,k),vp(k)*al2t,alt*vp(   3725
      *k),b(k,:),isc,jerr)
       if(jerr.ne.0) return                                                 3726
 21881 continue                                                             3727
@@ -6879,7 +6879,7 @@ c
       goto 22011                                                           3745
 22001 continue                                                             3745
       b(k,:)=gk*(u/(xv(k)+vp(k)*al2t))                                     3746
-      call chkbnds1(nc,gk,gkn,xv(k),cl(1,k),  cl(2,k),vp(k)*al2t,alt*vp(   3748 
+      call chkbnds1(nc,gk,gkn,xv(k),cl(1,k),  cl(2,k),vp(k)*al2t,alt*vp(   3748
      *k),b(k,:),isc,jerr)
       if(jerr.ne.0) return                                                 3749
 22011 continue                                                             3750
@@ -7004,20 +7004,20 @@ c
       deallocate(sxp,b,bs,r,q,mm,is,ga,ixx,gk,del,sxpl)                    3809
       return                                                               3810
       end                                                                  3811
-      subroutine multsprlognetn(parm,no,ni,nc,x,ix,jx,y,g,w,ju,vp,cl,ne,   3813 
+      subroutine multsprlognetn(parm,no,ni,nc,x,ix,jx,y,g,w,ju,vp,cl,ne,   3813
      *nx,nlam,  flmin,ulam,shri,intr,maxit,xv,xb,xs,lmu,a0,a,m,kin,dev0,
      *dev,alm,nlp,jerr)
-      real x(*),y(no,nc),g(no,nc),w(no),vp(ni),ulam(nlam),xb(ni),xs(ni),   3814 
+      real x(*),y(no,nc),g(no,nc),w(no),vp(ni),ulam(nlam),xb(ni),xs(ni),   3814
      *xv(ni)
       real a(nx,nc,nlam),a0(nc,nlam),dev(nlam),alm(nlam),cl(2,ni)          3815
       integer ix(*),jx(*),ju(ni),m(nx),kin(nlam)                           3816
-      real, dimension (:,:), allocatable :: q,r,b,bs                            
-      real, dimension (:), allocatable :: sxp,sxpl,ga,gk,del,sc,svr             
-      integer, dimension (:), allocatable :: mm,is,iy,isc                       
-      allocate(b(0:ni,1:nc),stat=jerr)                                          
-      allocate(bs(0:ni,1:nc),stat=ierr); jerr=jerr+ierr                         
-      allocate(q(1:no,1:nc),stat=ierr); jerr=jerr+ierr                          
-      allocate(r(1:no,1:nc),stat=ierr); jerr=jerr+ierr                          
+      real, dimension (:,:), allocatable :: q,r,b,bs
+      real, dimension (:), allocatable :: sxp,sxpl,ga,gk,del,sc,svr
+      integer, dimension (:), allocatable :: mm,is,iy,isc
+      allocate(b(0:ni,1:nc),stat=jerr)
+      allocate(bs(0:ni,1:nc),stat=ierr); jerr=jerr+ierr
+      allocate(q(1:no,1:nc),stat=ierr); jerr=jerr+ierr
+      allocate(r(1:no,1:nc),stat=ierr); jerr=jerr+ierr
       call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)               3825
       exmn=-exmx                                                           3826
       allocate(mm(1:ni),stat=ierr)                                         3826
@@ -7231,7 +7231,7 @@ c
       goto 22721                                                           3906
 22711 continue                                                             3907
       b(k,:)=gk*(u/(xv(k)+vp(k)*al2t))                                     3908
-      call chkbnds1(nc,gk,gkn,xv(k),cl(1,k),cl(2,k),  vp(k)*al2t,alt*vp(   3910 
+      call chkbnds1(nc,gk,gkn,xv(k),cl(1,k),cl(2,k),  vp(k)*al2t,alt*vp(   3910
      *k),b(k,:),isc,jerr)
       if(jerr.ne.0) return                                                 3911
 22721 continue                                                             3912
@@ -7240,7 +7240,7 @@ c
       if(maxval(abs(del)).le.0.0)goto 22681                                3913
 22730 do 22731 ic=1,nc                                                     3913
       dlx=max(dlx,xv(k)*del(ic)**2)                                        3914
-      r(jx(jb:je),ic)=r(jx(jb:je),ic)  -del(ic)*w(jx(jb:je))*(x(jb:je)-x   3916 
+      r(jx(jb:je),ic)=r(jx(jb:je),ic)  -del(ic)*w(jx(jb:je))*(x(jb:je)-x   3916
      *b(k))/xs(k)
 22731 continue                                                             3917
 22732 continue                                                             3917
@@ -7284,7 +7284,7 @@ c
       goto 22851                                                           3933
 22841 continue                                                             3934
       b(k,:)=gk*(u/(xv(k)+vp(k)*al2t))                                     3935
-      call chkbnds1(nc,gk,gkn,xv(k),cl(1,k),cl(2,k),  vp(k)*al2t,alt*vp(   3937 
+      call chkbnds1(nc,gk,gkn,xv(k),cl(1,k),cl(2,k),  vp(k)*al2t,alt*vp(   3937
      *k),b(k,:),isc,jerr)
       if(jerr.ne.0) return                                                 3938
 22851 continue                                                             3939
@@ -7293,7 +7293,7 @@ c
       if(maxval(abs(del)).le.0.0)goto 22811                                3940
 22860 do 22861 ic=1,nc                                                     3940
       dlx=max(dlx,xv(k)*del(ic)**2)                                        3941
-      r(jx(jb:je),ic)=r(jx(jb:je),ic)  -del(ic)*w(jx(jb:je))*(x(jb:je)-x   3943 
+      r(jx(jb:je),ic)=r(jx(jb:je),ic)  -del(ic)*w(jx(jb:je))*(x(jb:je)-x   3943
      *b(k))/xs(k)
 22861 continue                                                             3944
 22862 continue                                                             3944
@@ -7418,81 +7418,81 @@ c
       deallocate(sxp,b,bs,r,q,mm,is,sc,ga,iy,gk,del,sxpl)                  4003
       return                                                               4004
       end                                                                  4005
-      subroutine psort7 (v,a,ii,jj)                                             
-c                                                                               
-c     puts into a the permutation vector which sorts v into                     
-c     increasing order. the array v is not modified.                            
-c     only elements from ii to jj are considered.                               
-c     arrays iu(k) and il(k) permit sorting up to 2**(k+1)-1 elements           
-c                                                                               
-c     this is a modification of cacm algorithm #347 by r. c. singleton,         
-c     which is a modified hoare quicksort.                                      
-c                                                                               
-      dimension a(jj),v(jj),iu(20),il(20)                                       
-      integer t,tt                                                              
-      integer a                                                                 
-      real v                                                                    
-      m=1                                                                       
-      i=ii                                                                      
-      j=jj                                                                      
- 10   if (i.ge.j) go to 80                                                      
- 20   k=i                                                                       
-      ij=(j+i)/2                                                                
-      t=a(ij)                                                                   
-      vt=v(t)                                                                   
-      if (v(a(i)).le.vt) go to 30                                               
-      a(ij)=a(i)                                                                
-      a(i)=t                                                                    
-      t=a(ij)                                                                   
-      vt=v(t)                                                                   
- 30   l=j                                                                       
-      if (v(a(j)).ge.vt) go to 50                                               
-      a(ij)=a(j)                                                                
-      a(j)=t                                                                    
-      t=a(ij)                                                                   
-      vt=v(t)                                                                   
-      if (v(a(i)).le.vt) go to 50                                               
-      a(ij)=a(i)                                                                
-      a(i)=t                                                                    
-      t=a(ij)                                                                   
-      vt=v(t)                                                                   
-      go to 50                                                                  
- 40   a(l)=a(k)                                                                 
-      a(k)=tt                                                                   
- 50   l=l-1                                                                     
-      if (v(a(l)).gt.vt) go to 50                                               
-      tt=a(l)                                                                   
-      vtt=v(tt)                                                                 
- 60   k=k+1                                                                     
-      if (v(a(k)).lt.vt) go to 60                                               
-      if (k.le.l) go to 40                                                      
-      if (l-i.le.j-k) go to 70                                                  
-      il(m)=i                                                                   
-      iu(m)=l                                                                   
-      i=k                                                                       
-      m=m+1                                                                     
-      go to 90                                                                  
- 70   il(m)=k                                                                   
-      iu(m)=j                                                                   
-      j=l                                                                       
-      m=m+1                                                                     
-      go to 90                                                                  
- 80   m=m-1                                                                     
-      if (m.eq.0) return                                                        
-      i=il(m)                                                                   
-      j=iu(m)                                                                   
- 90   if (j-i.gt.10) go to 20                                                   
-      if (i.eq.ii) go to 10                                                     
-      i=i-1                                                                     
- 100  i=i+1                                                                     
-      if (i.eq.j) go to 80                                                      
-      t=a(i+1)                                                                  
-      vt=v(t)                                                                   
-      if (v(a(i)).le.vt) go to 100                                              
-      k=i                                                                       
- 110  a(k+1)=a(k)                                                               
-      k=k-1                                                                     
-      if (vt.lt.v(a(k))) go to 110                                              
-      a(k+1)=t                                                                  
-      go to 100                                                                 
-      end                                                                       
+      subroutine psort7 (v,a,ii,jj)
+c
+c     puts into a the permutation vector which sorts v into
+c     increasing order. the array v is not modified.
+c     only elements from ii to jj are considered.
+c     arrays iu(k) and il(k) permit sorting up to 2**(k+1)-1 elements
+c
+c     this is a modification of cacm algorithm #347 by r. c. singleton,
+c     which is a modified hoare quicksort.
+c
+      dimension a(jj),v(jj),iu(20),il(20)
+      integer t,tt
+      integer a
+      real v
+      m=1
+      i=ii
+      j=jj
+ 10   if (i.ge.j) go to 80
+ 20   k=i
+      ij=(j+i)/2
+      t=a(ij)
+      vt=v(t)
+      if (v(a(i)).le.vt) go to 30
+      a(ij)=a(i)
+      a(i)=t
+      t=a(ij)
+      vt=v(t)
+ 30   l=j
+      if (v(a(j)).ge.vt) go to 50
+      a(ij)=a(j)
+      a(j)=t
+      t=a(ij)
+      vt=v(t)
+      if (v(a(i)).le.vt) go to 50
+      a(ij)=a(i)
+      a(i)=t
+      t=a(ij)
+      vt=v(t)
+      go to 50
+ 40   a(l)=a(k)
+      a(k)=tt
+ 50   l=l-1
+      if (v(a(l)).gt.vt) go to 50
+      tt=a(l)
+      vtt=v(tt)
+ 60   k=k+1
+      if (v(a(k)).lt.vt) go to 60
+      if (k.le.l) go to 40
+      if (l-i.le.j-k) go to 70
+      il(m)=i
+      iu(m)=l
+      i=k
+      m=m+1
+      go to 90
+ 70   il(m)=k
+      iu(m)=j
+      j=l
+      m=m+1
+      go to 90
+ 80   m=m-1
+      if (m.eq.0) return
+      i=il(m)
+      j=iu(m)
+ 90   if (j-i.gt.10) go to 20
+      if (i.eq.ii) go to 10
+      i=i-1
+ 100  i=i+1
+      if (i.eq.j) go to 80
+      t=a(i+1)
+      vt=v(t)
+      if (v(a(i)).le.vt) go to 100
+      k=i
+ 110  a(k+1)=a(k)
+      k=k-1
+      if (vt.lt.v(a(k))) go to 110
+      a(k+1)=t
+      go to 100
+      end

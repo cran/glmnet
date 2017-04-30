@@ -1,8 +1,15 @@
+2017-04-25 Trevor Hastie <hastie@stanford.edu> version 2.0-8
+	* included native registration of fortran
+2016-08-25 Trevor Hastie <hastie@stanford.edu> version 2.0-7
+	* constant y blows up elnet; error trap included
+	* fixed lambda.interp which was returning NaNs under degenerate circumstances.
+2016-03-24 Trevor Hastie <hastie@stanford.edu> version 2.0-6
+	* added some code to extract time and status gracefully from a Surv object
 2016-02-21 Trevor Hastie <hastie@stanford.edu> version 2.0-3
 	* changed the usage of predict and coef with exact=TRUE. The user is strongly encouraged to supply the original x and y values, as well as any other data such as weights that were used in the original fit.
 2015-04-07 Trevor Hastie <hastie@stanford.edu> version 2.0-1
-	* Major upgrade to CV; let each model use its own lambdas, then predict at original set. 
-	* fixed some minor bugs	
+	* Major upgrade to CV; let each model use its own lambdas, then predict at original set.
+	* fixed some minor bugs
 2014-07-30  Trevor Hastie <hastie@stanford.edu> version 1.9-9
 	* fixed subsetting bug in lognet when some weights are zero and x is sparse
 2014-05-23  Trevor Hastie <hastie@stanford.edu> version 1.9-8
@@ -16,18 +23,18 @@
 	* added parallel capabilities, and fixed some minor bugs
 2013-03-01   Trevor Hastie <hastie@stanford.edu> version 1.9-3
 	* added intercept option
-2013-02-10   Trevor Hastie <hastie@stanford.edu> version 1.9-1 
+2013-02-10   Trevor Hastie <hastie@stanford.edu> version 1.9-1
 	* added upper and lower bounds for coefficients
 	* added glmnet.control for setting sytems parameters
 	* fixed serious bug in coxnet
-2012-12-31   Trevor Hastie <hastie@stanford.edu> version 1.8-5 
+2012-12-31   Trevor Hastie <hastie@stanford.edu> version 1.8-5
 	* added exact=TRUE option for prediction and coef functions
-2012-7-01   Trevor Hastie <hastie@stanford.edu> 
+2012-7-01   Trevor Hastie <hastie@stanford.edu>
 
 	Major new release
 	* added mgaussian family for multivariate response
 	* added grouped option for multinomial family
-	
+
 2012-4-26   Trevor Hastie <hastie@stanford.edu>
 	* nasty bug fixed in fortran - removed reference to dble
 	* check class of newx and make dgCmatrix if sparse
@@ -35,10 +42,10 @@
 	* lognet added a classnames component to the object
 	* predict.lognet(type="class") now returns a character vector/matrix
 2011-6-23   Trevor Hastie <hastie@stanford.edu>
-	* predict.glmnet : fixed bug with type="nonzero" 
+	* predict.glmnet : fixed bug with type="nonzero"
 	* glmnet: Now x can inherit from "sparseMatrix" rather than the very specific "dgCMatrix", and this will
 	   trigger sparse mode for glmnet
-	
+
 
 2010-11-01  Trevor Hastie  <hastie@stanford.edu>
 
@@ -56,8 +63,8 @@
 	* nonzeroCoef : added a special case for a single variable in x; it was dying on this
 	* deviance.glmnet : included
 	* deviance.glmnet.Rd : included
-	
+
 
 2010-06-26 Trevor Hastie <hastie@stanford.edu>
 	###	Note that this starts from glmnet_1.4
-	
+

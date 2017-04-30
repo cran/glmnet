@@ -28,10 +28,16 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   vnames=colnames(x)
   if(is.null(vnames))vnames=paste("V",seq(nvars),sep="")
   ne=as.integer(dfmax)
-  nx=as.integer(pmax)
-  if(!missing(exclude)){
+    nx=as.integer(pmax)
+    if(missing(exclude))exclude=integer(0)
+    if(any(penalty.factor==Inf)){
+        exclude=c(exclude,seq(nvars)[penalty.factor==Inf])
+        exclude=sort(unique(exclude))
+        }
+  if(length(exclude)>0){
     jd=match(exclude,seq(nvars),0)
     if(!all(jd>0))stop("Some excluded variables out of range")
+    penalty.factor[jd]=1 #ow can change lambda sequence
     jd=as.integer(c(length(jd),jd))
   }else jd=as.integer(0)
   vp=as.double(penalty.factor)
@@ -61,7 +67,7 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   }
   storage.mode(cl)="double"
   ### end check on limits
-  
+
   isd=as.integer(standardize)
   intr=as.integer(intercept)
   if(!missing(intercept)&&family=="cox")warning("Cox model has no intercept")
@@ -73,7 +79,7 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
     ulam=double(1)
   }
   else{
-     flmin=as.double(1)    
+     flmin=as.double(1)
     if(any(lambda<0))stop("lambdas should be non-negative")
     ulam=as.double(rev(sort(lambda)))
     nlam=as.integer(length(lambda))

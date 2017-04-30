@@ -2,16 +2,16 @@
 output: html_document
 ---
 
-<!-- 
-%\VignetteEngine{knitr::rmarkdown} 
+<!--
+%\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{An Introduction to Glmnet}
---> 
+-->
 
 <a id="top"></a>
 
 # Glmnet Vignette
 ### Trevor Hastie and Junyang Qian
-#### Stanford June 26, 2014
+#### Stanford September 13, 2016
 
 > [Introduction](#intro)
 
@@ -29,14 +29,16 @@ output: html_document
 
 > [Sparse Matrices](#spa)
 
+> [Appendix 0: Convergence Criteria](#con)
+
 > [Appendix 1: Internal Parameters](#int)
 
 > [Appendix 2: Comparison with Otherther Packages](#cmp)
 
 <a id="intro"></a>
 
-## Introduction 
- 
+## Introduction
+
 Glmnet is a package that fits a generalized linear model via penalized maximum likelihood. The regularization path is computed for the lasso or elasticnet penalty at a grid of values for the regularization parameter lambda. The algorithm is extremely fast, and can exploit sparsity in the input matrix `x`. It fits linear, logistic and multinomial, poisson, and Cox regression models. A variety of predictions can be made from the fitted models. It can also fit multi-response linear regression.
 
 The authors of glmnet are Jerome Friedman, Trevor Hastie, Rob Tibshirani and Noah Simon, and the R package is maintained by Trevor Hastie. The matlab version of glmnet is maintained by Junyang Qian. This vignette describes the usage of glmnet in R.
@@ -51,32 +53,32 @@ It is known that the ridge penalty shrinks the coefficients of correlated predic
 
 The `glmnet` algorithms use cyclical coordinate descent, which successively optimizes the objective function over each parameter with others fixed, and cycles repeatedly until convergence. The package also makes use of the strong rules for efficient restriction of the active set. Due to highly efficient updates and techniques such as warm starts and active-set convergence, our algorithms can compute the solution path very fast.
 
-The code can handle sparse input-matrix formats, as well as range constraints on coefficients. The core of `glmnet` is a set of fortran subroutines, which make for very fast execution. 
+The code can handle sparse input-matrix formats, as well as range constraints on coefficients. The core of `glmnet` is a set of fortran subroutines, which make for very fast execution.
 
-The package also includes methods for prediction and plotting, and a function that performs K-fold cross-validation. 
+The package also includes methods for prediction and plotting, and a function that performs K-fold cross-validation.
 
 <a id="install"></a>
 
 ## Installation
- 
+
 Like many other R packages, the simplest way to obtain `glmnet` is to install it directly from CRAN. Type the following command in R console:
 
 ```{r, eval=FALSE}
-install.packages("glmnet", repos = "http://cran.us.r-project.org")
+install.packages("glmnet", repos = "https://cran.us.r-project.org")
 ```
 
 Users may change the `repos` options depending on their locations and preferences. Other options such as the directories where to install the packages can be altered in the command. For more details, see `help(install.packages)`.
 
 Here the R package has been downloaded and installed to the default directories.
 
-Alternatively, users can download the package source at http://cran.r-project.org/package=glmnet and type Unix commands to install it to the desired location.
+Alternatively, users can download the package source at https://cran.r-project.org/package=glmnet and type Unix commands to install it to the desired location.
 
 [Back to Top](#top)
 
 <a id="qs"></a>
 
 ## Quick Start
- 
+
 The purpose of this section is to give users a general sense of the package, including the components, what they do and some basic usage. We will briefly go over the main functions, see the basic operations and have a look at the outputs. Users may have a better idea after this section what functions are available, which one to choose, or at least where to seek help. More details are given in later sections.
 
 First, we load the `glmnet` package:
@@ -87,7 +89,7 @@ The default model used in the package is the Guassian linear model or "least squ
 ```{r}
 data(QuickStartExample)
 ```
-The command loads an input matrix `x` and a response vector `y` from this saved R data archive. 
+The command loads an input matrix `x` and a response vector `y` from this saved R data archive.
 
 We fit the model using the most basic call to  `glmnet`.
 ```{r}
@@ -100,7 +102,7 @@ We can visualize the coefficients by executing the `plot` function:
 plot(fit)
 ```
 
-Each curve corresponds to a variable. It shows the path of its coefficient against the $\ell_1$-norm of the whole coefficient vector at as $\lambda$ varies. The axis above indicates the number of nonzero coefficients at the current $\lambda$, which is the effective degrees of freedom (_df_) for the lasso. Users may also wish to annotate the curves; this can be done by setting `label = TRUE` in the plot command. 
+Each curve corresponds to a variable. It shows the path of its coefficient against the $\ell_1$-norm of the whole coefficient vector at as $\lambda$ varies. The axis above indicates the number of nonzero coefficients at the current $\lambda$, which is the effective degrees of freedom (_df_) for the lasso. Users may also wish to annotate the curves; this can be done by setting `label = TRUE` in the plot command.
 
 A summary of the `glmnet` path at each step is displayed if we just enter the object name or use the `print` function:
 ```{r height = 4}
@@ -148,7 +150,7 @@ Predictions can be made based on the fitted `cv.glmnet` object. Let's see a toy 
 ```{r}
 predict(cvfit, newx = x[1:5,], s = "lambda.min")
 ```
-`newx` is for the new input matrix and `s`, as before, is the value(s) of $\lambda$ at which predictions are made. 
+`newx` is for the new input matrix and `s`, as before, is the value(s) of $\lambda$ at which predictions are made.
 
 That is the end of `glmnet` 101. With the tools introduced so far, users are able to fit the entire elastic net family, including ridge regression, using squared-error loss. In the package, there are many more options that give users a great deal of flexibility. To learn more, move on to later sections.
 
@@ -157,16 +159,16 @@ That is the end of `glmnet` 101. With the tools introduced so far, users are abl
 <a id="lin"></a>
 
 ## Linear Regression
- 
+
 Linear regression here refers to two families of models. One is `gaussian`, the Gaussian family, and the other is `mgaussian`, the multiresponse Gaussian family. We first discuss the ordinary Gaussian and the multiresponse one after that.
 
 ### Gaussian Family
 
-`gaussian ` is the default family option in the function `glmnet`. Suppose we have observations $x_i \in \mathbb{R}^p$ and the responses $y_i \in \mathbb{R}, i = 1, \ldots, N$. The objective function for the Gaussian family is 
+`gaussian ` is the default family option in the function `glmnet`. Suppose we have observations $x_i \in \mathbb{R}^p$ and the responses $y_i \in \mathbb{R}, i = 1, \ldots, N$. The objective function for the Gaussian family is
 $$
 \min_{(\beta_0, \beta) \in \mathbb{R}^{p+1}}\frac{1}{2N} \sum_{i=1}^N (y_i -\beta_0-x_i^T \beta)^2+\lambda \left[ (1-\alpha)||\beta||_2^2/2 + \alpha||\beta||_1\right],
 $$
-where $\lambda \geq 0$ is a complexity parameter and $0 \leq \alpha \leq 1$ is a compromise between ridge ($\alpha = 0$) and lasso ($\alpha = 1$). 
+where $\lambda \geq 0$ is a complexity parameter and $0 \leq \alpha \leq 1$ is a compromise between ridge ($\alpha = 0$) and lasso ($\alpha = 1$).
 
 Coordinate descent is applied to solve the problem. Specifically, suppose we have current estimates $\tilde{\beta_0}$ and $\tilde{\beta}_\ell$ $\forall j\in 1,]\ldots,p$. By computing the gradient at $\beta_j = \tilde{\beta}_j$ and simple calculus, the update is
 $$
@@ -182,11 +184,11 @@ This formula above applies when the `x` variables are standardized to have unit 
 
 * `weights` is for the observation weights. Default is 1 for each observation. (Note: `glmnet` rescales the weights to sum to N, the sample size.)
 
-* `nlambda` is the number of $\lambda$ values in the sequence. Default is 100. 
+* `nlambda` is the number of $\lambda$ values in the sequence. Default is 100.
 
 * `lambda` can be provided, but is typically not and the program constructs a sequence. When automatically generated, the $\lambda$ sequence is determined by `lambda.max` and `lambda.min.ratio`. The latter is the ratio of smallest value of the generated  $\lambda$ sequence (say `lambda.min`) to `lambda.max`.  The program then generated `nlambda` values linear on the log scale from `lambda.max` down to `lambda.min`. `lambda.max` is not given, but easily computed from the input $x$ and $y$; it is the smallest value for `lambda` such that all the coefficients are zero.  For `alpha=0` (ridge) `lambda.max` would be $\infty$; hence for this case we pick a value corresponding to a small value for `alpha` close to zero.)
 
-* `standardize` is a logical flag for `x` variable standardization, prior to fitting the model sequence. The coefficients are always returned on the original scale. Default is `standardize=TRUE`.  
+* `standardize` is a logical flag for `x` variable standardization, prior to fitting the model sequence. The coefficients are always returned on the original scale. Default is `standardize=TRUE`.
 
 For more information, type `help(glmnet)` or simply `?glmnet`.
 
@@ -194,7 +196,7 @@ As an example, we set $\alpha = 0.2$ (more like a ridge regression), and give do
 ```{r}
 fit = glmnet(x, y, alpha = 0.2, weights = c(rep(1,50),rep(2,50)), nlambda = 20)
 ```
-We can then print the `glmnet` object. 
+We can then print the `glmnet` object.
 ```{r}
 print(fit)
 ```
@@ -204,9 +206,9 @@ This displays the call that produced the object `fit` and a three-column matrix 
 
 Here the actual number of $\lambda$'s here is less than specified in the call. The reason lies in the stopping criteria of the algorithm. According to the default internal settings, the computations stop if either the fractional change in deviance down the path is less than $10^{-5}$ or the fraction of explained deviance reaches $0.999$. From the last few lines , we see the fraction of deviance does not change much and therefore the computation ends when meeting the stopping criteria. We can change such internal parameters. For details, see the Appendix section or type `help(glmnet.control)`.
 
-We can plot the fitted object as in the previous section. There are more options in the `plot` function. 
+We can plot the fitted object as in the previous section. There are more options in the `plot` function.
 
-Users can decide what is on the X-axis. `xvar` allows three measures: "norm" for the $\ell_1$-norm of the coefficients (default), "lambda" for the log-lambda value and "dev" for %deviance explained. 
+Users can decide what is on the X-axis. `xvar` allows three measures: "norm" for the $\ell_1$-norm of the coefficients (default), "lambda" for the log-lambda value and "dev" for %deviance explained.
 
 Users can also label the curves with variable sequence numbers simply by setting `label = TRUE`.
 
@@ -223,9 +225,9 @@ plot(fit, xvar = "dev", label = TRUE)
 
 We can extract the coefficients and make predictions at certain values of $\lambda$. Two commonly used options are:
 
-* `s` specifies the value(s) of $\lambda$ at which extraction is made. 
+* `s` specifies the value(s) of $\lambda$ at which extraction is made.
 
-* `exact` indicates whether the exact values of coefficients are desired or not. That is, if `exact = TRUE`, and predictions are to be made at values of s not included in the original fit, these values of s are merged with `object$lambda`, and the model is refit before predictions are made. If `exact=FALSE` (default), then the predict function uses linear interpolation to make predictions for values of s that do not coincide with lambdas used in the fitting algorithm. 
+* `exact` indicates whether the exact values of coefficients are desired or not. That is, if `exact = TRUE`, and predictions are to be made at values of s not included in the original fit, these values of s are merged with `object$lambda`, and the model is refit before predictions are made. If `exact=FALSE` (default), then the predict function uses linear interpolation to make predictions for values of s that do not coincide with lambdas used in the fitting algorithm.
 
 A simple example is:
 
@@ -235,7 +237,7 @@ coef.exact = coef(fit, s = 0.5, exact = TRUE)
 coef.apprx = coef(fit, s = 0.5, exact = FALSE)
 cbind2(coef.exact, coef.apprx)
 ```
-The left column is for `exact = TRUE` and the right for `FALSE`. We see from the above that 0.01 is not in the sequence and that hence there are some difference, though not much. Linear interpolation is mostly enough if there are no special requirements. 
+The left column is for `exact = TRUE` and the right for `FALSE`. We see from the above that 0.01 is not in the sequence and that hence there are some difference, though not much. Linear interpolation is mostly enough if there are no special requirements.
 
 Users can make predictions from the fitted object. In addition to the options in `coef`,  the primary argument is `newx`, a matrix of new values for `x`. The `type` option allows users to choose the type of prediction:
 * "link" gives the fitted values
@@ -261,7 +263,7 @@ As an example,
 ```{r}
 cvfit = cv.glmnet(x, y, type.measure = "mse", nfolds = 20)
 ```
-does 20-fold cross-validation, based on mean squared error criterion (default though). 
+does 20-fold cross-validation, based on mean squared error criterion (default though).
 
 Parallel computing is also supported by `cv.glmnet`. To make it work, users must register parallel beforehand. We give a simple example of comparison here. Unfortunately, the package `doMC` is not available on Windows platforms (it is on others), so we cannot run the code here, but we make it looks as if we have.
 ```{r, eval=FALSE}
@@ -275,15 +277,15 @@ Y = rnorm(1e4)
 system.time(cv.glmnet(X, Y))
 ```
 ```{r, echo=FALSE}
-structure(c(2.44, 0.08, 2.518, 0, 0), class = "proc_time", .Names = c("user.self", 
+structure(c(2.44, 0.08, 2.518, 0, 0), class = "proc_time", .Names = c("user.self",
 "sys.self", "elapsed", "user.child", "sys.child"))
 ```
 ```{r, eval=FALSE}
 system.time(cv.glmnet(X, Y, parallel = TRUE))
 ```
 ```{r, echo=FALSE}
-structure(c(0.508999999999999, 0.057, 1.56699999999999, 1.941, 
-0.1), class = "proc_time", .Names = c("user.self", "sys.self", 
+structure(c(0.508999999999999, 0.057, 1.56699999999999, 1.941,
+0.1), class = "proc_time", .Names = c("user.self", "sys.self",
 "elapsed", "user.child", "sys.child"))
 ```
 
@@ -340,7 +342,7 @@ This argument allows users to apply separate penalty factors to each coefficient
 $$
 \lambda \sum_{j=1}^p \boldsymbol{v_j} P_\alpha(\beta_j) = \lambda \sum_{j=1}^p \boldsymbol{v_j} \left[ (1-\alpha)\frac{1}{2} \beta_j^2 + \alpha |\beta_j| \right].
 $$
-Note the penalty factors are internally rescaled to sum to nvars. 
+Note the penalty factors are internally rescaled to sum to nvars.
 
 This is very useful when people have prior knowledge or preference over the variables. In many cases, some variables may be so important that one wants to keep them all the time, which can be achieved by setting corresponding penalty factors to 0:
 
@@ -351,7 +353,7 @@ pfit = glmnet(x, y, penalty.factor = p.fac)
 plot(pfit, label = TRUE)
 ```
 
-We see from the labels that the three variables with 0 penalty factors always stay in the model, while the others follow typical regularization paths and shrunken to 0 eventually. 
+We see from the labels that the three variables with 0 penalty factors always stay in the model, while the others follow typical regularization paths and shrunken to 0 eventually.
 
 Some other useful arguments. `exclude` allows one to block certain variables from being the model at all. Of course, one could simply subset these out of `x`, but sometimes `exclude` is more useful, since it returns a full vector of coefficients, just with the excluded ones set to zero. There is also an `intercept` argument which defaults to `TRUE`; if `FALSE` the intercept is forced to be zero.
 
@@ -359,7 +361,7 @@ Some other useful arguments. `exclude` allows one to block certain variables fro
 
 Sometimes, especially when the number of variables is small, we want to add variable labels to a plot. Since `glmnet` is intended primarily for wide data, this is not supprted in `plot.glmnet`. However, it is easy to do, as the following little toy example shows.
 
-We first generate some data, with 10 variables, and for lack of imagination and ease we give them simple character names. 
+We first generate some data, with 10 variables, and for lack of imagination and ease we give them simple character names.
 We then fit a glmnet model, and make the standard plot.
 ```{r}
 set.seed(101)
@@ -372,13 +374,13 @@ plot(fit)
 
 We wish to label the curves with the variable names. Here s a simple way to do this, using the `axis` command in R (and a little research into how to customize it). We need to have the positions of the coefficients at the end of the path, and we need to make some space using the `par` command, so that our labels will fit in.
 This requires knowing how long your labels are, but here they are all quite short.
- 
+
 ```{r}
 par(mar=c(4.5,4.5,1,4))
 plot(fit)
 vnat=coef(fit)
 vnat=vnat[-1,ncol(vnat)] # remove the intercept, and get the coefficients at the end of the path
-axis(4, at=vnat,line=-.5,label=vn,las=1,tick=FALSE, cex.axis=0.5) 
+axis(4, at=vnat,line=-.5,label=vn,las=1,tick=FALSE, cex.axis=0.5)
 ```
 
 We have done nothing here to avoid overwriting of labels, in the event that they are close together. This would be a bit more work, but perhaps best left alone, anyway.
@@ -388,7 +390,7 @@ We have done nothing here to avoid overwriting of labels, in the event that they
 
 The multiresponse Gaussian family is obtained using `family = "mgaussian"` option in `glmnet`. It is very similar to the single-response case above. This is useful when there are a number of (correlated) responses - the so-called "multi-task learning" problem. Here the sharing involves which variables are selected, since when a variable is selected, a coefficient is fit for each response. Most of the options are the same, so we focus here on the differences with the single response model.
 
-Obviously, as the name suggests, $y$ is not a vector, but a matrix of quantitative responses in this section. The coefficients at each value of lambda are also a matrix as a result. 
+Obviously, as the name suggests, $y$ is not a vector, but a matrix of quantitative responses in this section. The coefficients at each value of lambda are also a matrix as a result.
 
 Here we solve the following problem:
 $$
@@ -411,7 +413,7 @@ To visualize the coefficients, we use the `plot` function.
 plot(mfit, xvar = "lambda", label = TRUE, type.coef = "2norm")
 ```
 
-Note that we set `type.coef = "2norm"`. Under this setting, a single curve is plotted per variable, with value equal to the $\ell_2$ norm. The default setting is `type.coef = "coef"`, where a coefficient plot is created for each response (multiple figures). 
+Note that we set `type.coef = "2norm"`. Under this setting, a single curve is plotted per variable, with value equal to the $\ell_2$ norm. The default setting is `type.coef = "coef"`, where a coefficient plot is created for each response (multiple figures).
 
 `xvar` and `label` are two other options besides ordinary graphical parameters. They are the same as the single-response case.
 
@@ -419,13 +421,13 @@ We can extract the coefficients at requested values of $\lambda$ by using the fu
 ```{r}
 predict(mfit, newx = x[1:5,], s = c(0.1, 0.01))
 ```
-The prediction result is saved in a three-dimensional array with the first two dimensions being the prediction matrix for each response variable and the third indicating the response variables. 
+The prediction result is saved in a three-dimensional array with the first two dimensions being the prediction matrix for each response variable and the third indicating the response variables.
 
 We can also do k-fold cross-validation. The options are almost the same as the ordinary Gaussian family and we do not expand here.
 ```{r}
 cvmfit = cv.glmnet(x, y, family = "mgaussian")
 ```
-We plot the resulting `cv.glmnet` object "cvmfit". 
+We plot the resulting `cv.glmnet` object "cvmfit".
 ```{r}
 plot(cvmfit)
 ```
@@ -443,7 +445,7 @@ Prediction for `cv.glmnet` object works almost the same as for `glmnet` object. 
 <a id="log"></a>
 
 ## Logistic Regression
- 
+
 Logistic regression  is another widely-used model when the response is categorical. If there are two possible outcomes, we use the binomial distribution, else we use the multinomial.
 
 ### Binomial Models
@@ -454,7 +456,7 @@ which can be written in the following form
 $$\log\frac{\mbox{Pr}(G=2|X=x)}{\mbox{Pr}(G=1|X=x)}=\beta_0+\beta^Tx,$$
 the so-called "logistic" or log-odds transformation.
 
-The objective function for the penalized logistic regression uses the negative binomial log-likelihood, and is 
+The objective function for the penalized logistic regression uses the negative binomial log-likelihood, and is
 $$
 \min_{(\beta_0, \beta) \in \mathbb{R}^{p+1}} -\left[\frac{1}{N} \sum_{i=1}^N y_i \cdot (\beta_0 + x_i^T \beta) - \log (1+e^{(\beta_0+x_i^T \beta)})\right] + \lambda \big[ (1-\alpha)||\beta||_2^2/2 + \alpha||\beta||_1\big].
 $$
@@ -463,14 +465,14 @@ the elastic-net penalty alleviates these issues, and regularizes and selects var
 
 Our algorithm uses a quadratic approximation to the log-likelihood,  and then coordinate descent on the resulting penalized weighted least-squares problem. These constitute an outer and inner loop.
 
- 
+
 For illustration purpose, we load pre-generated input matrix `x` and the response vector `y` from the data file.
 ```{r}
 data(BinomialExample)
 ```
 The input matrix $x$ is the same as other families. For binomial logistic regression, the response variable $y$ should be either a factor with two levels, or a two-column matrix of counts or proportions.
 
-Other optional arguments of `glmnet` for binomial regression are almost same as those for Gaussian family. Don't forget to set `family` option to "binomial". 
+Other optional arguments of `glmnet` for binomial regression are almost same as those for Gaussian family. Don't forget to set `family` option to "binomial".
 ```{r}
 fit = glmnet(x, y, family = "binomial")
 ```
@@ -480,7 +482,7 @@ plot(fit, xvar = "dev", label = TRUE)
 ```
 
 Prediction is a little different for logistic from Gaussian, mainly in the option `type`. "link" and "response" are never equivalent and "class" is only available for logistic regression. In summary,
-* "link" gives the linear predictors 
+* "link" gives the linear predictors
 
 * "response" gives the fitted probabilities
 
@@ -526,7 +528,7 @@ cvfit$lambda.1se
 ```{r}
 coef(cvfit, s = "lambda.min")
 ```
-As mentioned previously, the results returned here are only for the second level of the factor response. 
+As mentioned previously, the results returned here are only for the second level of the factor response.
 
 ```{r}
 predict(cvfit, newx = x[1:10,], s = "lambda.min", type = "class")
@@ -537,7 +539,7 @@ For example, you may have fitted some other logistic regression using other vari
 
 ### Multinomial Models
 
-For the multinomial model, suppose the response variable has $K$ levels ${\cal G}=\{1,2,\ldots,K\}$. Here we model 
+For the multinomial model, suppose the response variable has $K$ levels ${\cal G}=\{1,2,\ldots,K\}$. Here we model
 $$\mbox{Pr}(G=k|X=x)=\frac{e^{\beta_{0k}+\beta_k^Tx}}{\sum_{\ell=1}^Ke^{\beta_{0\ell}+\beta_\ell^Tx}}.$$
 
 Let ${Y}$ be the $N \times K$ indicator response matrix, with elements $y_{i\ell} = I(g_i=\ell)$. Then the elastic-net penalized negative log-likelihood function becomes
@@ -547,9 +549,9 @@ $$
 Here we really abuse notation! $\beta$ is a $p\times K$ matrix of coefficients. $\beta_k$ refers to the kth column (for outcome category k), and $\beta_j$ the jth row (vector of K coefficients for variable j).
 The last penalty term is $||\beta_j||_q$, we have two options for q: $q\in \{1,2\}$.
 When q=1, this is a lasso penalty on each of the parameters. When q=2, this is a grouped-lasso penalty on all the K coefficients for a particular variables, which makes them all be zero or nonzero together.
-  
 
-The standard Newton algorithm can be tedious here. Instead, we use a so-called partial Newton algorithm by making a partial quadratic approximation to the log-likelihood, allowing only $(\beta_{0k}, \beta_k)$ to vary for a single class at a time. 
+
+The standard Newton algorithm can be tedious here. Instead, we use a so-called partial Newton algorithm by making a partial quadratic approximation to the log-likelihood, allowing only $(\beta_{0k}, \beta_k)$ to vary for a single class at a time.
 For each value of $\lambda$, we first cycle over all classes indexed by $k$, computing each time a partial quadratic approximation about the parameters of the current class. Then the inner procedure is almost the same as for the binomial case.
 This is the case for lasso (q=1). When q=2, we use a different approach, which we wont dwell on here.
 
@@ -558,12 +560,12 @@ For the multinomial case, the usage is similar to logistic regression, and we ma
 ```{r}
 data(MultinomialExample)
 ```
-The optional arguments in `glmnet` for multinomial logistic regression are mostly similar to binomial regression except for a few cases. 
+The optional arguments in `glmnet` for multinomial logistic regression are mostly similar to binomial regression except for a few cases.
 
-The response variable can be a `nc >= 2` level factor, or a `nc`-column matrix of counts or proportions. 
+The response variable can be a `nc >= 2` level factor, or a `nc`-column matrix of counts or proportions.
 Internally glmnet will make the rows of this matrix sum to 1, and absorb the total mass into the weight for that observation.
 
-`offset` should be a `nobs x nc` matrix if there is one. 
+`offset` should be a `nobs x nc` matrix if there is one.
 
 A special option for multinomial regression is `type.multinomial`, which allows the usage of a grouped lasso penalty if `type.multinomial = "grouped"`. This will ensure that the multinomial coefficients for a variable are all in or out together, just like for the multi-response Gaussian.
 
@@ -576,7 +578,7 @@ We plot the resulting object "fit".
 plot(fit, xvar = "lambda", label = TRUE, type.coef = "2norm")
 ```
 
-The options are `xvar`, `label` and `type.coef`, in addition to other ordinary graphical parameters. 
+The options are `xvar`, `label` and `type.coef`, in addition to other ordinary graphical parameters.
 
 `xvar` and `label` are the same as other families while `type.coef` is only for multinomial regression and multiresponse Gaussian model. It can produce a figure of coefficients for each response variable if `type.coef = "coef"` or a figure showing the $\ell_2$-norm in one figure if `type.coef = "2norm"`
 
@@ -598,8 +600,8 @@ predict(cvfit, newx = x[1:10,], s = "lambda.min", type = "class")
 <a id="poi"></a>
 
 ## Poisson Models
- 
-Poisson regression is used to model count data under the assumption of Poisson error, or otherwise non-negative data where the mean and variance are proportional. Like the Gaussian and binomial model, the Poisson is a member of the exponential family of distributions. We usually model its positive mean on the log scale:   $\log \mu(x) = \beta_0+\beta' x$.  
+
+Poisson regression is used to model count data under the assumption of Poisson error, or otherwise non-negative data where the mean and variance are proportional. Like the Gaussian and binomial model, the Poisson is a member of the exponential family of distributions. We usually model its positive mean on the log scale:   $\log \mu(x) = \beta_0+\beta' x$.
 The log-likelihood for observations $\{x_i,y_i\}_1^N$ is given my
 $$
 l(\beta|X, Y) = \sum_{i=1}^N (y_i (\beta_0+\beta' x_i) - e^{\beta_0+\beta^Tx_i}.
@@ -609,7 +611,7 @@ As before, we optimize the penalized log-lielihood:
 \min_{\beta_0,\beta} -\frac1N l(\beta|X, Y)  + \lambda \left((1-\alpha) \sum_{i=1}^N \beta_i^2/2) +\alpha \sum_{i=1}^N |\beta_i|\right).
 $$
 
-Glmnet uses an outer Newton loop, and an inner weighted least-squares loop (as in logistic regression) to optimize this criterion. 
+Glmnet uses an outer Newton loop, and an inner weighted least-squares loop (as in logistic regression) to optimize this criterion.
 
 
 
@@ -622,7 +624,7 @@ We apply the function `glmnet` with the `"poisson"` option.
 ```{r}
 fit = glmnet(x, y, family = "poisson")
 ```
-The optional input arguments of `glmnet` for `"poisson"` family are similar to those for others. 
+The optional input arguments of `glmnet` for `"poisson"` family are similar to those for others.
 
 `offset` is a useful argument particularly in Poisson models.
 
@@ -674,7 +676,7 @@ The `predict` method is similar and we do not repeat it here.
 <a id="cox"></a>
 
 ## Cox Models
- 
+
 The Cox proportional hazards model is commonly used for the study of the relationship beteween predictor variables and survival time. In the usual survival analysis framework, we have data of the form $(y_1, x_1, \delta_1), \ldots, (y_n, x_n, \delta_n)$ where $y_i$, the observed time, is a time of failure if $\delta_i$ is 1 or right-censoring if $\delta_i$ is 0. We also let $t_1 < t_2 < \ldots < t_m$ be the increasing list of unique failure times, and $j(i)$ denote the index of the observation failing at time $t_i$.
 
 The Cox model assumes a semi-parametric form for the hazard
@@ -689,7 +691,7 @@ where $R_i$ is the set of indices $j$ with $y_j \geq t_i$ (those at risk at time
 
 Note there is no intercept in the Cox mode (its built into the baseline hazard, and like it, would cancel in the partial likelihood.)
 
-We penalize the negative log of the partial likelihood, just like the other models, with an elastic-net penalty.  
+We penalize the negative log of the partial likelihood, just like the other models, with an elastic-net penalty.
 
 We use a pre-generated set of sample data and response. Users can load their own data and follow a similar procedure. In this case $x$ must be an $n\times p$ matrix of covariate values - each row corresponds to a patient and each column a covariate. $y$ is an $n \times 2$  matrix, with a column "time" of failure/censoring times, and "status" a 0/1 indicator, with 1 meaning the time is a failure time, and zero a censoring time.
 
@@ -697,7 +699,7 @@ We use a pre-generated set of sample data and response. Users can load their own
 data(CoxExample)
 y[1:5,]
 ```
-The `Surv` function in the package `survival` can create such a matrix. Note, however, that the `coxph` and related linear models can handle interval and other fors of censoring, while glmnet can only handle right censoring in its present form.  
+The `Surv` function in the package `survival` can create such a matrix. Note, however, that the `coxph` and related linear models can handle interval and other fors of censoring, while glmnet can only handle right censoring in its present form.
 
 We apply the `glmnet` function to compute the solution path under default settings.
 ```{r}
@@ -717,15 +719,15 @@ coef(fit, s = 0.05)
 
 Since the Cox Model is not commonly used for prediction, we do not give an illustrative example on prediction. If needed, users can refer to the help file by typing `help(predict.glmnet)`.
 
-Also, the function `cv.glmnet` can be used to compute $k$-fold cross-validation for the Cox model. The usage is similar to that for other families except for two main differences. 
+Also, the function `cv.glmnet` can be used to compute $k$-fold cross-validation for the Cox model. The usage is similar to that for other families except for two main differences.
 
-One is that `type.measure` only supports "deviance"(also default), which gives the partial-likelihood. 
+One is that `type.measure` only supports "deviance"(also default), which gives the partial-likelihood.
 
 The other is in the option `grouped`. `grouped = TRUE` obtains the CV partial likelihood for the Kth fold by subtraction; by subtracting the log partial likelihood evaluated on the full dataset from that evaluated on the on the (K-1)/K dataset. This makes more efficient use of risk sets. With `grouped=FALSE` the log partial likelihood is computed only on the Kth fold, which is only reasonable if each fold has a large number of observations.
 ```{r}
 cvfit = cv.glmnet(x, y, family = "cox")
 ```
-Once fit, we can view the optimal $\lambda$ value and a cross validated error plot to help evaluate our model. 
+Once fit, we can view the optimal $\lambda$ value and a cross validated error plot to help evaluate our model.
 ```{r}
 plot(cvfit)
 ```
@@ -774,7 +776,7 @@ cvfit = cv.glmnet(x, y)
 plot(cvfit)
 ```
 
-The usage of other functions are similar and we do not expand here. 
+The usage of other functions are similar and we do not expand here.
 
 Note that sparse matrices can also be used for `newx`, the new input matrix in the `predict` function. For example,
 ```{r}
@@ -787,10 +789,53 @@ predict(cvfit, newx = nx, s = "lambda.min")
 
 [Back to Top](#top)
 
+
+<a id="con"></a>
+
+## Appendix 0: Convergence Criteria
+
+Glmnet uses a convergence criterion that focuses not on coefficient
+change but rather the impact of the change on the fitted values, and
+hence the  loss part of the objective. The net result is a
+weighted norm of the coefficient change vector.
+
+For gaussian models it uses the following. Suppose observation $i$
+has weight $w_i$. Let $v_j$ be the (weighted)
+sum-of-squares for variable $x_j$:
+$$v_j=\sum_{i=1}^Nw_ix_{ij}^2.$$
+If there is an intercept in the model, these $x_j$ will be centered by
+the weighted mean, and hence this would be a weighted variance.
+After $\hat\beta_j^o$ has been updated to $\hat\beta_j^n$,    we compute
+$\Delta_j=v_j(\hat\beta_j^o-\hat\beta_j^n)^2$. After a complete cycle of coordinate descent, we look at
+$\Delta_{max}=\max_j\Delta_j$.  Why this measure?
+We can write
+$$\Delta_j=\frac1N\sum_{i=1}^N w_j(x_{ij}\hat\beta_j^o-x_{ij}\hat\beta_j^n)^2,$$
+which measures the weighted sum of squares of changes in fitted values
+for this term. This measures the impact of the change in this
+coefficient on the fit. If the largest such change is negligible, we stop.
+
+
+For logistic regression, and other non-Gaussian models it is similar
+for the inner loop. Only now the weights for each observation are more
+complex. For example, for logisitic regression the weights are those
+that arise from the current Newton step, namely $w_i^*=w_i\hat p_i(1-\hat p_i)$. Here $\hat p_i$ are the fitted probabilities as we
+entered the current inner loop.  The intuition is the same --- it
+measures the impact of the coefficient change on the current weighted
+least squares loss, or quadratic approximation to the log-likelihood
+loss.
+
+What about outer-loop convergence? We use the same measure, except now
+$\hat\beta^o$ is the coefficient vector before we entered this inner
+loop, and $\hat\beta^n$ the converged solution for this inner
+loop. Hence if this Newton step had no impact, we declare outer-loop convergence.
+
+
+[Back to Top](#top)
+
 <a id="int"></a>
 
 ## Appendix 1: Internal Parameters
- 
+
 Our package has a set of internal parameters which control some aspects of the computation of the path. The *factory default* settings are expected to serve in most cases, and users do not need to make changes unless there are special requirements.
 
 There are several parameters that users can change:
@@ -822,13 +867,13 @@ data(QuickStartExample)
 fit = glmnet(x, y)
 print(fit)
 ```
-We can change the minimum fractional change in deviance for stopping path and compare the results. 
+We can change the minimum fractional change in deviance for stopping path and compare the results.
 ```{r}
 glmnet.control(fdev = 0)
 fit = glmnet(x, y)
 print(fit)
 ```
-We set `fdev = 0` to continue all along the path, even without much change. The length of the sequence becomes 100, which is the default of `nlambda`. 
+We set `fdev = 0` to continue all along the path, even without much change. The length of the sequence becomes 100, which is the default of `nlambda`.
 
 Users can also reset to the default settings.
 ```{r}
@@ -886,13 +931,13 @@ Lasso = CallCVX(cvxcode, const.var = list(p = p, x = x, y = y, lambda = 8), opt.
 beta_CVX = Lasso$beta
 ```
 
-For convenience here, the results were saved in `CVXResult.RData`, and we simply load in the results. 
+For convenience here, the results were saved in `CVXResult.RData`, and we simply load in the results.
 
 ```{r}
 data(CVXResults)
 ```
 
-In addition, we use `lars` to solve the same problem. 
+In addition, we use `lars` to solve the same problem.
 ```{r,message=FALSE}
 require(lars)
 ```
@@ -907,13 +952,13 @@ The results are listed below up to 6 decimal digits (due to convergence threshol
 cmp = round(cbind(beta_glmnet, beta_lars, beta_CVX), digits = 6)
 colnames(cmp) = c("beta_glmnet", "beta_lars", "beta_CVX")
 cmp
-``` 
+```
 
 [Back to Top](#top)
 
 
 ## References
- 
+
 
 <p>Jerome Friedman, Trevor Hastie and Rob Tibshirani. (2008). <br>
 <a href="http://www.jstatsoft.org/v33/i01/">Regularization Paths for Generalized Linear Models via Coordinate Descent</a><br>

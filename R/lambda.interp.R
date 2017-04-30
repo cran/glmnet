@@ -5,7 +5,7 @@ lambda.interp=function(lambda,s){
 ### the new values are interpolated bewteen the two using the fraction
 ### Note: lambda decreases. you take:
 ### sfrac*left+(1-sfrac*right)
-  
+
   if(length(lambda)==1){# degenerate case of only one lambda
     nums=length(s)
     left=rep(1,nums)
@@ -23,6 +23,8 @@ lambda.interp=function(lambda,s){
       right <- ceiling(coord)
       sfrac=(sfrac-lambda[right])/(lambda[left] - lambda[right])
       sfrac[left==right]=1
+      sfrac[abs(lambda[left]-lambda[right])<.Machine$double.eps]=1
+
     }
 list(left=left,right=right,frac=sfrac)
 }
