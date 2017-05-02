@@ -150,6 +150,8 @@ y=rpois(n,mu)
 cvob4=cv.glmnet(x,y,family="poisson")
 plot(cvob4)
 title("Poisson Family",line=2.5)
+
+\dontrun{
 # Multinomial
 n=500;p=30
 nzc=trunc(p/10)
@@ -175,7 +177,6 @@ foldid=sample(rep(seq(10),length=n))
 fit1_cv=cv.glmnet(x,y,family="cox",foldid=foldid)
 plot(fit1_cv)
 title("Cox Family",line=2.5)
-\dontrun{
 # Parallel
 require(doMC)
 registerDoMC(cores=4)

@@ -1,12 +1,12 @@
 // Automatically generated, editing not advised.
-#ifndef R_GAM_H
-#define R_GAM_H
+#ifndef R_GLMNET_H
+#define R_GLMNET_H
 #include <R.h>
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
 #ifdef ENABLE_NLS
 #include <libintl.h>
-#define _(String) dgettext ("gam", String)
+#define _(String) dgettext ("glmnet", String)
 #else
 #define _(String) (String)
 #endif
@@ -630,6 +630,15 @@ static R_NativePrimitiveArgType chg_bnorm_t[] = {
   REALSXP,
   INTSXP
 };
+void F77_SUB(get_bnorm)(
+			double *arg,
+			int *irg
+			);
+
+static R_NativePrimitiveArgType get_bnorm_t[] = {
+  REALSXP,
+  INTSXP
+};
 
 static R_FortranMethodDef fMethods[] = {
   FDEF(coxnet) ,
@@ -650,10 +659,11 @@ static R_FortranMethodDef fMethods[] = {
   FDEF(chg_min_null_prob) ,
   FDEF(chg_max_exp) ,
   FDEF(chg_bnorm) ,
+  FDEF(get_bnorm) ,
   {NULL, NULL, 0}
 };
 
-void R_init_gam(DllInfo *dll){
+void R_init_glmnet(DllInfo *dll){
   R_registerRoutines(dll, NULL, NULL, fMethods, NULL);
   R_useDynamicSymbols(dll, FALSE);
 }

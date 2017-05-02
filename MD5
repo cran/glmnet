@@ -1,5 +1,5 @@
 c8b93d865844327a54916936ab727807 *ChangeLog
-ba42df43ba5f666900a956fe9dc3fff1 *DESCRIPTION
+05c9c1f8752538eb86b05850a88974c2 *DESCRIPTION
 fa9a693eacfc0519cb57e4839eea1505 *NAMESPACE
 1edccac1b5d30969fd2f1b2ffa94b97a *R/auc.R
 8cd96999dce298c1d81ce51ea2f6d2a3 *R/auc.mat.R
@@ -56,7 +56,7 @@ ea696d8bc26ce7a5900ec3e52cad8ccb *R/print.glmnet.R
 b9badc67791d4c312f4045cf0c41d43f *R/response.coxnet.R
 8b945ab1cb9a14d10fed2265eb839876 *R/rmult.R
 0d040824da1ffcd1edb57b252f6b1f6e *R/zeromat.R
-0af4689a7166b88f65ea0db2513efe7c *build/vignette.rds
+2b154d69e4a603e0757f534587100b28 *build/vignette.rds
 d5b44b59f23b953d6c2f8835e3fb180d *cleanup
 7d272deaf972618a3f6f70b36e2272f7 *configure
 8bd1021d80561a0f3e79137e920b3ecd *configure.in
@@ -71,14 +71,14 @@ beaffe6c0ae597f8803216e3bbd4a2d1 *data/QuickStartExample.RData
 7056d5f98a624c060d0522045f1b68f8 *data/SparseExample.RData
 c22d19c217bc163a2c38b84add608c31 *inst/CITATION
 f486f9f7f486424fa8d8e05a38e9e6d5 *inst/doc/Coxnet.R
-f41067103e4845e4612719c567cbf8d3 *inst/doc/Coxnet.pdf
+cd51e3da6087c5ddafe7660537d8c9fa *inst/doc/Coxnet.pdf
 89bb275bc27d5cebcf61d4f0517fb5d5 *inst/doc/Coxnet.rnw
 312b2db2950d6ff1cf8e78d96904dc05 *inst/doc/glmnet_beta.R
-115f2d21e440930c3d513af4d6bc64a9 *inst/doc/glmnet_beta.Rmd
-71979f2338e3cdd43e29a9a37db46f51 *inst/doc/glmnet_beta.html
+f0a507478aabbdcbb1795a8c77279686 *inst/doc/glmnet_beta.Rmd
+21d532260eea378614cc9d1b7bb47b98 *inst/doc/glmnet_beta.pdf
 bc3890905a7f0bfbee2c8d48b2840d45 *inst/mortran/glmnet5.m
 4b562f8e16199091b797e15c24b6b258 *man/beta_CVX.Rd
-31bc2d0829360561e2ee2eb0d120f729 *man/cv.glmnet.Rd
+671c3ce9ca2512bd1f9694bf7129a994 *man/cv.glmnet.Rd
 a9f31f3162f2729793d2e034a4279a25 *man/deviance.glmnet.Rd
 2fc00f3a2bde279626cf477f69de2940 *man/glmnet-internal.Rd
 b4dab413345857ebceb378b4fb9c92d1 *man/glmnet-package.Rd
@@ -92,7 +92,8 @@ ec4cf2278b0e3cace7980b6d05506f53 *man/print.glmnet.Rd
 03d5d624b734ace367b45b789fbf66a4 *src/Makevars.in
 1bd30ec98a50c49ec6aabebbb458d0cb *src/Makevars.win
 23c6d31e7ffc3be2bd5b9f11fc2fddc9 *src/glmnet5.f90
-1ce705fa9badb6bc43cc092a8992ffec *src/glmnet_init.c
+7df5b34e03decaa7ac28d6072ebde055 *src/glmnet_init.c
 89bb275bc27d5cebcf61d4f0517fb5d5 *vignettes/Coxnet.rnw
 bbb84222f5172db7113f5f9f07214ed9 *vignettes/VignetteExample.rdata
-115f2d21e440930c3d513af4d6bc64a9 *vignettes/glmnet_beta.Rmd
+f0a507478aabbdcbb1795a8c77279686 *vignettes/glmnet_beta.Rmd
+b30880e44478a7130a9711434eec8c40 *vignettes/glmnet_beta.html
