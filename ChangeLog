@@ -1,3 +1,5 @@
+2017-05-05 Trevor Hastie <hastie@stanford.edu> version 2.0-10
+	* Two iterations to fix to fix native fortran registration.
 2017-04-25 Trevor Hastie <hastie@stanford.edu> version 2.0-8
 	* included native registration of fortran
 2016-08-25 Trevor Hastie <hastie@stanford.edu> version 2.0-7

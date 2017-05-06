@@ -1,5 +1,5 @@
-c8b93d865844327a54916936ab727807 *ChangeLog
-05c9c1f8752538eb86b05850a88974c2 *DESCRIPTION
+bb6b5bbd8af0216c16f2beba533dd173 *ChangeLog
+730da932d418f6c27ccdfe83a16c9409 *DESCRIPTION
 fa9a693eacfc0519cb57e4839eea1505 *NAMESPACE
 1edccac1b5d30969fd2f1b2ffa94b97a *R/auc.R
 8cd96999dce298c1d81ce51ea2f6d2a3 *R/auc.mat.R
@@ -71,11 +71,11 @@ beaffe6c0ae597f8803216e3bbd4a2d1 *data/QuickStartExample.RData
 7056d5f98a624c060d0522045f1b68f8 *data/SparseExample.RData
 c22d19c217bc163a2c38b84add608c31 *inst/CITATION
 f486f9f7f486424fa8d8e05a38e9e6d5 *inst/doc/Coxnet.R
-cd51e3da6087c5ddafe7660537d8c9fa *inst/doc/Coxnet.pdf
+ade6635f2314f32b76e443aa53aa28d0 *inst/doc/Coxnet.pdf
 89bb275bc27d5cebcf61d4f0517fb5d5 *inst/doc/Coxnet.rnw
 312b2db2950d6ff1cf8e78d96904dc05 *inst/doc/glmnet_beta.R
 f0a507478aabbdcbb1795a8c77279686 *inst/doc/glmnet_beta.Rmd
-21d532260eea378614cc9d1b7bb47b98 *inst/doc/glmnet_beta.pdf
+8c59810c5cb7daa2994ffb5536662cbc *inst/doc/glmnet_beta.pdf
 bc3890905a7f0bfbee2c8d48b2840d45 *inst/mortran/glmnet5.m
 4b562f8e16199091b797e15c24b6b258 *man/beta_CVX.Rd
 671c3ce9ca2512bd1f9694bf7129a994 *man/cv.glmnet.Rd
@@ -92,7 +92,7 @@ ec4cf2278b0e3cace7980b6d05506f53 *man/print.glmnet.Rd
 03d5d624b734ace367b45b789fbf66a4 *src/Makevars.in
 1bd30ec98a50c49ec6aabebbb458d0cb *src/Makevars.win
 23c6d31e7ffc3be2bd5b9f11fc2fddc9 *src/glmnet5.f90
-7df5b34e03decaa7ac28d6072ebde055 *src/glmnet_init.c
+a3983812e8e4ad189c7f96733eb5e553 *src/glmnet_init.c
 89bb275bc27d5cebcf61d4f0517fb5d5 *vignettes/Coxnet.rnw
 bbb84222f5172db7113f5f9f07214ed9 *vignettes/VignetteExample.rdata
 f0a507478aabbdcbb1795a8c77279686 *vignettes/glmnet_beta.Rmd
