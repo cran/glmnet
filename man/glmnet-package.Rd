@@ -32,7 +32,7 @@ Maintainer: Trevor Hastie  <hastie@stanford.edu>
 }
 \references{Friedman, J., Hastie, T. and Tibshirani, R. (2008)
   \emph{Regularization Paths for Generalized Linear Models via Coordinate
-    Descent},   \url{http://www.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
+    Descent},   \url{https://web.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
   \emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\cr
   \url{http://www.jstatsoft.org/v33/i01/}\cr
   Simon, N., Friedman, J., Hastie, T., Tibshirani, R. (2011)
@@ -44,9 +44,9 @@ Maintainer: Trevor Hastie  <hastie@stanford.edu>
   N.,Taylor, J. and Tibshirani, Ryan. (2012)
   \emph{Strong Rules for Discarding Predictors in Lasso-type Problems,
     JRSSB, vol 74},\cr
-  \url{http://www-stat.stanford.edu/~tibs/ftp/strong.pdf}\cr
+  \url{http://statweb.stanford.edu/~tibs/ftp/strong.pdf}\cr
   \emph{Stanford Statistics Technical Report}\cr
-  \emph{Glmnet Vignette} \url{http://www.stanford.edu/~hastie/glmnet/glmnet_alpha.html}
+  \emph{Glmnet Vignette} \url{https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html}
 }
 \keyword{models}
 \keyword{regression}

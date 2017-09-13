@@ -1,3 +1,6 @@
+2017-09-05 Trevor Hastie <hastie@stanford.edu> version 2.0-11
+	* Added protection with exact=TRUE calls to coef and predict. See
+	help file for more details
 2017-05-05 Trevor Hastie <hastie@stanford.edu> version 2.0-10
 	* Two iterations to fix to fix native fortran registration.
 2017-04-25 Trevor Hastie <hastie@stanford.edu> version 2.0-8

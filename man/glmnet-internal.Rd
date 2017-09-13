@@ -35,6 +35,7 @@
 \alias{plotCoef}
 \alias{zeromat}
 \alias{na.mean}
+\alias{check_dots}
 \description{Internal glmnet functions}
 \usage{
 fix.lam(lam)
@@ -49,6 +50,8 @@ glmnet_softmax(x)
   \code{nonzeroCoef} determines in an efficient manner which variables
   are nonzero in each fit. \code{jerr} prints out error messages from
   the fortran. \code{plotCoef} is called by the \code{plot} method for
-  \code{glmnet} objects. 
+  \code{glmnet} objects. \code{check_dots} is used in \code{coef} and
+  \code{predict} with argument \code{exact=TRUE}, to make sure user
+  supplies original data used to fit the \code{"glmnet"} object.
 }
 \keyword{internal}

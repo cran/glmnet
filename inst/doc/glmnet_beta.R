@@ -51,9 +51,10 @@ plot(fit, xvar = "lambda", label = TRUE)
 plot(fit, xvar = "dev", label = TRUE)
 
 ## ------------------------------------------------------------------------
+fit = glmnet(x, y)
 any(fit$lambda == 0.5)
-coef.exact = coef(fit, s = 0.5, exact = TRUE)
 coef.apprx = coef(fit, s = 0.5, exact = FALSE)
+coef.exact = coef(fit, s = 0.5, exact = TRUE, x=x, y=y)
 cbind2(coef.exact, coef.apprx)
 
 ## ------------------------------------------------------------------------
@@ -295,7 +296,8 @@ data(QuickStartExample)
 
 ## ------------------------------------------------------------------------
 fit = glmnet(x, y, intercept = F, standardize = F, thresh = 1e-20)
-beta_glmnet = as.matrix(predict(fit, s = 8/(2*dim(x)[1]), type = "coefficients", exact = T)[-1,])
+beta_glmnet = as.matrix(predict(fit, s = 8/(2*dim(x)[1]), type = "coefficients",
+                                exact = TRUE, x=x, y=y)[-1,])
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  library(CVXfromR)

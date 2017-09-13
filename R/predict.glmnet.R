@@ -1,4 +1,4 @@
-predict.glmnet=function(object,newx,s=NULL,type=c("link","response","coefficients","nonzero","class"),exact=FALSE,offset,...){
+predict.glmnet=function(object,newx,s=NULL,type=c("link","response","coefficients","nonzero","class"),exact=FALSE,newoffset,...){
  type=match.arg(type)
   if(missing(newx)){
     if(!match(type,c("coefficients","nonzero"),FALSE))stop("You need to supply a value for 'newx'")
@@ -8,10 +8,12 @@ predict.glmnet=function(object,newx,s=NULL,type=c("link","response","coefficient
     lambda=object$lambda
     which=match(s,lambda,FALSE)
     if(!all(which>0)){
-      lambda=unique(rev(sort(c(s,lambda))))
-      object=tryCatch(update(object,lambda=lambda,...),error=function(e)stop("problem with predict.glmnet() or coef.glmnet(): unable to refit the glmnet object to compute exact coefficients; please supply original data by name, such as x and y, plus any weights, offsets etc.",call.=FALSE))
+        lambda=unique(rev(sort(c(s,lambda))))
+        check_dots(object,...)# This fails if you don't supply the crucial arguments
+        object=update(object,lambda=lambda,...)
+#      object=tryCatch(update(object,lambda=lambda,...),error=function(e)stop("problem with predict.glmnet() or coef.glmnet(): unable to refit the glmnet object to compute exact coefficients; please supply original data by name, such as x and y, plus any weights, offsets etc.",call.=FALSE))
     }
-  } 
+  }
   a0=t(as.matrix(object$a0))
   rownames(a0)="(Intercept)"
   nbeta=methods::rbind2(a0,object$beta)#was rbind2
@@ -20,7 +22,7 @@ predict.glmnet=function(object,newx,s=NULL,type=c("link","response","coefficient
     dimnames(nbeta)=list(NULL,NULL)
     lambda=object$lambda
     lamlist=lambda.interp(lambda,s)
-    
+
     nbeta=nbeta[,lamlist$left,drop=FALSE]%*%Diagonal(x=lamlist$frac) +nbeta[,lamlist$right,drop=FALSE]%*%Diagonal(x=1-lamlist$frac)
     dimnames(nbeta)=list(vnames,paste(seq(along=s)))
   }
@@ -30,9 +32,9 @@ predict.glmnet=function(object,newx,s=NULL,type=c("link","response","coefficient
  if(inherits(newx, "sparseMatrix"))newx=as(newx,"dgCMatrix")
   nfit=as.matrix(cbind2(1,newx)%*%nbeta)
    if(object$offset){
-    if(missing(offset))stop("No offset provided for prediction, yet used in fit of glmnet",call.=FALSE)
-    if(is.matrix(offset)&&dim(offset)[[2]]==2)offset=offset[,2]
-    nfit=nfit+array(offset,dim=dim(nfit))
+    if(missing(newoffset))stop("No newoffset provided for prediction, yet offset used in fit of glmnet",call.=FALSE)
+    if(is.matrix(newoffset)&&inherits(object,"lognet")&&dim(newoffset)[[2]]==2)newoffset=newoffset[,2]
+    nfit=nfit+array(newoffset,dim=dim(nfit))
   }
 nfit
   }

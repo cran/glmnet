@@ -227,17 +227,23 @@ We can extract the coefficients and make predictions at certain values of $\lamb
 
 * `s` specifies the value(s) of $\lambda$ at which extraction is made.
 
-* `exact` indicates whether the exact values of coefficients are desired or not. That is, if `exact = TRUE`, and predictions are to be made at values of s not included in the original fit, these values of s are merged with `object$lambda`, and the model is refit before predictions are made. If `exact=FALSE` (default), then the predict function uses linear interpolation to make predictions for values of s that do not coincide with lambdas used in the fitting algorithm.
+* `exact` indicates whether the exact values of coefficients are desired or not. That is, if `exact = TRUE`, and predictions are to be made at values of `s` not included in the original fit, these values of `s` are merged with `object$lambda`, and the model is refit before predictions are made. If `exact=FALSE` (default), then the predict function uses linear interpolation to make predictions for values of `s` that do not coincide with lambdas used in the fitting algorithm.
 
 A simple example is:
 
 ```{r}
+fit = glmnet(x, y)
 any(fit$lambda == 0.5)
-coef.exact = coef(fit, s = 0.5, exact = TRUE)
 coef.apprx = coef(fit, s = 0.5, exact = FALSE)
+coef.exact = coef(fit, s = 0.5, exact = TRUE, x=x, y=y)
 cbind2(coef.exact, coef.apprx)
 ```
-The left column is for `exact = TRUE` and the right for `FALSE`. We see from the above that 0.01 is not in the sequence and that hence there are some difference, though not much. Linear interpolation is mostly enough if there are no special requirements.
+The left column is for `exact = TRUE` and the right for `FALSE`. We
+see from the above that 0.5 is not in the sequence and that hence
+there are some difference, though not much. Linear interpolation is
+mostly enough if there are no special requirements. Notice that with
+`exact=TRUE` we have to supply by named argument any data that was used in creating the
+original fit, in this case `x` and `y`.
 
 Users can make predictions from the fitted object. In addition to the options in `coef`,  the primary argument is `newx`, a matrix of new values for `x`. The `type` option allows users to choose the type of prediction:
 * "link" gives the fitted values
@@ -451,7 +457,7 @@ Logistic regression  is another widely-used model when the response is categoric
 ### Binomial Models
 
 For the binomial model, suppose the response variable takes value in $\mathcal{G}=\{1,2\}$. Denote $y_i = I(g_i=1)$. We model
-$$\mbox{Pr}(G=2|X=x)+\frac{e^{\beta_0+\beta^Tx}}{1+e^{\beta_0+\beta^Tx}},$$
+$$\mbox{Pr}(G=2|X=x)=\frac{e^{\beta_0+\beta^Tx}}{1+e^{\beta_0+\beta^Tx}},$$
 which can be written in the following form
 $$\log\frac{\mbox{Pr}(G=2|X=x)}{\mbox{Pr}(G=1|X=x)}=\beta_0+\beta^Tx,$$
 the so-called "logistic" or log-odds transformation.
@@ -604,7 +610,7 @@ predict(cvfit, newx = x[1:10,], s = "lambda.min", type = "class")
 Poisson regression is used to model count data under the assumption of Poisson error, or otherwise non-negative data where the mean and variance are proportional. Like the Gaussian and binomial model, the Poisson is a member of the exponential family of distributions. We usually model its positive mean on the log scale:   $\log \mu(x) = \beta_0+\beta' x$.
 The log-likelihood for observations $\{x_i,y_i\}_1^N$ is given my
 $$
-l(\beta|X, Y) = \sum_{i=1}^N (y_i (\beta_0+\beta' x_i) - e^{\beta_0+\beta^Tx_i}.
+l(\beta|X, Y) = \sum_{i=1}^N \left(y_i (\beta_0+\beta' x_i) - e^{\beta_0+\beta^Tx_i}\right).
 $$
 As before, we optimize the penalized log-lielihood:
  $$
@@ -628,7 +634,7 @@ The optional input arguments of `glmnet` for `"poisson"` family are similar to t
 
 `offset` is a useful argument particularly in Poisson models.
 
-When dealing with rate data in Poisson models, the counts collected are often based on different  exposures, such as length of time observed, area and years. A poisson rate $\mu(x)$ is relative to a unit exposure time, so if an observation $y_i$ was exposed for $E_i$ units of time, then the expected count would be $E_i\mu(x)$, and the log mean would be $\log(E_i)+\log(\mu(x)$. In a case like this, we would supply an *offset* $\log(E_i)$ for each observation.
+When dealing with rate data in Poisson models, the counts collected are often based on different  exposures, such as length of time observed, area and years. A poisson rate $\mu(x)$ is relative to a unit exposure time, so if an observation $y_i$ was exposed for $E_i$ units of time, then the expected count would be $E_i\mu(x)$, and the log mean would be $\log(E_i)+\log(\mu(x))$. In a case like this, we would supply an *offset* $\log(E_i)$ for each observation.
 Hence `offset` is a vector of length `nobs` that is included in the linear predictor.   Other families can also use options, typically for different reasons.
 
 (Warning: if `offset` is supplied in `glmnet`, offsets must also also be supplied to `predict` to make reasonable predictions.)
@@ -916,7 +922,8 @@ Alternatively, a more stable and __strongly recommended__ way to perform this ta
 
 ```{r}
 fit = glmnet(x, y, intercept = F, standardize = F, thresh = 1e-20)
-beta_glmnet = as.matrix(predict(fit, s = 8/(2*dim(x)[1]), type = "coefficients", exact = T)[-1,])
+beta_glmnet = as.matrix(predict(fit, s = 8/(2*dim(x)[1]), type = "coefficients",
+                                exact = TRUE, x=x, y=y)[-1,])
 ```
 
 We also use CVX, a general convex optimization solver, to solve this specific Lasso problem. Users could also call CVX from R using the `CVXfromR` package and solve the problem as follows.

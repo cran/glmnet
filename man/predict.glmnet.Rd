@@ -14,7 +14,7 @@ coefficients and more from a fitted \code{"glmnet"} object.
 }
 \usage{
 \method{predict}{glmnet}(object, newx, s = NULL,
-type=c("link","response","coefficients","nonzero","class"), exact = FALSE, offset, ...)
+type=c("link","response","coefficients","nonzero","class"), exact = FALSE, newoffset, ...)
 \method{coef}{glmnet}(object,s=NULL, exact=FALSE, ...)
 }
 \arguments{
@@ -51,16 +51,15 @@ type=c("link","response","coefficients","nonzero","class"), exact = FALSE, offse
   With \code{exact=TRUE}, these different values of \code{s} are merged
   (and sorted) with
   \code{object$lambda}, and the model is refit before predictions are
-  made. In this case, it is strongly advisable to supply the original
+  made. In this case, it is required to supply the original
   data \code{x=} and \code{y=} as additional
-  named  arguments to \code{predict()} or \code{coef()}.
+  named  arguments to \code{predict()} or \code{coef()}.  
  The workhorse \code{predict.glmnet()} needs to  \code{update} the model,
- and expects the data used to create it to be around.
- Although it will often work fine without supplying these additional arguments, it will likely break when
- used inside a nested sequence of function calls. 
- If additional arguments such as \code{weights} and
-\code{offset} were used, these should be included by name as well.}
- \item{offset}{If an offset is used in the fit, then one must be
+ and so needs the data used to create it. The same is
+  true of \code{weights}, \code{offset}, \code{penalty.factor},
+  \code{lower.limits}, \code{upper.limits} if these were used in the
+  original call. Failure to do so will result in an error.}
+ \item{newoffset}{If an offset is used in the fit, then one must be
    supplied for making predictions (except for
    \code{type="coefficients"}  or \code{type="nonzero"})}
   \item{\dots}{This is the mechanism for passing arguments like
@@ -74,7 +73,7 @@ model types. \code{coef(...)} is equivalent to \code{predict(type="coefficients"
 \value{The object returned depends on type.}
 \references{Friedman, J., Hastie, T. and Tibshirani, R. (2008)
   \emph{Regularization Paths for Generalized Linear Models via Coordinate
-    Descent},   \url{http://www.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
+    Descent},   \url{https://web.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
   \emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\cr
   \url{http://www.jstatsoft.org/v33/i01/}\cr
   Simon, N., Friedman, J., Hastie, T., Tibshirani, R. (2011)

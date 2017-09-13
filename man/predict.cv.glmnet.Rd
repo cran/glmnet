@@ -29,7 +29,6 @@ to the \code{predict} method for \code{glmnet} objects.}
 \references{Friedman, J., Hastie, T. and Tibshirani, R. (2008)
   \emph{Regularization Paths for Generalized Linear Models via Coordinate
     Descent, Journal of Statistical Software, Vol. 33, Issue 1, Feb 2010}\cr
-  \url{http://www-stat.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
   \url{http://www.jstatsoft.org/v33/i01/}
 }
 \author{Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr

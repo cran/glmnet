@@ -13,7 +13,7 @@ export(glmnet,
        cv.glmnet,
        cv.elnet,cv.lognet,cv.multnet,cv.fishnet,cv.coxnet,cv.mrelnet,getmin,auc,auc.mat,cvcompute,coxnet.deviance,
        lambda.interp,response.coxnet,rmult,glmnet_softmax,na.mean,glmnet.control,
-       predict.elnet,predict.lognet,predict.fishnet,mrelnet,predict.multnet,predict.coxnet,predict.mrelnet,nonzeroCoef,plotCoef,jerr,jerr.elnet,jerr.lognet,jerr.fishnet,jerr.coxnet,jerr.mrelnet,elnet,lognet,fishnet,coxnet,getcoef,getcoef.multinomial,coefnorm)
+       predict.elnet,predict.lognet,predict.fishnet,mrelnet,predict.multnet,predict.coxnet,predict.mrelnet,nonzeroCoef,plotCoef,jerr,jerr.elnet,jerr.lognet,jerr.fishnet,jerr.coxnet,jerr.mrelnet,elnet,lognet,fishnet,coxnet,getcoef,getcoef.multinomial,coefnorm,check_dots)
 
 S3method("print","glmnet")
 S3method("plot","glmnet")

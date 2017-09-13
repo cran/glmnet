@@ -94,7 +94,7 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, 
 }
 \references{Friedman, J., Hastie, T. and Tibshirani, R. (2008)
   \emph{Regularization Paths for Generalized Linear Models via Coordinate
-    Descent},   \url{http://www.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
+    Descent},   \url{https://web.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
   \emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\cr
   \url{http://www.jstatsoft.org/v33/i01/}\cr
   Simon, N., Friedman, J., Hastie, T., Tibshirani, R. (2011)
