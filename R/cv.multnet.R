@@ -1,12 +1,12 @@
 cv.multnet <-
-  function (outlist, lambda, x, y, weights, offset, foldid, type.measure, 
-            grouped, keep = FALSE) 
+  function (outlist, lambda, x, y, weights, offset, foldid, type.measure,
+            grouped, keep = FALSE)
 {
-  typenames = c(mse = "Mean-Squared Error", mae = "Mean Absolute Error", 
+  typenames = c(mse = "Mean-Squared Error", mae = "Mean Absolute Error",
     deviance = "Multinomial Deviance", class = "Misclassification Error")
-  if (type.measure == "default") 
+  if (type.measure == "default")
     type.measure = "deviance"
-  if (!match(type.measure, c("mse", "mae", "deviance", "class"), 
+  if (!match(type.measure, c("mse", "mae", "deviance", "class"),
              FALSE)) {
     warning("Only 'deviance', 'class',  'mse' or 'mae'  available for multinomial models; 'deviance' used")
     type.measure = "deviance"
@@ -21,7 +21,7 @@ cv.multnet <-
     y = diag(nc)[as.numeric(y), ]
   }
   else nc = nc[2]
-  if (!is.null(offset)) 
+  if (!is.null(offset))
     is.offset = TRUE
   else is.offset = FALSE
 
@@ -34,9 +34,9 @@ cv.multnet <-
   for (i in seq(nfolds)) {
     which = foldid == i
     fitobj = outlist[[i]]
-    if (is.offset) 
+    if (is.offset)
       off_sub = offset[which, , drop = FALSE]
-    preds = predict(fitobj, x[which, , drop = FALSE], s=lambda[which_lam],offset = off_sub, 
+    preds = predict(fitobj, x[which, , drop = FALSE], s=lambda[which_lam],newoffset = off_sub,
       type = "response")
     nlami = sum(which_lam)
     predmat[which, , seq(nlami)] = preds
@@ -47,8 +47,8 @@ cv.multnet <-
   weights = weights * ywt
   N = nrow(y) - apply(is.na(predmat[, 1, ]), 2, sum)
   bigY = array(y, dim(predmat))
-  cvraw = switch(type.measure, mse = apply((bigY - predmat)^2, 
-                                 c(1, 3), sum), mae = apply(abs(bigY - predmat), c(1, 
+  cvraw = switch(type.measure, mse = apply((bigY - predmat)^2,
+                                 c(1, 3), sum), mae = apply(abs(bigY - predmat), c(1,
                                                   3), sum), deviance = {
                                                     predmat = pmin(pmax(predmat, prob_min), prob_max)
                                                     lp = bigY * log(predmat)
@@ -61,7 +61,7 @@ cv.multnet <-
                                                     matrix(1 - yperm[cbind(seq(classid), classid)], ncol = length(lambda))
                                                   })
   if ((nrow(y)/nfolds < 3) && grouped) {
-    warning("Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold", 
+    warning("Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold",
             call. = FALSE)
     grouped = FALSE
   }
@@ -72,10 +72,10 @@ cv.multnet <-
     N = cvob$N
   }
   cvm = apply(cvraw, 2, weighted.mean, w = weights, na.rm = TRUE)
-  cvsd = sqrt(apply(scale(cvraw, cvm, FALSE)^2, 2, weighted.mean, 
+  cvsd = sqrt(apply(scale(cvraw, cvm, FALSE)^2, 2, weighted.mean,
     w = weights, na.rm = TRUE)/(N - 1))
   out = list(cvm = cvm, cvsd = cvsd, name = typenames[type.measure])
-  if (keep) 
+  if (keep)
     out$fit.preval = predmat
   out
 }

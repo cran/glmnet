@@ -11,7 +11,6 @@ predict.glmnet=function(object,newx,s=NULL,type=c("link","response","coefficient
         lambda=unique(rev(sort(c(s,lambda))))
         check_dots(object,...)# This fails if you don't supply the crucial arguments
         object=update(object,lambda=lambda,...)
-#      object=tryCatch(update(object,lambda=lambda,...),error=function(e)stop("problem with predict.glmnet() or coef.glmnet(): unable to refit the glmnet object to compute exact coefficients; please supply original data by name, such as x and y, plus any weights, offsets etc.",call.=FALSE))
     }
   }
   a0=t(as.matrix(object$a0))

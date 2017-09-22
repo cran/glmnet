@@ -1,4 +1,4 @@
-predict.coxnet=function(object,newx,s=NULL,type=c("link","response","coefficients","nonzero"),exact=FALSE,offset,...){
+predict.coxnet=function(object,newx,s=NULL,type=c("link","response","coefficients","nonzero"),exact=FALSE,newoffset,...){
   type=match.arg(type)
   ###coxnet has no intercept, so we treat it separately
   if(missing(newx)){
@@ -9,7 +9,8 @@ predict.coxnet=function(object,newx,s=NULL,type=c("link","response","coefficient
     which=match(s,lambda,FALSE)
     if(!all(which>0)){
       lambda=unique(rev(sort(c(s,lambda))))
-      object=tryCatch(update(object,lambda=lambda,...),error=function(e)stop("problem with predict.glmnet() or coef.glmnet(): unable to refit the glmnet object to compute exact coefficients; please supply original data by name, such as x and y, plus any weights, offsets etc.",call.=FALSE))
+        check_dots(object,...)# This fails if you don't supply the crucial arguments
+        object=update(object,lambda=lambda,...)
     }
   }
 
@@ -26,11 +27,11 @@ predict.coxnet=function(object,newx,s=NULL,type=c("link","response","coefficient
   if(type=="nonzero")return(nonzeroCoef(nbeta,bystep=TRUE))
   nfit=as.matrix(newx%*%nbeta)
   if(object$offset){
-    if(missing(offset))stop("No offset provided for prediction, yet used in fit of glmnet",call.=FALSE)
-    nfit=nfit+array(offset,dim=dim(nfit))
+    if(missing(newoffset))stop("No newoffset provided for prediction, yet offset used in fit of glmnet",call.=FALSE)
+    nfit=nfit+array(newoffset,dim=dim(nfit))
   }
   switch(type,
          response=exp(nfit),
          link=nfit
          )
-}  
+}

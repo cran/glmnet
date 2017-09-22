@@ -1,10 +1,6 @@
 elnet=function(x,is.sparse,ix,jx,y,weights,offset,type.gaussian=c("covariance","naive"),alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit){
   maxit=as.integer(maxit)
   weights=as.double(weights)
-### compute the null deviance
-  ybar=weighted.mean(y,weights)
-  nulldev=sum(weights* (y-ybar)^2)
-if(nulldev==0)stop("y is constant; gaussian glmnet fails at standardization step")
   type.gaussian=match.arg(type.gaussian)
 
   ka=as.integer(switch(type.gaussian,
@@ -15,15 +11,20 @@ if(nulldev==0)stop("y is constant; gaussian glmnet fails at standardization step
 
  storage.mode(y)="double"
    if(is.null(offset)){
-    offset=y*0
     is.offset=FALSE}
   else{
     storage.mode(offset)="double"
     is.offset=TRUE
+    y=y-offset
   }
+### compute the null deviance
+  ybar=weighted.mean(y,weights)
+  nulldev=sum(weights* (y-ybar)^2)
+if(nulldev==0)stop("y is constant; gaussian glmnet fails at standardization step")
+
 
 fit=if(is.sparse).Fortran("spelnet",
-        ka,parm=alpha,nobs,nvars,x,ix,jx,y-offset,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,
+        ka,parm=alpha,nobs,nvars,x,ix,jx,y,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,
         lmu=integer(1),
         a0=double(nlam),
         ca=double(nx*nlam),
@@ -35,7 +36,7 @@ fit=if(is.sparse).Fortran("spelnet",
         jerr=integer(1),PACKAGE="glmnet"
         )
 else .Fortran("elnet",
-          ka,parm=alpha,nobs,nvars,as.double(x),y-offset,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,
+          ka,parm=alpha,nobs,nvars,as.double(x),y,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,
           lmu=integer(1),
           a0=double(nlam),
           ca=double(nx*nlam),

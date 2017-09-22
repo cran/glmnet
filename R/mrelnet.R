@@ -8,26 +8,28 @@ mrelnet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne
     responseNames=dimnames(y)[[2]]
     if(is.null(responseNames))responseNames=paste("y",seq(nr),sep="")
   }
+
+ storage.mode(y)="double"
+   if(is.null(offset)){
+    is.offset=FALSE}
+  else{
+    offset=as.matrix(offset)
+    storage.mode(offset)="double"
+    if(!all.equal(dim(offset),dim(y)))stop("Offset must match dimension of y")
+    y=y-offset
+    is.offset=TRUE
+    }
+
   nulldev=0
   for(i in seq(nr)){
   ybar=weighted.mean(y[,i],weights)
   nulldev=nulldev+sum(weights* (y[,i]-ybar)^2)
 }
- 
- storage.mode(y)="double"
-   if(is.null(offset)){
-    offset=y*0
-    is.offset=FALSE}
-  else{
-    offset=as.matrix(offset)
-    storage.mode(offset)="double"
-    if(dim(offset)!=dim(y))stop("Offset must match dimension of y")
-    is.offset=TRUE
-  }
+
   storage.mode(nr)="integer"
 
 fit=if(is.sparse).Fortran("multspelnet",
-        parm=alpha,nobs,nvars,nr,x,ix,jx,y-offset,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,maxit,
+        parm=alpha,nobs,nvars,nr,x,ix,jx,y,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,maxit,
         lmu=integer(1),
         a0=double(nlam*nr),
         ca=double(nx*nlam*nr),
@@ -39,7 +41,7 @@ fit=if(is.sparse).Fortran("multspelnet",
         jerr=integer(1),PACKAGE="glmnet"
         )
 else .Fortran("multelnet",
-          parm=alpha,nobs,nvars,nr,as.double(x),y-offset,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,maxit,
+          parm=alpha,nobs,nvars,nr,as.double(x),y,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,maxit,
           lmu=integer(1),
           a0=double(nlam*nr),
           ca=double(nx*nlam*nr),
@@ -57,7 +59,7 @@ if(fit$jerr!=0){
 }
   if(nr>1)
     outlist=getcoef.multinomial(fit,nvars,nx,vnames,nr,responseNames,center.intercept=FALSE)
-  else 
+  else
     outlist=getcoef(fit,nvars,nx,vnames)
   dev=fit$rsq[seq(fit$lmu)]
   outlist=c(outlist,list(dev.ratio=dev,nulldev=nulldev,npasses=fit$nlp,jerr=fit$jerr,offset=is.offset))

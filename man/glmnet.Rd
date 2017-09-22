@@ -62,7 +62,7 @@ glmnet(x, y, family=c("gaussian","binomial","poisson","multinomial","cox","mgaus
     is to have the 
     program compute its own \code{lambda} sequence based on
     \code{nlambda} and \code{lambda.min.ratio}. Supplying a value of
-    \code{lambda} overrides this. WARNING: use with care. Do not supply
+    \code{lambda} overrides this. WARNING: use with care. Avoid supplying
   a single value for \code{lambda} (for predictions after CV use \code{predict()}
   instead).  Supply instead
     a decreasing sequence of \code{lambda} values. \code{glmnet} relies
@@ -137,6 +137,7 @@ glmnet(x, y, family=c("gaussian","binomial","poisson","multinomial","cox","mgaus
   RSS/nobs + \lambda*penalty,} and for the other models it is
   \deqn{-loglik/nobs + \lambda*penalty.} Note also that for
   \code{"gaussian"}, \code{glmnet} standardizes y to have unit variance
+  (using 1/n rather than 1/(n-1) formula)
   before computing its lambda sequence (and then unstandardizes the
   resulting coefficients); if you wish to reproduce/compare results with other
   software, best to supply a standardized y. The coefficients for any  predictor variables
@@ -149,7 +150,7 @@ glmnet(x, y, family=c("gaussian","binomial","poisson","multinomial","cox","mgaus
   "multi-task" learning in some domains. The grouped multinomial allows the same penalty for the
   \code{family="multinomial"} model, which is also multi-responsed. For
   both of these the penalty on the coefficient vector for variable j is 
-   \deqn{(1-\alpha)/2||\beta_j||_2^2+\alpha||\beta_j||_2.} When
+   \deqn{(1-\alpha)/2||\beta_j||_2^2+\alpha||\beta_j||_1.} When
   \code{alpha=1} this is a group-lasso penalty, and otherwise it mixes
   with quadratic just like elasticnet. 
   }

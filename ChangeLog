@@ -1,3 +1,6 @@
+2017-09-21 Trevor Hastie <hastie@stanford.edu> version 2.0-13
+	* Cleaned up some bugs to do with exact prediction
+	* newoffset created problems all over - fixed these
 2017-09-05 Trevor Hastie <hastie@stanford.edu> version 2.0-11
 	* Added protection with exact=TRUE calls to coef and predict. See
 	help file for more details
