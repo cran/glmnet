@@ -18,7 +18,7 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   np=dim(x)
    ###check dims
   if(is.null(np)){
-    nobs = length(x)
+    nobs = as.integer(length(x))
     nvars = as.integer(1)
   }
   else {
@@ -27,7 +27,6 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   }
   if(missing(weights))weights=rep(1,nobs)
   else if(length(weights)!=nobs)stop(paste("number of elements in weights (",length(weights),") not equal to the number of rows of x (",nobs,")",sep=""))
-  nvars=as.integer(np[2])
   dimy=dim(y)
   nrowy=ifelse(is.null(dimy),length(y),dimy[1])
     if(nrowy!=nobs)stop(paste("number of observations in y (",nrowy,") not equal to the number of rows of x (",nobs,")",sep=""))
