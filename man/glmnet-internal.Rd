@@ -3,6 +3,7 @@
 \alias{auc}
 \alias{auc.mat}
 \alias{coxnet.deviance}
+\alias{cvtype}
 \alias{cvcompute}
 \alias{getcoef}
 \alias{getcoef.multinomial}

@@ -1,3 +1,12 @@
+2018-03-12 Trevor Hastie <hastie@stanford.edu> version 2.0-16
+	* Additional fixes to mortran; current mortran src is in
+	inst/mortran
+	* Mortran uses double precision, and variables are initialized to
+	avoid -Wall warnings
+	* cleaned up repeat code in CV by creating a utility function
+2018-01-31 Trevor Hastie <hastie@stanford.edu> version 2.0-15
+	* Naras fixed up the mortran so that generic fortran compiler can
+	run without any configure
 2017-09-21 Trevor Hastie <hastie@stanford.edu> version 2.0-13
 	* Cleaned up some bugs to do with exact prediction
 	* newoffset created problems all over - fixed these

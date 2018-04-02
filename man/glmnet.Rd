@@ -152,7 +152,12 @@ glmnet(x, y, family=c("gaussian","binomial","poisson","multinomial","cox","mgaus
   both of these the penalty on the coefficient vector for variable j is 
    \deqn{(1-\alpha)/2||\beta_j||_2^2+\alpha||\beta_j||_1.} When
   \code{alpha=1} this is a group-lasso penalty, and otherwise it mixes
-  with quadratic just like elasticnet. 
+  with quadratic just like elasticnet. A small detail in the Cox model:
+  if death times are tied with censored times, we assume the censored
+  times occurred just \emph{before} the death times in computing the
+  Breslow approximation; if users prefer the usual convention of
+  \emph{after}, they can add a small number to all censoring times to
+  achieve this effect. 
   }
 \value{
 An object with S3 class \code{"glmnet","*" }, where \code{"*"} is

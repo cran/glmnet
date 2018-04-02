@@ -140,6 +140,7 @@ set.seed(1011)
 cvob3=cv.glmnet(x,ly,family="binomial",type.measure="class")
 plot(cvob3)
 title("Binomial Family",line=2.5)
+\dontrun{
 set.seed(1011)
 cvob3a=cv.glmnet(x,ly,family="binomial",type.measure="auc")
 plot(cvob3a)
@@ -151,7 +152,6 @@ cvob4=cv.glmnet(x,y,family="poisson")
 plot(cvob4)
 title("Poisson Family",line=2.5)
 
-\dontrun{
 # Multinomial
 n=500;p=30
 nzc=trunc(p/10)

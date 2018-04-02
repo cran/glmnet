@@ -11,7 +11,7 @@ import(foreach)
 export(glmnet,
        print.glmnet,plot.glmnet,plot.multnet,plot.mrelnet,predict.glmnet,coef.glmnet,coef.cv.glmnet,predict.cv.glmnet,plot.cv.glmnet,deviance.glmnet,
        cv.glmnet,
-       cv.elnet,cv.lognet,cv.multnet,cv.fishnet,cv.coxnet,cv.mrelnet,getmin,auc,auc.mat,cvcompute,coxnet.deviance,
+       cv.elnet,cv.lognet,cv.multnet,cv.fishnet,cv.coxnet,cv.mrelnet,getmin,auc,auc.mat,cvcompute,coxnet.deviance,cvtype,
        lambda.interp,response.coxnet,rmult,glmnet_softmax,na.mean,glmnet.control,
        predict.elnet,predict.lognet,predict.fishnet,mrelnet,predict.multnet,predict.coxnet,predict.mrelnet,nonzeroCoef,plotCoef,jerr,jerr.elnet,jerr.lognet,jerr.fishnet,jerr.coxnet,jerr.mrelnet,elnet,lognet,fishnet,coxnet,getcoef,getcoef.multinomial,coefnorm,check_dots)
 

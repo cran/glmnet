@@ -1,7 +1,0 @@
-#!/bin/sh
-
-echo "NOTE: This package requires gfortran!"
-echo "   So your build might fail if you don't have it.!"
-echo "   The recommended way is to install Rtools."
-echo "   See the R-Windows FAQ."
-
