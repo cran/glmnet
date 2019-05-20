@@ -1,13 +1,19 @@
 cv.glmnet <-
   function (x, y, weights, offset = NULL, lambda = NULL, type.measure = c("mse",
-                                                           "deviance", "class", "auc", "mae"), nfolds = 10, foldid,
+                                                           "deviance", "class", "auc", "mae"), nfolds = 10, foldid, alignment=c("lambda","fraction"),
             grouped = TRUE, keep = FALSE, parallel = FALSE, ...)
 {
   if (missing(type.measure))
     type.measure = "default"
   else type.measure = match.arg(type.measure)
+  alignment=match.arg(alignment)
   if (!is.null(lambda) && length(lambda) < 2)
-    stop("Need more than one value of lambda for cv.glmnet")
+      stop("Need more than one value of lambda for cv.glmnet")
+  if (!is.null(lambda) && alignment=="fraction"){
+      warning("fraction of path alignment not available if lambda given as argument; switched to alignment=`lambda`")
+      alignment="lambda"
+  }
+
   N = nrow(x)
   if (missing(weights))
     weights = rep(1, N)
@@ -74,7 +80,7 @@ cv.glmnet <-
   fun = paste("cv", subclass, sep = ".")
   lambda = glmnet.object$lambda
   cvstuff = do.call(fun, list(outlist, lambda, x, y, weights,
-    offset, foldid, type.measure, grouped, keep))
+    offset, foldid, type.measure, grouped, keep, alignment))
   cvm = cvstuff$cvm
   cvsd = cvstuff$cvsd
   nas=is.na(cvsd)

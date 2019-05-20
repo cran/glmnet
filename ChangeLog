@@ -1,3 +1,9 @@
+2019-04-22 Trevor Hastie <hastie@stanford.edu> version 2.0-17
+	* Added an option alignment to cv.glmnet, for cases when wierd
+	things happen
+2019-03-27 Trevor Hastie <hastie@stanford.edu> version 2.0-17
+	* Further fixes to mortran to get clean fortran; current mortran src is in
+	inst/mortran
 2018-03-12 Trevor Hastie <hastie@stanford.edu> version 2.0-16
 	* Additional fixes to mortran; current mortran src is in
 	inst/mortran

@@ -1,8 +1,8 @@
 "
 c
 c                          newGLMnet (5/12/14)
-c                            
-c                        
+c
+c
 c                 Elastic net with squared-error loss
 c
 c dense predictor matrix:
@@ -275,7 +275,7 @@ c output:
 c
 c    f(nr,n) = model predictions
 c
-c   
+c
 c
 c
 c          Symmetric binomial/multinomial logistic elastic net
@@ -301,7 +301,7 @@ c other inputs:
 c
 c   parm,no,ni,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit
 c    = same as elnet above.
-c   
+c
 c   nc = number of classes (distinct outcome values)
 c        nc=1 => binomial two-class logistic regression
 c            (all output references class 1)
@@ -424,7 +424,7 @@ c
 c                        Poisson elastic net
 c
 c
-c dense predictor matrix:                      
+c dense predictor matrix:
 c
 c call fishnet (parm,no,ni,x,y,o,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
 c               isd,intr,maxit,lmu,a0,ca,ia,nin,dev0,fdev,alm,nlp,jerr)
@@ -467,7 +467,7 @@ c            exceeds nx (see above) at kth lamda value.
 c    o(no) = training data values for last (lmu_th) solution linear
 c            combination.
 c
-c 
+c
 c Poisson utility routines:
 c
 c
@@ -697,8 +697,8 @@ entry chg_min_lambdas(irg); mnlam0=irg; return;
 entry chg_min_null_prob(arg); pmin0=arg; return;
 entry chg_max_exp(arg); exmx0=arg; return;
 end;
-subroutine elnet
- (ka,parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,
+subroutine elnet(ka,parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,
+   flmin,ulam,thr,isd,intr,maxit,
    lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision x(no,ni),y(no),w(no),vp(ni),ca(nx,nlam),cl(2,ni);
@@ -723,8 +723,8 @@ else <
 deallocate(vq);
 return;
 end;
-subroutine elnetu
- (parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,
+subroutine elnetu(parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,
+   flmin,ulam,thr,isd,intr,maxit,
    lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision x(no,ni),y(no),w(no),vp(ni),ulam(nlam),cl(2,ni);
@@ -734,18 +734,12 @@ integer jd(*),ia(nx),nin(nlam);
       double precision, dimension (:), allocatable :: xm,xs,g,xv,vlam
       integer, dimension (:), allocatable :: ju
 %mortran
-allocate(g(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xs(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ju(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xv(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(vlam(1:nlam),stat=jerr);
-if(jerr.ne.0) return;
+allocate(g(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xs(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ju(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xv(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(vlam(1:nlam),stat=jerr); if(jerr.ne.0) return;
 call chkvars(no,ni,x,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
@@ -763,7 +757,7 @@ if(jerr.gt.0) return;
 deallocate(xm,xs,g,ju,xv,vlam);
 return;
 end;
-subroutine standard (no,ni,x,y,w,isd,intr,ju,g,xm,xs,ym,ys,xv,jerr);
+subroutine standard(no,ni,x,y,w,isd,intr,ju,g,xm,xs,ym,ys,xv,jerr);
 implicit double precision(a-h,o-z);
 double precision x(no,ni),y(no),w(no),g(ni),xm(ni),xs(ni),xv(ni);
 integer ju(ni);
@@ -798,7 +792,7 @@ g=0.0; <j=1,ni; if(ju(j).ne.0) g(j)=dot_product(y,x(:,j));>
 deallocate(v);
 return;
 end;
-subroutine elnet1 (beta,ni,ju,vp,cl,g,no,ne,nx,x,nlam,flmin,ulam,thr,maxit,xv,
+subroutine elnet1(beta,ni,ju,vp,cl,g,no,ne,nx,x,nlam,flmin,ulam,thr,maxit,xv,
    lmu,ao,ia,kin,rsqo,almo,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision vp(ni),g(ni),x(no,ni),ulam(nlam),ao(nx,nlam);
@@ -813,12 +807,9 @@ integer ju(ni),ia(nx),kin(nlam);
       if(jerr.ne.0) return;
 %mortran
 call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx);
-allocate(a(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(da(1:ni),stat=jerr);
-if(jerr.ne.0) return;
+allocate(a(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(da(1:ni),stat=jerr); if(jerr.ne.0) return;
 bta=beta; omb=1.0-bta;
 if flmin.lt.1.0 < eqs=max(eps,flmin); alf=eqs**(1.0/(nlam-1));>
 rsq=0.0; a=0.0; mm=0; /nlp,nin/=0; iz=0; mnl=min(mnlam,nlam);
@@ -873,7 +864,7 @@ alm=0.0;
       <j=1,ni; if(mm(j).ne.0) next;
          if(ju(j).ne.0) g(j)=g(j)-dot_product(da(1:nin),c(j,1:nin));
       >
-      jz=0;      
+      jz=0;
    >
    if nin.gt.nx < jerr=-10000-m;  exit;>
    if(nin.gt.0) ao(1:nin,m)=a(ia(1:nin)); kin(m)=nin;
@@ -885,7 +876,7 @@ alm=0.0;
 deallocate(a,mm,c,da);
 return;
 end;
-subroutine elnetn (parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,
+subroutine elnetn(parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,
    intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision vp(ni),x(no,ni),y(no),w(no),ulam(nlam),cl(2,ni);
@@ -895,16 +886,11 @@ integer jd(*),ia(nx),nin(nlam);
       double precision, dimension (:), allocatable :: xm,xs,xv,vlam
       integer, dimension (:), allocatable :: ju
 %mortran
-allocate(xm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xs(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ju(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xv(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(vlam(1:nlam),stat=jerr);
-if(jerr.ne.0) return;
+allocate(xm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xs(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ju(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xv(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(vlam(1:nlam),stat=jerr); if(jerr.ne.0) return;
 call chkvars(no,ni,x,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
@@ -922,7 +908,7 @@ if(jerr.gt.0) return;
 deallocate(xm,xs,ju,xv,vlam);
 return;
 end;
-subroutine standard1 (no,ni,x,y,w,isd,intr,ju,xm,xs,ym,ys,xv,jerr);
+subroutine standard1(no,ni,x,y,w,isd,intr,ju,xm,xs,ym,ys,xv,jerr);
 implicit double precision(a-h,o-z);
 double precision x(no,ni),y(no),w(no),xm(ni),xs(ni),xv(ni); integer ju(ni);
 %fortran
@@ -965,14 +951,10 @@ integer ju(ni),ia(nx),kin(nlam);
       integer, dimension (:), allocatable :: mm,ix
 %mortran
 call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx);
-allocate(a(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(g(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ix(1:ni),stat=jerr);
-if(jerr.ne.0) return;
+allocate(a(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(g(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ix(1:ni),stat=jerr); if(jerr.ne.0) return;
 bta=beta; omb=1.0-bta; ix=0;
 "Begin: added by Naras"
 alf=1.0;
@@ -1004,7 +986,7 @@ rsq=0.0; a=0.0; mm=0; /nlp,nin/=0; iz=0; mnl=min(mnlam,nlam); alm=0.0;
             mm(k)=nin; ia(nin)=k;
          >
          del=a(k)-ak; rsq=rsq+del*(2.0*gk-del*xv(k));
-         y=y-del*x(:,k); dlx=max(xv(k)*del**2,dlx);         
+         y=y-del*x(:,k); dlx=max(xv(k)*del**2,dlx);
       >
       if(nin.gt.nx) exit;
       if dlx.lt.thr < ixx=0;
@@ -1015,7 +997,7 @@ rsq=0.0; a=0.0; mm=0; /nlp,nin/=0; iz=0; mnl=min(mnlam,nlam); alm=0.0;
          if(ixx.eq.1) go to :again:;
          exit;
       >
-      if nlp.gt.maxit < jerr=-m; return;> 
+      if nlp.gt.maxit < jerr=-m; return;>
       :b: iz=1;
       loop < nlp=nlp+1; dlx=0.0;
          <l=1,nin; k=ia(l); gk=dot_product(y,x(:,k));
@@ -1061,8 +1043,8 @@ f=a0; if(nin.le.0) return;
 <i=1,n; f(i)=f(i)+dot_product(ca(1:nin),x(i,ia(1:nin)));>
 return;
 end;
-subroutine spelnet
- (ka,parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,
+subroutine spelnet(ka,parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,
+   flmin,ulam,thr,isd,intr,
    maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision x(*),y(no),w(no),vp(ni),ulam(nlam),cl(2,ni);
@@ -1087,8 +1069,8 @@ else <
 deallocate(vq);
 return;
 end;
-subroutine spelnetu
- (parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,
+subroutine spelnetu(parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,
+   flmin,ulam,thr,isd,intr,
    maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision x(*),y(no),w(no),vp(ni),ulam(nlam),cl(2,ni);
@@ -1098,18 +1080,12 @@ integer ix(*),jx(*),jd(*),ia(nx),nin(nlam);
       double precision, dimension (:), allocatable :: xm,xs,g,xv,vlam
       integer, dimension (:), allocatable :: ju
 %mortran
-allocate(g(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xs(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ju(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xv(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(vlam(1:nlam),stat=jerr);
-if(jerr.ne.0) return;
+allocate(g(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xs(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ju(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xv(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(vlam(1:nlam),stat=jerr); if(jerr.ne.0) return;
 call spchkvars(no,ni,x,ix,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
@@ -1127,14 +1103,14 @@ if(jerr.gt.0) return;
 deallocate(xm,xs,g,ju,xv,vlam);
 return;
 end;
-subroutine spstandard (no,ni,x,ix,jx,y,w,ju,isd,intr,g,xm,xs,ym,ys,xv,jerr);
+subroutine spstandard(no,ni,x,ix,jx,y,w,ju,isd,intr,g,xm,xs,ym,ys,xv,jerr);
 implicit double precision(a-h,o-z);
 double precision x(*),y(no),w(no),g(ni),xm(ni),xs(ni),xv(ni);
 integer ix(*),jx(*),ju(ni);
 w=w/sum(w);
 if intr.eq.0 < ym=0.0;
    ys=sqrt(dot_product(w,y**2)-dot_product(w,y)**2); y=y/ys;
-   <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; jb=ix(j); je=ix(j+1)-1; 
+   <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; jb=ix(j); je=ix(j+1)-1;
       xv(j)=dot_product(w(jx(jb:je)),x(jb:je)**2);
       if isd.ne.0 < xbq=dot_product(w(jx(jb:je)),x(jb:je))**2; vc=xv(j)-xbq;
          xs(j)=sqrt(vc); xv(j)=1.0+xbq/vc;
@@ -1172,12 +1148,9 @@ integer ix(*),jx(*),ju(ni),ia(nx),kin(nlam);
       if(jerr.ne.0) return;
 %mortran
 call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx);
-allocate(a(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(da(1:ni),stat=jerr);
-if(jerr.ne.0) return;
+allocate(a(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(da(1:ni),stat=jerr); if(jerr.ne.0) return;
 bta=beta; omb=1.0-bta;
 "Begin: added by Naras"
 alm=0.0; alf=1.0;
@@ -1255,16 +1228,11 @@ integer ix(*),jx(*),jd(*),ia(nx),nin(nlam);
       double precision, dimension (:), allocatable :: xm,xs,xv,vlam
       integer, dimension (:), allocatable :: ju
 %mortran
-allocate(xm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xs(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ju(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xv(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(vlam(1:nlam),stat=jerr);
-if(jerr.ne.0) return;
+allocate(xm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xs(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ju(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xv(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(vlam(1:nlam),stat=jerr); if(jerr.ne.0) return;
 call spchkvars(no,ni,x,ix,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
@@ -1282,7 +1250,7 @@ if(jerr.gt.0) return;
 deallocate(xm,xs,ju,xv,vlam);
 return;
 end;
-subroutine spstandard1 (no,ni,x,ix,jx,y,w,ju,isd,intr,xm,xs,ym,ys,xv,jerr);
+subroutine spstandard1(no,ni,x,ix,jx,y,w,ju,isd,intr,xm,xs,ym,ys,xv,jerr);
 implicit double precision(a-h,o-z);
 double precision x(*),y(no),w(no),xm(ni),xs(ni),xv(ni);
 integer ix(*),jx(*),ju(ni);
@@ -1318,14 +1286,10 @@ integer ix(*),jx(*),ju(ni),ia(nx),kin(nlam);
       integer, dimension (:), allocatable :: mm,iy
 %mortran
 call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx);
-allocate(a(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(g(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(iy(1:ni),stat=jerr);
-if(jerr.ne.0) return;
+allocate(a(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(g(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(iy(1:ni),stat=jerr); if(jerr.ne.0) return;
 bta=beta; omb=1.0-bta; alm=0.0; iy=0;
 "Begin: added by Naras"
 alf=1.0;
@@ -1343,12 +1307,12 @@ rsq=0.0; a=0.0; mm=0; o=0.0; /nlp,nin/=0; iz=0; mnl=min(mnlam,nlam);
    else < alm0=0.0;
       <j=1,ni; if(ju(j).eq.0) next; if(vp(j).gt.0.0) alm0=max(alm0,g(j)/vp(j));>
       alm0=alm0/max(bta,1.0d-3); alm=alf*alm0;
-   >   
+   >
    dem=alm*omb; ab=alm*bta; rsq0=rsq; jz=1;
    tlam=bta*(2.0*alm-alm0);
    <k=1,ni; if(iy(k).eq.1) next; if(ju(k).eq.0) next;
       if(g(k).gt.tlam*vp(k)) iy(k)=1;
-   >   
+   >
    loop < if(iz*jz.ne.0) go to :b:;
       :again:nlp=nlp+1; dlx=0.0;
       <k=1,ni; if(iy(k).eq.0) next; jb=ix(k); je=ix(k+1)-1;
@@ -1362,7 +1326,7 @@ rsq=0.0; a=0.0; mm=0; o=0.0; /nlp,nin/=0; iz=0; mnl=min(mnlam,nlam);
          >
          del=a(k)-ak; rsq=rsq+del*(2.0*gk-del*xv(k));
          y(jx(jb:je))=y(jx(jb:je))-del*x(jb:je)/xs(k);
-         o=o+del*xm(k)/xs(k); dlx=max(xv(k)*del**2,dlx);         
+         o=o+del*xm(k)/xs(k); dlx=max(xv(k)*del**2,dlx);
       >
       if(nin.gt.nx) exit;
       if dlx.lt.thr < ixx=0;
@@ -1387,7 +1351,7 @@ rsq=0.0; a=0.0; mm=0; o=0.0; /nlp,nin/=0; iz=0; mnl=min(mnlam,nlam);
             y(jx(jb:je))=y(jx(jb:je))-del*x(jb:je)/xs(k);
             o=o+del*xm(k)/xs(k); dlx=max(xv(k)*del**2,dlx);
          >
-         if(dlx.lt.thr) exit; if nlp.gt.maxit < jerr=-m; return;>            
+         if(dlx.lt.thr) exit; if nlp.gt.maxit < jerr=-m; return;>
       >
       jz=0;
    >
@@ -1442,7 +1406,7 @@ loop <
 :done: dot=s;
 return;
 end;
-subroutine lognet (parm,no,ni,nc,x,y,g,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
+subroutine lognet(parm,no,ni,nc,x,y,g,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
    isd,intr,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision x(no,ni),y(no,max(2,nc)),g(no,nc),vp(ni),ulam(nlam);
@@ -1453,14 +1417,10 @@ integer jd(*),ia(nx),nin(nlam);
       integer, dimension (:), allocatable :: ju
 %mortran
 if maxval(vp).le.0.0 < jerr=10000; return;>
-allocate(ww(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ju(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(vq(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
+allocate(ww(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(ju(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(vq(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xm(1:ni),stat=jerr); if(jerr.ne.0) return;
 if kopt.eq.2 < allocate(xv(1:ni),stat=jerr); if(jerr.ne.0) return;>
 if isd.gt.0 < allocate(xs(1:ni),stat=jerr); if(jerr.ne.0) return;>
 
@@ -1496,7 +1456,7 @@ deallocate(ww,ju,vq,xm); if(isd.gt.0) deallocate(xs);
 if(kopt.eq.2) deallocate(xv);
 return;
 end;
-subroutine lstandard1 (no,ni,x,w,ju,isd,intr,xm,xs);
+subroutine lstandard1(no,ni,x,w,ju,isd,intr,xm,xs);
 implicit double precision(a-h,o-z);
 double precision x(no,ni),w(no),xm(ni),xs(ni); integer ju(ni);
 if intr.eq.0 <
@@ -1513,7 +1473,7 @@ if intr.eq.0 <
 >
 return;
 end;
-subroutine multlstandard1 (no,ni,x,w,ju,isd,intr,xm,xs,xv);
+subroutine multlstandard1(no,ni,x,w,ju,isd,intr,xm,xs,xv);
 implicit double precision(a-h,o-z);
 double precision x(no,ni),w(no),xm(ni),xs(ni),xv(ni); integer ju(ni);
 if intr.eq.0 <
@@ -1543,24 +1503,15 @@ integer ju(ni),m(nx),kin(nlam);
       integer, dimension (:), allocatable :: mm,ixx
 %mortran
 call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx);
-allocate(b(0:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xv(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ga(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(bs(0:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ixx(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(r(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(v(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(q(1:no),stat=jerr);
-if(jerr.ne.0) return;
+allocate(b(0:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xv(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ga(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(bs(0:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ixx(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(r(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(v(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(q(1:no),stat=jerr); if(jerr.ne.0) return;
 fmax=log(1.0/pmin-1.0); fmin=-fmax; vmin=(1.0+pmin)*pmin*(1.0-pmin);
 bta=parm; omb=1.0-bta;
 q0=dot_product(w,y); if q0.le.pmin < jerr=8001; return;>
@@ -1585,7 +1536,7 @@ dev0=dev1;
 >
 "Begin: added by Naras"
 alf=1.0;
-"End: added by Naras"   
+"End: added by Naras"
 if flmin.lt.1.0 < eqs=max(eps,flmin); alf=eqs**(1.0/(nlam-1));>
 m=0; mm=0; /nlp,nin/=0; mnl=min(mnlam,nlam); bs=0.0; b(1:ni)=0.0;
 shr=shri*dev0;
@@ -1645,7 +1596,7 @@ shr=shri*dev0;
       <i=1,no; fi=b(0)+g(i);
          if(nin.gt.0) fi=fi+dot_product(b(m(1:nin)),x(i,m(1:nin)));
          if fi.lt.fmin < q(i)=0.0;> elseif fi.gt.fmax < q(i)=1.0;>
-         else < q(i)=1.0/(1.0+exp(-fi));> 
+         else < q(i)=1.0/(1.0+exp(-fi));>
       >
       v=w*q*(1.0-q); xmz=sum(v); if(xmz.le.vmin) exit; r=w*(y-q);
       if xmz*(b(0)-bs(0))**2.lt.shr < ix=0;
@@ -1660,7 +1611,7 @@ shr=shri*dev0;
             if(ix.eq.1) go to :again:;
             exit;
          >
-      >      
+      >
    >
    if nin.gt.nx < jerr=-10000-ilm;  exit;>
    if(nin.gt.0) a(1:nin,ilm)=b(m(1:nin)); kin(ilm)=nin;
@@ -1693,12 +1644,9 @@ double precision y(n),g(n),q(n);
       double precision, dimension (:), allocatable :: e,p,w
 %mortran
   azero = 0.0;
-allocate(e(1:n),stat=jerr);
-if(jerr.ne.0) return;
-allocate(p(1:n),stat=jerr);
-if(jerr.ne.0) return;
-allocate(w(1:n),stat=jerr);
-if(jerr.ne.0) return;
+allocate(e(1:n),stat=jerr); if(jerr.ne.0) return;
+allocate(p(1:n),stat=jerr); if(jerr.ne.0) return;
+allocate(w(1:n),stat=jerr); if(jerr.ne.0) return;
 az=0.0; e=exp(-g); qy=dot_product(q,y); p=1.0/(1.0+e);
 loop < w=q*p*(1.0-p);
    d=(qy-dot_product(q,p))/sum(w); az=az+d; if(abs(d).lt.eps) exit;
@@ -1723,31 +1671,22 @@ integer ju(ni),m(nx),kin(nlam);
       allocate(b(0:ni,1:nc),stat=jerr)
       if(jerr.ne.0) return
       allocate(xv(1:ni,1:nc),stat=jerr)
-      if(jerr.ne.0) return					   
+      if(jerr.ne.0) return
       allocate(bs(0:ni,1:nc),stat=jerr)
-      if(jerr.ne.0) return					   
+      if(jerr.ne.0) return
       allocate(q(1:no,1:nc),stat=jerr)
-      if(jerr.ne.0) return		      
+      if(jerr.ne.0) return
 %mortran
 call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx); exmn=-exmx;
-allocate(r(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(v(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(is(1:max(nc,ni)),stat=jerr);
-if(jerr.ne.0) return;
-allocate(sxp(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(sxpl(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(di(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ga(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ixx(1:ni),stat=jerr);
-if(jerr.ne.0) return;
+allocate(r(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(v(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(is(1:max(nc,ni)),stat=jerr); if(jerr.ne.0) return;
+allocate(sxp(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(sxpl(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(di(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(ga(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ixx(1:ni),stat=jerr); if(jerr.ne.0) return;
 pmax=1.0-pmin; emin=pmin/pmax; emax=1.0/emin;
 pfm=(1.0+pmin)*pmin; pfx=(1.0-pmin)*pmax; vmin=pfm*pmax;
 bta=parm; omb=1.0-bta; dev1=0.0; dev0=0.0;
@@ -1768,7 +1707,7 @@ else < <i=1,no; g(i,:)=g(i,:)-sum(g(i,:))/nc;> sxp=0.0;
    else < call kazero(nc,no,y,g,w,b(0,:),jerr); if(jerr.ne.0) return;>
    dev1=0.0;
    <ic=1,nc; q(:,ic)=b(0,ic)+g(:,ic);
-      dev1=dev1-dot_product(w,y(:,ic)*q(:,ic)); 
+      dev1=dev1-dot_product(w,y(:,ic)*q(:,ic));
       q(:,ic)=exp(q(:,ic)); sxp=sxp+q(:,ic);
    >
    sxpl=w*log(sxp); <ic=1,nc; dev1=dev1+dot_product(y(:,ic),sxpl);>
@@ -1781,7 +1720,7 @@ if kopt.gt.0 <
 >
 "Begin: added by Naras"
 alf=1.0;
-"End: added by Naras"   
+"End: added by Naras"
 if flmin.lt.1.0 < eqs=max(eps,flmin); alf=eqs**(1.0/(nlam-1));>
 m=0; mm=0; nin=0; nlp=0; mnl=min(mnlam,nlam); bs=0.0; shr=shri*dev0;
 ga=0.0;
@@ -1814,7 +1753,7 @@ ga=0.0;
          if(xmz.le.vmin) next; ig=1;
          if kopt.eq.0 <
            <j=1,ni; if(ixx(j).gt.0) xv(j,ic)=dot_product(v,x(:,j)**2);>
-         >     
+         >
          loop < nlp=nlp+1; dlx=0.0;
             <k=1,ni; if(ixx(k).eq.0) next;
                bk=b(k,ic); gk=dot_product(r,x(:,k));
@@ -1852,30 +1791,30 @@ ga=0.0;
                if d.ne.0.0 < b(0,ic)=b(0,ic)+d;
                   dlx=max(dlx,xmz*d**2); r=r-d*v;
                >
-               if(dlx.lt.shr) exit; if nlp.gt.maxit < jerr=-ilm; return;>                
+               if(dlx.lt.shr) exit; if nlp.gt.maxit < jerr=-ilm; return;>
             >
          >
          if(jx.gt.0) exit;
          if(xmz*(b(0,ic)-bs(0,ic))**2.gt.shr) ix=1;
          if ix.eq.0 <
-            <j=1,nin; k=m(j); 
-               if xv(k,ic)*(b(k,ic)-bs(k,ic))**2.gt.shr < ix=1; exit;>               
+            <j=1,nin; k=m(j);
+               if xv(k,ic)*(b(k,ic)-bs(k,ic))**2.gt.shr < ix=1; exit;>
             >
-         >       
+         >
          <i=1,no; fi=b(0,ic)+g(i,ic);
             if(nin.gt.0)
               fi=fi+dot_product(b(m(1:nin),ic),x(i,m(1:nin)));
-            fi=min(max(exmn,fi),exmx); sxp(i)=sxp(i)-q(i,ic); 
+            fi=min(max(exmn,fi),exmx); sxp(i)=sxp(i)-q(i,ic);
             q(i,ic)=min(max(emin*sxp(i),exp(fi)),emax*sxp(i));
             sxp(i)=sxp(i)+q(i,ic);
-         >     
+         >
       >
       s=-sum(b(0,:))/nc; b(0,:)=b(0,:)+s; di=s;
       <j=1,nin; l=m(j);
          if vp(l).le.0.0 < s=sum(b(l,:))/nc;>
          else < s=elc(parm,nc,cl(:,l),b(l,:),is);>
          b(l,:)=b(l,:)-s; di=di-s*x(:,l);
-      > 
+      >
       di=exp(di); sxp=sxp*di; <ic=1,nc; q(:,ic)=q(:,ic)*di;>
       if(jx.gt.0) exit; if(ig.eq.0) exit;
       if ix.eq.0 <
@@ -1891,7 +1830,7 @@ ga=0.0;
          if(ix.eq.1) go to :again:;
          exit;
       >
-   > 
+   >
    if jx.gt.0 < jerr=-10000-ilm;  exit;> devi=0.0;
    <ic=1,nc;
       if(nin.gt.0) a(1:nin,ic,ilm)=b(m(1:nin),ic); a0(ic,ilm)=b(0,ic);
@@ -1919,8 +1858,7 @@ double precision y(n,kk),g(n,kk),q(n),az(kk);
       allocate(e(1:n,1:kk),stat=jerr)
       if(jerr.ne.0) return
 %mortran
-allocate(s(1:n),stat=jerr);
-if(jerr.ne.0) return;
+allocate(s(1:n),stat=jerr); if(jerr.ne.0) return;
 az=0.0; e=exp(g); <i=1,n; s(i)=sum(e(i,:));>
 loop < dm=0.0;
    <k=1,kk; /t,u/=0.0;
@@ -1967,13 +1905,13 @@ double precision a(nx,nc); integer m(nx),is(ni);
 is=0; nintot=0;
 <ic=1,nc; <j=1,nin; k=m(j); if(is(k).ne.0) next;
    if(a(j,ic).eq.0.0) next; is(k)=k; nintot=nintot+1;
->>   
+>>
 return;
 end;
 subroutine luncomp(ni,nx,nc,ca,ia,nin,a);
 implicit double precision(a-h,o-z);
 double precision ca(nx,nc),a(ni,nc); integer ia(nx);
-a=0.0; 
+a=0.0;
 <ic=1,nc; if(nin.gt.0) a(ia(1:nin),ic)=ca(1:nin,ic);>
 return;
 end;
@@ -1986,7 +1924,7 @@ double precision a0(nc),ca(nx,nc),x(nt,*),ans(nc,nt); integer ia(nx);
 >>
 return;
 end;
-subroutine splognet (parm,no,ni,nc,x,ix,jx,y,g,jd,vp,cl,ne,nx,nlam,flmin,
+subroutine splognet(parm,no,ni,nc,x,ix,jx,y,g,jd,vp,cl,ne,nx,nlam,flmin,
    ulam,thr,isd,intr,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision x(*),y(no,max(2,nc)),g(no,nc),vp(ni),ulam(nlam);
@@ -1997,16 +1935,11 @@ integer ix(*),jx(*),jd(*),ia(nx),nin(nlam);
       integer, dimension (:), allocatable :: ju
 %mortran
 if maxval(vp).le.0.0 < jerr=10000; return;>
-allocate(ww(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ju(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(vq(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xs(1:ni),stat=jerr);
-if(jerr.ne.0) return;
+allocate(ww(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(ju(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(vq(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xs(1:ni),stat=jerr); if(jerr.ne.0) return;
 if kopt.eq.2 < allocate(xv(1:ni),stat=jerr); if(jerr.ne.0) return;>
 
 call spchkvars(no,ni,x,ix,ju);
@@ -2046,7 +1979,7 @@ end;
 subroutine multsplstandard2(no,ni,x,ix,jx,w,ju,isd,intr,xm,xs,xv);
 implicit double precision(a-h,o-z);
 double precision x(*),w(no),xm(ni),xs(ni),xv(ni); integer ix(*),jx(*),ju(ni);
-if intr.eq.0 < 
+if intr.eq.0 <
    <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; jb=ix(j); je=ix(j+1)-1;
       xv(j)=dot_product(w(jx(jb:je)),x(jb:je)**2);
       if isd.ne.0 < xbq=dot_product(w(jx(jb:je)),x(jb:je))**2; vc=xv(j)-xbq;
@@ -2085,7 +2018,7 @@ if intr.eq.0 <
 if(isd.eq.0) xs=1.0;
 return;
 end;
-subroutine sprlognet2n (parm,no,ni,x,ix,jx,y,g,w,ju,vp,cl,ne,nx,nlam,
+subroutine sprlognet2n(parm,no,ni,x,ix,jx,y,g,w,ju,vp,cl,ne,nx,nlam,
    flmin,ulam,shri,isd,intr,maxit,kopt,xb,xs,
    lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
@@ -2098,28 +2031,17 @@ double precision xb(ni),xs(ni); integer ix(*),jx(*),ju(ni),m(nx),kin(nlam);
       integer, dimension (:), allocatable :: mm,ixx
 %mortran
 call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx);
-allocate(b(0:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xm(0:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xv(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(bs(0:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ga(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ixx(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(q(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(r(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(v(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(sc(1:no),stat=jerr);
-if(jerr.ne.0) return;
+allocate(b(0:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xm(0:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xv(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(bs(0:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ga(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ixx(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(q(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(r(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(v(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(sc(1:no),stat=jerr); if(jerr.ne.0) return;
 fmax=log(1.0/pmin-1.0); fmin=-fmax; vmin=(1.0+pmin)*pmin*(1.0-pmin);
 bta=parm; omb=1.0-bta;
 q0=dot_product(w,y); if q0.le.pmin < jerr=8001; return;>
@@ -2169,7 +2091,7 @@ shr=shri*dev0; al=0.0; ixx=0;
    <k=1,ni; if(ixx(k).eq.1) next; if(ju(k).eq.0) next;
       if(ga(k).gt.tlam*vp(k)) ixx(k)=1;
    >
-   :again:continue;   
+   :again:continue;
    loop <  bs(0)=b(0); if(nin.gt.0) bs(m(1:nin))=b(m(1:nin));
       <j=1,ni; if(ixx(j).eq.0) next;
          jb=ix(j); je=ix(j+1)-1; jn=ix(j+1)-ix(j);
@@ -2256,7 +2178,7 @@ shr=shri*dev0; al=0.0; ixx=0;
                ga(j)=abs((gj-svr*xb(j))/xs(j));
                if ga(j).gt.al1*vp(j) < ixx(j)=1; kx=1;>
             >
-            if(kx.eq.1) go to :again:;     
+            if(kx.eq.1) go to :again:;
             exit;
          >
       >
@@ -2290,33 +2212,23 @@ integer ix(*),jx(*),ju(ni),m(nx),kin(nlam);
       allocate(b(0:ni,1:nc),stat=jerr)
       if(jerr.ne.0) return
       allocate(xv(1:ni,1:nc),stat=jerr)
-      if(jerr.ne.0) return 					   
+      if(jerr.ne.0) return
       allocate(bs(0:ni,1:nc),stat=jerr)
-      if(jerr.ne.0) return					   
+      if(jerr.ne.0) return
       allocate(q(1:no,1:nc),stat=jerr)
-      if(jerr.ne.0) return					  
+      if(jerr.ne.0) return
 %mortran
 call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx); exmn=-exmx;
-allocate(xm(0:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(r(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(v(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ga(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(iy(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(is(1:max(nc,ni)),stat=jerr);
-if(jerr.ne.0) return;
-allocate(sxp(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(sxpl(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(sc(1:no),stat=jerr);
-if(jerr.ne.0) return;
+allocate(xm(0:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(r(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(v(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ga(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(iy(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(is(1:max(nc,ni)),stat=jerr); if(jerr.ne.0) return;
+allocate(sxp(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(sxpl(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(sc(1:no),stat=jerr); if(jerr.ne.0) return;
 pmax=1.0-pmin; emin=pmin/pmax; emax=1.0/emin;
 pfm=(1.0+pmin)*pmin; pfx=(1.0-pmin)*pmax; vmin=pfm*pmax;
 bta=parm; omb=1.0-bta; dev1=0.0; dev0=0.0;
@@ -2370,7 +2282,7 @@ shr=shri*dev0; ga=0.0;
    if flmin.ge.1.0 < al=ulam(ilm);>
    elseif ilm.gt.2 < al=al*alf;>
    elseif ilm.eq.1 < al=big;>
-   else < al0=0.0;     
+   else < al0=0.0;
       <j=1,ni; if(ju(j).eq.0) next; if(vp(j).gt.0.0) al0=max(al0,ga(j)/vp(j));>
       al0=al0/max(bta,1.0d-3); al=alf*al0;
    >
@@ -2449,14 +2361,14 @@ shr=shri*dev0; ga=0.0;
                if d.ne.0.0 < b(0,ic)=b(0,ic)+d; dlx=max(dlx,xm(0)*d**2);
                   r=r-d*v; svr=svr-d*xm(0);
                >
-               if(dlx.lt.shr) exit; if nlp.gt.maxit < jerr=-ilm; return;>                
+               if(dlx.lt.shr) exit; if nlp.gt.maxit < jerr=-ilm; return;>
             >
          >
          if(jxx.gt.0) exit;
          if(xm(0)*(b(0,ic)-bs(0,ic))**2.gt.shr) ixx=1;
          if ixx.eq.0 <
             <j=1,nin; k=m(j);
-               if xv(k,ic)*(b(k,ic)-bs(k,ic))**2.gt.shr < ixx=1; exit;>               
+               if xv(k,ic)*(b(k,ic)-bs(k,ic))**2.gt.shr < ixx=1; exit;>
             >
          >
          sc=b(0,ic)+g(:,ic); b0=0.0;
@@ -2464,7 +2376,7 @@ shr=shri*dev0; ga=0.0;
             sc(jx(jb:je))=sc(jx(jb:je))+b(l,ic)*x(jb:je)/xs(l);
             b0=b0-b(l,ic)*xb(l)/xs(l);
          >
-         sc=min(max(exmn,sc+b0),exmx);     
+         sc=min(max(exmn,sc+b0),exmx);
          sxp=sxp-q(:,ic);
          q(:,ic)=min(max(emin*sxp,exp(sc)),emax*sxp);
          sxp=sxp+q(:,ic);
@@ -2496,7 +2408,7 @@ shr=shri*dev0; ga=0.0;
          if(ixx.eq.1) go to :again:;
          exit;
       >
-   > 
+   >
    if jxx.gt.0 < jerr=-10000-ilm; exit;> devi=0.0;
    <ic=1,nc;
       if(nin.gt.0) a(1:nin,ic,ilm)=b(m(1:nin),ic); a0(ic,ilm)=b(0,ic);
@@ -2523,7 +2435,7 @@ double precision a0(nc),ca(nx,nc),x(*),f(nc,n); integer ia(*),ix(*),jx(*);
 >
 return;
 end;
-subroutine coxnet (parm,no,ni,x,y,d,g,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
+subroutine coxnet(parm,no,ni,x,y,d,g,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
    maxit,isd,lmu,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision x(no,ni),y(no),d(no),g(no),w(no),vp(ni),ulam(nlam);
@@ -2534,12 +2446,9 @@ integer jd(*),ia(nx),nin(nlam);
       integer, dimension (:), allocatable :: ju
 %mortran
 if maxval(vp).le.0.0 < jerr=10000; return;>
-allocate(ww(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ju(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(vq(1:ni),stat=jerr);
-if(jerr.ne.0) return;
+allocate(ww(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(ju(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(vq(1:ni),stat=jerr); if(jerr.ne.0) return;
 if isd.gt.0 < allocate(xs(1:ni),stat=jerr); if(jerr.ne.0) return;>
 
 call chkvars(no,ni,x,ju);
@@ -2557,7 +2466,7 @@ if isd.gt.0 < <k=1,lmu; nk=nin(k); ca(1:nk,k)=ca(1:nk,k)/xs(ia(1:nk));>>
 deallocate(ww,ju,vq); if(isd.gt.0) deallocate(xs);
 return;
 end;
-subroutine cstandard (no,ni,x,w,ju,isd,xs);
+subroutine cstandard(no,ni,x,w,ju,isd,xs);
 implicit double precision(a-h,o-z);
 double precision x(no,ni),w(no),xs(ni); integer ju(ni);
 <j=1,ni; if(ju(j).eq.0) next;
@@ -2580,38 +2489,22 @@ integer ju(ni),m(nx),kin(nlam);
 %mortran
 call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx);
 sml=sml*100.0; devmax=devmax*0.99/0.999;
-allocate(e(1:no),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(uu(1:no),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(f(1:no),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(w(1:no),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(v(1:ni),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(a(1:ni),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(as(1:ni),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(xs(1:ni),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(ga(1:ni),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(ixx(1:ni),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(jp(1:no),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(kp(1:no),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(dk(1:no),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(wr(1:no),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(dq(1:no),stat=jerr);
-if(jerr.ne.0)go to :done:;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0)go to :done:;
+allocate(e(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(uu(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(f(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(w(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(v(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(a(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(as(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xs(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ga(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ixx(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(jp(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(kp(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(dk(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(wr(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(dq(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
 call groups(no,y,d,q,nk,kp,jp,t0,jerr);
 if(jerr.ne.0) go to :done:; alpha=parm;
 oma=1.0-alpha; nlm=0; ixx=0; al=0.0;
@@ -2619,11 +2512,11 @@ dq=d*q; call died(no,nk,dq,kp,jp,dk);
 a=0.0; f(1)=0.0; fmax=log(huge(f(1))*0.1);
 if nonzero(no,g).ne.0 < f=g-dot_product(q,g);
    e=q*exp(sign(min(abs(f),fmax),f));
-> 
+>
 else < f=0.0; e=q;>
 r0=risk(no,ni,nk,dq,dk,f,e,kp,jp,uu);
 rr=-(dot_product(dk(1:nk),log(dk(1:nk)))+r0); dev0=rr;
-<i=1,no; if y(i).lt.t0.or.q(i).le.0.0 < /w(i),wr(i)/=0.0;>>  
+<i=1,no; if y(i).lt.t0.or.q(i).le.0.0 < /w(i),wr(i)/=0.0;>>
 call outer(no,nk,dq,dk,kp,jp,e,wr,w,jerr,uu);
 if(jerr.ne.0) go to :done:;
 "Begin: added by Naras"
@@ -2781,7 +2674,7 @@ end;
 function risk(no,ni,nk,d,dk,f,e,kp,jp,u);
 implicit double precision(a-h,o-z);
 double precision d(no),dk(nk),f(no);
-integer kp(nk),jp(no); double precision e(no),u(nk),s;
+integer kp(nk),jp(no); double precision e(no),u(nk);
 call usk(no,nk,kp,jp,e,u); u=log(u);
 risk=dot_product(d,f)-dot_product(dk,u);
 return;
@@ -2794,24 +2687,15 @@ double precision x(no,ni),y(no),d(no),g(no),w(no),a(ni,nlam),flog(nlam);
       double precision, dimension (:), allocatable :: e,uu
       integer, dimension (:), allocatable :: jp,kp
 %mortran
-allocate(e(1:no),stat=jerr);
-if(jerr.ne.0) go to :done:;
-allocate(q(1:no),stat=jerr);
-if(jerr.ne.0) go to :done:;
-allocate(uu(1:no),stat=jerr);
-if(jerr.ne.0) go to :done:;
-allocate(f(1:no),stat=jerr);
-if(jerr.ne.0) go to :done:;
-allocate(dk(1:no),stat=jerr);
-if(jerr.ne.0) go to :done:;
-allocate(jp(1:no),stat=jerr);
-if(jerr.ne.0) go to :done:;
-allocate(kp(1:no),stat=jerr);
-if(jerr.ne.0) go to :done:;
-allocate(dq(1:no),stat=jerr);
-if(jerr.ne.0) go to :done:;
-allocate(xm(1:ni),stat=jerr);
-if(jerr.ne.0) go to :done:;
+allocate(e(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(q(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(uu(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(f(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(dk(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(jp(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(kp(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(dq(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(xm(1:ni),stat=jerr); if(jerr.ne.0) return;
 q=max(0d0,w); sw=sum(q);
 if sw.le.0.0 < jerr=9999; go to :done:;>
 call groups(no,y,d,q,nk,kp,jp,t0,jerr);
@@ -2827,7 +2711,7 @@ dq=d*q; call died(no,nk,dq,kp,jp,dk); gm=dot_product(q,g)/sw;
 :done: deallocate(e,uu,dk,f,jp,kp,dq);
 return;
 end;
-subroutine fishnet (parm,no,ni,x,y,g,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
+subroutine fishnet(parm,no,ni,x,y,g,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
    isd,intr,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision x(no,ni),y(no),g(no),w(no),vp(ni),ulam(nlam);
@@ -2839,14 +2723,10 @@ integer jd(*),ia(nx),nin(nlam);
 %mortran
 if maxval(vp).le.0.0 < jerr=10000; return;>
 if minval(y).lt.0.0 < jerr=8888; return;>
-allocate(ww(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ju(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(vq(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
+allocate(ww(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(ju(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(vq(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xm(1:ni),stat=jerr); if(jerr.ne.0) return;
 if isd.gt.0 < allocate(xs(1:ni),stat=jerr); if(jerr.ne.0) return;>
 call chkvars(no,ni,x,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
@@ -2878,26 +2758,16 @@ integer ju(ni),m(nx),kin(nlam);
       integer, dimension (:), allocatable :: mm,ixx
 %mortran
 call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx); sml=sml*10.0;
-allocate(a(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(as(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(t(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ga(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ixx(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(wr(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(v(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(w(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(f(1:no),stat=jerr);
-if(jerr.ne.0) return;
+allocate(a(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(as(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(t(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ga(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ixx(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(wr(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(v(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(w(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(f(1:no),stat=jerr); if(jerr.ne.0) return;
 bta=parm; omb=1.0-bta;
 t=q*y; yb=sum(t); fmax=log(huge(bta)*0.1);
 if nonzero(no,g).eq.0 <
@@ -2935,7 +2805,7 @@ m=0; mm=0; /nlp,nin/=0; mnl=min(mnlam,nlam); shr=shri*dev0; ixx=0; al=0.0;
       az0=az; if(nin.gt.0) as(m(1:nin))=a(m(1:nin));
       <j=1,ni; if(ixx(j).ne.0) v(j)=dot_product(w,x(:,j)**2);>
       loop < nlp=nlp+1; dlx=0.0;
-         <k=1,ni; if(ixx(k).eq.0) next; ak=a(k);           
+         <k=1,ni; if(ixx(k).eq.0) next; ak=a(k);
             u=dot_product(wr,x(:,k))+v(k)*ak; au=abs(u)-vp(k)*al1;
             if au.le.0.0 < a(k)=0.0;>
             else <
@@ -2982,7 +2852,7 @@ m=0; mm=0; /nlp,nin/=0; mnl=min(mnlam,nlam); shr=shri*dev0; ixx=0; al=0.0;
             if(ix.eq.1) go to :again:;
             exit;
          >
-      >    
+      >
    >
    if nin.gt.nx < jerr=-10000-ilm;  exit;>
    if(nin.gt.0) ca(1:nin,ilm)=a(m(1:nin)); kin(ilm)=nin;
@@ -3035,7 +2905,7 @@ yb=dot_product(w,y)/sw; fmax=log(huge(y(1))*0.1);
 :done: deallocate(w);
 return;
 end;
-subroutine spfishnet (parm,no,ni,x,ix,jx,y,g,w,jd,vp,cl,ne,nx,nlam,flmin,
+subroutine spfishnet(parm,no,ni,x,ix,jx,y,g,w,jd,vp,cl,ne,nx,nlam,flmin,
    ulam,thr,isd,intr,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision x(*),y(no),g(no),w(no),vp(ni),ulam(nlam),cl(2,ni);
@@ -3047,16 +2917,11 @@ integer ix(*),jx(*),jd(*),ia(nx),nin(nlam);
 %mortran
 if maxval(vp).le.0.0 < jerr=10000; return;>
 if minval(y).lt.0.0 < jerr=8888; return;>
-allocate(ww(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ju(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(vq(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xs(1:ni),stat=jerr);
-if(jerr.ne.0) return;
+allocate(ww(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(ju(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(vq(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xs(1:ni),stat=jerr); if(jerr.ne.0) return;
 call spchkvars(no,ni,x,ix,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; go to :done:;>
@@ -3088,28 +2953,17 @@ integer ix(*),jx(*),ju(ni),m(nx),kin(nlam);
       integer, dimension (:), allocatable :: mm,ixx
 %mortran
 call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx); sml=sml*10.0;
-allocate(a(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(as(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(t(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ga(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ixx(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(wr(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(v(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(w(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(qy(1:no),stat=jerr);
-if(jerr.ne.0) return;
+allocate(a(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(as(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(t(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ga(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ixx(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(wr(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(v(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(w(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(qy(1:no),stat=jerr); if(jerr.ne.0) return;
 bta=parm; omb=1.0-bta; fmax=log(huge(bta)*0.1);
 qy=q*y; yb=sum(qy);
 if nonzero(no,g).eq.0 < t=0.0;
@@ -3126,7 +2980,7 @@ else < w=q*exp(sign(min(abs(g),fmax),g)); ww=sum(w); t=g;
    <j=1,ni; if(ju(j).eq.0) next; jb=ix(j); je=ix(j+1)-1;
       xm(j)=dot_product(w(jx(jb:je)),x(jb:je));
    >
->   
+>
 tt=yb*uu; ww=1.0; if(intr.ne.0) ww=yb; wr=qy-q*(yb*(1.0-uu)); a=0.0; as=0.0;
 dvr=-yb;
 <i=1,no; if(qy(i).gt.0.0) dvr=dvr+qy(i)*log(y(i));> dvr=dvr-dv0; dev0=dvr;
@@ -3159,10 +3013,10 @@ m=0; mm=0; /nlp,nin/=0; mnl=min(mnlam,nlam); shr=shri*dev0; al=0.0; ixx=0;
          xm(j)=dot_product(w(jx(jb:je)),x(jb:je));
          v(j)=(dot_product(w(jx(jb:je)),x(jb:je)**2)
                 -2.0*xb(j)*xm(j)+ww*xb(j)**2)/xs(j)**2;
-      >   
+      >
       loop <
          nlp=nlp+1; dlx=0.0;
-         <k=1,ni; if(ixx(k).eq.0) next; jb=ix(k); je=ix(k+1)-1; ak=a(k);           
+         <k=1,ni; if(ixx(k).eq.0) next; jb=ix(k); je=ix(k+1)-1; ak=a(k);
             u=(dot_product(wr(jx(jb:je)),x(jb:je))
                -uu*(xm(k)-ww*xb(k))-xb(k)*tt)/xs(k)+v(k)*ak;
             au=abs(u)-vp(k)*al1;
@@ -3173,7 +3027,7 @@ m=0; mm=0; /nlp,nin/=0; mnl=min(mnlam,nlam); shr=shri*dev0; al=0.0; ixx=0;
             if(a(k).eq.ak) next;
             if mm(k).eq.0 < nin=nin+1; if(nin.gt.nx) exit;
                mm(k)=nin; m(nin)=k;
-            >            
+            >
             d=a(k)-ak; dlx=max(dlx,v(k)*d**2); dv=d/xs(k);
             wr(jx(jb:je))=wr(jx(jb:je))-dv*w(jx(jb:je))*x(jb:je);
             t(jx(jb:je))=t(jx(jb:je))+dv*x(jb:je);
@@ -3247,10 +3101,8 @@ integer ix(*),jx(*);
       double precision, dimension (:), allocatable :: w,f
 %mortran
 if minval(y).lt.0.0 < jerr=8888; return;>
-allocate(w(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(f(1:no),stat=jerr);
-if(jerr.ne.0) return;
+allocate(w(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(f(1:no),stat=jerr); if(jerr.ne.0) return;
 w=max(0d0,q); sw=sum(w); if sw.le.0.0 < jerr=9999; go to :done:;>
 yb=dot_product(w,y)/sw; fmax=log(huge(y(1))*0.1);
 <lam=1,nlam; f=a0(lam);
@@ -3272,10 +3124,8 @@ integer ix(*),jx(*),nin(nlam),ia(nx);
       double precision, dimension (:), allocatable :: w,f
 %mortran
 if minval(y).lt.0.0 < jerr=8888; return;>
-allocate(w(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(f(1:no),stat=jerr);
-if(jerr.ne.0) return;
+allocate(w(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(f(1:no),stat=jerr); if(jerr.ne.0) return;
 w=max(0d0,q); sw=sum(w); if sw.le.0.0 < jerr=9999; go to :done:;>
 yb=dot_product(w,y)/sw; fmax=log(huge(y(1))*0.1);
 <lam=1,nlam; f=a0(lam);
@@ -3289,8 +3139,8 @@ yb=dot_product(w,y)/sw; fmax=log(huge(y(1))*0.1);
 :done: deallocate(w,f);
 return;
 end;
-subroutine multelnet
- (parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,jsd,intr,maxit,
+subroutine multelnet(parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,
+   flmin,ulam,thr,isd,jsd,intr,maxit,
    lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision x(no,ni),y(no,nr),w(no),vp(ni),ca(nx,nr,nlam);
@@ -3307,7 +3157,7 @@ call multelnetn(parm,no,ni,nr,x,y,w,jd,vq,cl,ne,nx,nlam,flmin,ulam,thr,isd,
 deallocate(vq);
 return;
 end;
-subroutine multelnetn (parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
+subroutine multelnetn(parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,
    isd,jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision vp(ni),x(no,ni),y(no,nr),w(no),ulam(nlam),cl(2,ni);
@@ -3320,18 +3170,12 @@ integer jd(*),ia(nx),nin(nlam);
       allocate(clt(1:2,1:nr,1:ni),stat=jerr);
       if(jerr.ne.0) return
 %mortran
-allocate(xm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xs(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ym(1:nr),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ys(1:nr),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ju(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xv(1:ni),stat=jerr);
-if(jerr.ne.0) return;
+allocate(xm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xs(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ym(1:nr),stat=jerr); if(jerr.ne.0) return;
+allocate(ys(1:nr),stat=jerr); if(jerr.ne.0) return;
+allocate(ju(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xv(1:ni),stat=jerr); if(jerr.ne.0) return;
 call chkvars(no,ni,x,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
@@ -3353,8 +3197,8 @@ if(jerr.gt.0) return;
 deallocate(xm,xs,ym,ys,ju,xv,clt);
 return;
 end;
-subroutine multstandard1
-   (no,ni,nr,x,y,w,isd,jsd,intr,ju,xm,xs,ym,ys,xv,ys0,jerr);
+subroutine multstandard1(no,ni,nr,x,y,w,isd,jsd,intr,ju,
+			 xm,xs,ym,ys,xv,ys0,jerr);
 implicit double precision(a-h,o-z);
 double precision x(no,ni),y(no,nr),w(no),xm(ni),xs(ni),xv(ni),ym(nr),ys(nr);
 integer ju(ni);
@@ -3380,7 +3224,7 @@ if intr.eq.0 <
       else < ys(j)=1.0; ys0=ys0+z;>
    >
    go to :out:;
->   
+>
 <j=1,ni; if(ju(j).eq.0) next;
    xm(j)=dot_product(w,x(:,j)); x(:,j)=v*(x(:,j)-xm(j));
    xv(j)=dot_product(x(:,j),x(:,j)); if(isd.gt.0) xs(j)=sqrt(xv(j));
@@ -3414,20 +3258,13 @@ integer ju(ni),ia(nx),kin(nlam);
       if(jerr.ne.0) return
 %mortran
 call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx);
-allocate(gj(1:nr),stat=jerr);
-if(jerr.ne.0) return;
-allocate(gk(1:nr),stat=jerr);
-if(jerr.ne.0) return;
-allocate(del(1:nr),stat=jerr);
-if(jerr.ne.0) return;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(g(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ix(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(isc(1:nr),stat=jerr);
-if(jerr.ne.0) return;
+allocate(gj(1:nr),stat=jerr); if(jerr.ne.0) return;
+allocate(gk(1:nr),stat=jerr); if(jerr.ne.0) return;
+allocate(del(1:nr),stat=jerr); if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(g(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ix(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(isc(1:nr),stat=jerr); if(jerr.ne.0) return;
 bta=beta; omb=1.0-bta; ix=0; thr=thri*ys0/nr;
 "Begin: added by Naras"
 alf=1.0;
@@ -3609,8 +3446,8 @@ double precision a0(nr),ca(nx,nr),x(n,*),f(nr,n); integer ia(nx);
 <i=1,n; <j=1,nr; f(j,i)=f(j,i)+dot_product(ca(1:nin,j),x(i,ia(1:nin)));>>
 return;
 end;
-subroutine multspelnet
- (parm,no,ni,nr,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,
+subroutine multspelnet(parm,no,ni,nr,x,ix,jx,y,w,jd,vp,cl,ne,nx,
+   nlam,flmin,ulam,thr,isd,
    jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision x(*),y(no,nr),w(no),vp(ni),ulam(nlam),cl(2,ni);
@@ -3640,18 +3477,12 @@ integer ix(*),jx(*),jd(*),ia(nx),nin(nlam);
       allocate(clt(1:2,1:nr,1:ni),stat=jerr)
       if(jerr.ne.0) return
 %mortran
-allocate(xm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xs(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ym(1:nr),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ys(1:nr),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ju(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(xv(1:ni),stat=jerr);
-if(jerr.ne.0) return;
+allocate(xm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xs(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ym(1:nr),stat=jerr); if(jerr.ne.0) return;
+allocate(ys(1:nr),stat=jerr); if(jerr.ne.0) return;
+allocate(ju(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(xv(1:ni),stat=jerr); if(jerr.ne.0) return;
 call spchkvars(no,ni,x,ix,ju);
 if(jd(1).gt.0) ju(jd(2:(jd(1)+1)))=0;
 if maxval(ju).le.0 < jerr=7777; return;>
@@ -3688,7 +3519,7 @@ if intr.eq.0 <
       >
       else < xs(j)=1.0; xv(j)=z;>
    >
-   ys0=0.0;   
+   ys0=0.0;
    <j=1,nr; ym(j)=0.0; z=dot_product(w,y(:,j)**2);
       if jsd.gt.0 < u=z-dot_product(w,y(:,j))**2; ys0=ys0+z/u;
          ys(j)=sqrt(u); y(:,j)=y(:,j)/ys(j);
@@ -3727,22 +3558,14 @@ integer ix(*),jx(*),ju(ni),ia(nx),kin(nlam);
       if(jerr.ne.0) return
 %mortran
 call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx);
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(g(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(gj(1:nr),stat=jerr);
-if(jerr.ne.0) return;
-allocate(gk(1:nr),stat=jerr);
-if(jerr.ne.0) return;
-allocate(del(1:nr),stat=jerr);
-if(jerr.ne.0) return;
-allocate(o(1:nr),stat=jerr);
-if(jerr.ne.0) return;
-allocate(iy(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(isc(1:nr),stat=jerr);
-if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(g(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(gj(1:nr),stat=jerr); if(jerr.ne.0) return;
+allocate(gk(1:nr),stat=jerr); if(jerr.ne.0) return;
+allocate(del(1:nr),stat=jerr); if(jerr.ne.0) return;
+allocate(o(1:nr),stat=jerr); if(jerr.ne.0) return;
+allocate(iy(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(isc(1:nr),stat=jerr); if(jerr.ne.0) return;
 bta=beta; omb=1.0-bta; alm=0.0; iy=0; thr=thri*ys0/nr;
 "Begin: added by Naras"
 alf=1.0;
@@ -3855,31 +3678,22 @@ integer ju(ni),m(nx),kin(nlam);
       allocate(b(0:ni,1:nc),stat=jerr)
       if(jerr.ne.0) return
       allocate(bs(0:ni,1:nc),stat=jerr)
-      if(jerr.ne.0) return					   
+      if(jerr.ne.0) return
       allocate(q(1:no,1:nc),stat=jerr)
-      if(jerr.ne.0) return					  
+      if(jerr.ne.0) return
       allocate(r(1:no,1:nc),stat=jerr)
       if(jerr.ne.0) return
 %mortran
 call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx); exmn=-exmx;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(is(1:max(nc,ni)),stat=jerr);
-if(jerr.ne.0) return;
-allocate(sxp(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(sxpl(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ga(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ixx(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(gk(1:nc),stat=jerr);
-if(jerr.ne.0) return;
-allocate(del(1:nc),stat=jerr);
-if(jerr.ne.0) return;
-allocate(isc(1:nc),stat=jerr);
-if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(is(1:max(nc,ni)),stat=jerr); if(jerr.ne.0) return;
+allocate(sxp(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(sxpl(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(ga(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ixx(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(gk(1:nc),stat=jerr); if(jerr.ne.0) return;
+allocate(del(1:nc),stat=jerr); if(jerr.ne.0) return;
+allocate(isc(1:nc),stat=jerr); if(jerr.ne.0) return;
 pmax=1.0-pmin; emin=pmin/pmax; emax=1.0/emin;
 bta=parm; omb=1.0-bta; dev1=0.0; dev0=0.0;
 <ic=1,nc; q0=dot_product(w,y(:,ic));
@@ -4051,35 +3865,24 @@ integer ix(*),jx(*),ju(ni),m(nx),kin(nlam);
       allocate(b(0:ni,1:nc),stat=jerr)
       if(jerr.ne.0) return
       allocate(bs(0:ni,1:nc),stat=jerr)
-      if(jerr.ne.0) return					   
+      if(jerr.ne.0) return
       allocate(q(1:no,1:nc),stat=jerr)
-      if(jerr.ne.0) return					  
+      if(jerr.ne.0) return
       allocate(r(1:no,1:nc),stat=jerr)
-      if(jerr.ne.0) return					  
+      if(jerr.ne.0) return
 %mortran
 call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx); exmn=-exmx;
-allocate(mm(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(ga(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(gk(1:nc),stat=jerr);
-if(jerr.ne.0) return;
-allocate(del(1:nc),stat=jerr);
-if(jerr.ne.0) return;
-allocate(iy(1:ni),stat=jerr);
-if(jerr.ne.0) return;
-allocate(is(1:max(nc,ni)),stat=jerr);
-if(jerr.ne.0) return;
-allocate(sxp(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(sxpl(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(svr(1:nc),stat=jerr);
-if(jerr.ne.0) return;
-allocate(sc(1:no),stat=jerr);
-if(jerr.ne.0) return;
-allocate(isc(1:nc),stat=jerr);
-if(jerr.ne.0) return;
+allocate(mm(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(ga(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(gk(1:nc),stat=jerr); if(jerr.ne.0) return;
+allocate(del(1:nc),stat=jerr); if(jerr.ne.0) return;
+allocate(iy(1:ni),stat=jerr); if(jerr.ne.0) return;
+allocate(is(1:max(nc,ni)),stat=jerr); if(jerr.ne.0) return;
+allocate(sxp(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(sxpl(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(svr(1:nc),stat=jerr); if(jerr.ne.0) return;
+allocate(sc(1:no),stat=jerr); if(jerr.ne.0) return;
+allocate(isc(1:nc),stat=jerr); if(jerr.ne.0) return;
 pmax=1.0-pmin; emin=pmin/pmax; emax=1.0/emin;
 bta=parm; omb=1.0-bta; dev1=0.0; dev0=0.0;
 <ic=1,nc; q0=dot_product(w,y(:,ic));
@@ -4251,7 +4054,7 @@ deallocate(sxp,b,bs,r,q,mm,is,sc,ga,iy,gk,del,sxpl);
 return;
 end;
 %fortran
-      subroutine psort7 (v,a,ii,jj)
+      subroutine psort7(v,a,ii,jj)
       implicit double precision(a-h,o-z)
 c
 c     puts into a the permutation vector which sorts v into

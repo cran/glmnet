@@ -1,24 +1,26 @@
 cv.elnet <-
 function (outlist, lambda, x, y, weights, offset, foldid, type.measure,
-            grouped, keep = FALSE)
+            grouped, keep = FALSE, alignment="lambda")
 {
   if (!is.null(offset))
     y = y - drop(offset)
-  ##We dont want to extrapolate lambdas on the small side
-  mlami=max(sapply(outlist,function(obj)min(obj$lambda)))
-  which_lam=lambda >= mlami
 
   predmat = matrix(NA, length(y), length(lambda))
   nfolds = max(foldid)
   nlams = double(nfolds)
+  nlambda=length(lambda)
   for (i in seq(nfolds)) {
     which = foldid == i
     fitobj = outlist[[i]]
     fitobj$offset = FALSE
-    preds = predict(fitobj, x[which, , drop = FALSE], s=lambda[which_lam])
-    nlami = sum(which_lam)
-    predmat[which, seq(nlami)] = preds
-    nlams[i] = nlami
+    preds = switch(alignment,
+                   fraction = predict(fitobj, x[which, , drop = FALSE]),
+                   lambda =   predict(fitobj, x[which, , drop = FALSE], s=lambda)
+                   )
+    nlami = min(ncol(preds),nlambda)
+    predmat[which, seq(nlami)] = preds[,seq(nlami)]
+    if(nlami<nlambda)predmat[which,seq(from=nlami,to=nlambda)]=preds[,nlami]
+    nlams[i] = nlambda
   }
   N = length(y) - apply(is.na(predmat), 2, sum)
   cvraw = switch(type.measure,

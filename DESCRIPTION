@@ -1,13 +1,13 @@
 Package: glmnet
 Type: Package
 Title: Lasso and Elastic-Net Regularized Generalized Linear Models
-Version: 2.0-16
-Date: 2018-03-12
+Version: 2.0-18
+Date: 2019-05-18
 Author: Jerome Friedman [aut, cre],
 	Trevor Hastie [aut, cre],
 	Rob Tibshirani [aut, cre],
 	Noah Simon [aut, ctb],
-	Balasubramanian Narasimhan [ctb],
+	Balasubramanian Narasimhan [aut, ctb],
 	Junyang Qian [ctb]
 Maintainer: Trevor Hastie <hastie@stanford.edu>
 Depends: Matrix (>= 1.0-6), utils, foreach
@@ -18,6 +18,6 @@ License: GPL-2
 VignetteBuilder: knitr
 URL: http://www.jstatsoft.org/v33/i01/.
 NeedsCompilation: yes
-Packaged: 2018-03-12 04:20:32 UTC; hastie
+Packaged: 2019-05-19 00:31:37 UTC; hastie
 Repository: CRAN
-Date/Publication: 2018-04-02 12:06:40 UTC
+Date/Publication: 2019-05-20 05:10:12 UTC

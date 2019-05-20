@@ -4,8 +4,8 @@
 \description{Does k-fold cross-validation for glmnet, produces a plot,
   and returns a value for \code{lambda}}
 \usage{
-cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, keep,
-      parallel, ...)
+cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, alignment,
+     grouped, keep, parallel, ...)
 }
 \arguments{
   \item{x}{\code{x} matrix as in \code{glmnet}.}
@@ -14,12 +14,6 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, 
   \item{offset}{Offset vector (matrix) as in \code{glmnet}}
   \item{lambda}{Optional user-supplied lambda sequence; default is
     \code{NULL}, and \code{glmnet} chooses its own sequence}
-  \item{nfolds}{number of folds - default is 10. Although \code{nfolds}
-    can be as large as the sample size (leave-one-out CV), it is not
-    recommended for large datasets. Smallest value allowable is \code{nfolds=3}}
-  \item{foldid}{an optional vector of values between 1 and \code{nfold}
-    identifying what fold each observation is in. If supplied,
-    \code{nfold} can be missing.}
   \item{type.measure}{loss to use for cross-validation. Currently five
     options, not all available for all models. The default is \code{type.measure="deviance"}, which uses
     squared-error for gaussian models (a.k.a \code{type.measure="mse"} there), deviance
@@ -31,7 +25,22 @@ cv.glmnet(x, y, weights, offset, lambda, type.measure, nfolds, foldid, grouped, 
     curve. \code{type.measure="mse"} or \code{type.measure="mae"} (mean absolute error)
     can be used by all models except the \code{"cox"}; they measure the
     deviation from the fitted mean to the response.}
-    \item{grouped}{This is an experimental argument, with default
+  \item{nfolds}{number of folds - default is 10. Although \code{nfolds}
+    can be as large as the sample size (leave-one-out CV), it is not
+    recommended for large datasets. Smallest value allowable is \code{nfolds=3}}
+  \item{foldid}{an optional vector of values between 1 and \code{nfold}
+    identifying what fold each observation is in. If supplied,
+    \code{nfold} can be missing.}
+  \item{alignment}{This is an experimental argument, designed to fix the problems users were having with CV,
+    with possible values \code{"lambda"} (the default) else
+    \code{"fraction"}. With \code{"lambda"} the \code{lambda} values
+    from the master fit (on all the data) are used to line up the
+    predictions from each of the folds. In some cases this can give
+    strange values, since the effective \code{lambda} values in each
+    fold could be quite different. With \code{"fraction"} we line up the
+    predictions in each fold according to the fraction of progress along
+    the regularization. If in the call a \code{lambda} argument is also provided,  \code{alignment="fraction"} is ignored (with a warning).}
+  \item{grouped}{This is an experimental argument, with default
       \code{TRUE}, and can be ignored by most users. For all models
       except the \code{"cox"}, this refers to computing \code{nfolds}
       separate statistics, and then using their mean and estimated

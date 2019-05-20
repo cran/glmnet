@@ -1,6 +1,6 @@
 cv.lognet <-
   function (outlist, lambda, x, y, weights, offset, foldid, type.measure,
-            grouped, keep = FALSE)
+            grouped, keep = FALSE, alignment="lambda")
 {
   prob_min = 1e-05
   prob_max = 1 - prob_min
@@ -28,22 +28,26 @@ cv.lognet <-
     offset = drop(offset)
   }
   else is.offset = FALSE
-  mlami=max(sapply(outlist,function(obj)min(obj$lambda)))
-  which_lam=lambda >= mlami
-
   predmat = matrix(NA, nrow(y), length(lambda))
   nlams = double(nfolds)
+  nlambda=length(lambda)
   for (i in seq(nfolds)) {
     which = foldid == i
     fitobj = outlist[[i]]
     if (is.offset)
       off_sub = offset[which]
-    preds = predict(fitobj,x[which, , drop = FALSE], s=lambda[which_lam], newoffset = off_sub,
-      type = "response")
-    nlami = sum(which_lam)
-    predmat[which, seq(nlami)] = preds
-    nlams[i] = nlami
-  }
+    preds = switch(alignment,
+                   fraction=predict(fitobj,x[which, , drop = FALSE], newoffset = off_sub,
+                                    type = "response"),
+                   lambda=predict(fitobj,x[which, , drop = FALSE],s=lambda, newoffset = off_sub,
+                                  type = "response")
+                   )
+
+    nlami = min(ncol(preds),nlambda)
+    predmat[which, seq(nlami)] = preds[,seq(nlami)]
+    if(nlami<nlambda)predmat[which,seq(from=nlami,to=nlambda)]=preds[,nlami]
+    nlams[i] = nlambda
+}
   if (type.measure == "auc") {
     cvraw = matrix(NA, nfolds, length(lambda))
     good = matrix(0, nfolds, length(lambda))

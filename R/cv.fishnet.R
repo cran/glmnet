@@ -1,15 +1,12 @@
 cv.fishnet <-
   function (outlist, lambda, x, y, weights, offset, foldid, type.measure,
-            grouped, keep = FALSE)
+            grouped, keep = FALSE,alignment="lambda")
 {
   if (!is.null(offset)) {
     is.offset = TRUE
     offset = drop(offset)
   }
   else is.offset = FALSE
-    ##We dont want to extrapolate lambdas on the small side
-  mlami=max(sapply(outlist,function(obj)min(obj$lambda)))
-  which_lam=lambda >= mlami
 
   devi = function(y, eta) {
     deveta = y * eta - exp(eta)
@@ -20,15 +17,20 @@ cv.fishnet <-
   predmat = matrix(NA, length(y), length(lambda))
   nfolds = max(foldid)
   nlams = double(nfolds)
+  nlambda=length(lambda)
   for (i in seq(nfolds)) {
     which = foldid == i
     fitobj = outlist[[i]]
     if (is.offset)
       off_sub = offset[which]
-    preds = predict(fitobj, x[which, , drop = FALSE], s=lambda[which_lam], newoffset = off_sub)
-     nlami = sum(which_lam)
-    predmat[which, seq(nlami)] = preds
-    nlams[i] = nlami
+    preds = switch(alignment,
+                   fraction=predict(fitobj, x[which, , drop = FALSE], newoffset = off_sub),
+                   lambda=predict(fitobj, x[which, , drop = FALSE], s=lambda, newoffset = off_sub)
+                   )
+    nlami = min(ncol(preds),nlambda)
+    predmat[which, seq(nlami)] = preds[,seq(nlami)]
+    if(nlami<nlambda)predmat[which,seq(from=nlami,to=nlambda)]=preds[,nlami]
+    nlams[i] = nlambda
   }
   N = length(y) - apply(is.na(predmat), 2, sum)
   cvraw = switch(type.measure,

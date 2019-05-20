@@ -150,7 +150,7 @@ glmnet(x, y, family=c("gaussian","binomial","poisson","multinomial","cox","mgaus
   "multi-task" learning in some domains. The grouped multinomial allows the same penalty for the
   \code{family="multinomial"} model, which is also multi-responsed. For
   both of these the penalty on the coefficient vector for variable j is 
-   \deqn{(1-\alpha)/2||\beta_j||_2^2+\alpha||\beta_j||_1.} When
+   \deqn{(1-\alpha)/2||\beta_j||_2^2+\alpha||\beta_j||_2.} When
   \code{alpha=1} this is a group-lasso penalty, and otherwise it mixes
   with quadratic just like elasticnet. A small detail in the Cox model:
   if death times are tied with censored times, we assume the censored
