@@ -1,81 +1,105 @@
 ---
-output: pdf_document
+title: "An Introduction to `glmnet`"
+author: "Trevor Hastie and Junyang Qian"
+date: "September 13, 2016"
+bibliography: assets/glmnet_refs.bib
+link-citations: true
+output:
+  pdf_document:
+    fig_caption: yes
+    toc: yes
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{An Introduction to glmnet}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 ---
-
-<!--
-%\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{An Introduction to Glmnet}
--->
-
-<a id="top"></a>
-
-# Glmnet Vignette
-### Trevor Hastie and Junyang Qian
-#### Stanford September 13, 2016
-
-> [Introduction](#intro)
-
-> [Installation](#install)
-
-> [Quick Start](#qs)
-
-> [Linear Regression](#lin)
-
-> [Logistic Regression](#log)
-
-> [Poisson Models](#poi)
-
-> [Cox Models](#cox)
-
-> [Sparse Matrices](#spa)
-
-> [Appendix 0: Convergence Criteria](#con)
-
-> [Appendix 1: Internal Parameters](#int)
-
-> [Appendix 2: Comparison with Otherther Packages](#cmp)
-
-<a id="intro"></a>
 
 ## Introduction
 
-Glmnet is a package that fits a generalized linear model via penalized maximum likelihood. The regularization path is computed for the lasso or elasticnet penalty at a grid of values for the regularization parameter lambda. The algorithm is extremely fast, and can exploit sparsity in the input matrix `x`. It fits linear, logistic and multinomial, poisson, and Cox regression models. A variety of predictions can be made from the fitted models. It can also fit multi-response linear regression.
+Glmnet is a package that fits a generalized linear model via penalized
+maximum likelihood. The regularization path is computed for the lasso
+or elasticnet penalty at a grid of values for the regularization
+parameter lambda. The algorithm is extremely fast, and can exploit
+sparsity in the input matrix `x`. It fits linear, logistic and
+multinomial, poisson, and Cox regression models. A variety of
+predictions can be made from the fitted models. It can also fit
+multi-response linear regression.
 
-The authors of glmnet are Jerome Friedman, Trevor Hastie, Rob Tibshirani and Noah Simon, and the R package is maintained by Trevor Hastie. The matlab version of glmnet is maintained by Junyang Qian. This vignette describes the usage of glmnet in R.
+The authors of glmnet are Jerome Friedman, Trevor Hastie, Rob
+Tibshirani and Noah Simon, and the R package is maintained by Trevor
+Hastie. The matlab version of glmnet is maintained by Junyang
+Qian. This vignette describes the usage of glmnet in R.
+There is an additional vignette for the new `relaxed` features in
+`glmnet`, along with some new capabilities. There is as well a
+vignette devoted to Cox models in `glmnet`.
 
 `glmnet` solves the following problem
+
 $$
 \min_{\beta_0,\beta} \frac{1}{N} \sum_{i=1}^{N} w_i l(y_i,\beta_0+\beta^T x_i) + \lambda\left[(1-\alpha)||\beta||_2^2/2 + \alpha ||\beta||_1\right],
 $$
-over a grid of values of $\lambda$ covering the entire range. Here $l(y,\eta)$ is the negative log-likelihood contribution for observation $i$; e.g. for the Gaussian case it is $\frac{1}{2}(y-\eta)^2$. The _elastic-net_ penalty is controlled by $\alpha$, and  bridges the gap between lasso ($\alpha=1$, the default) and ridge ($\alpha=0$). The tuning parameter $\lambda$ controls the overall strength of the penalty.
 
-It is known that the ridge penalty shrinks the coefficients of correlated predictors towards each other while the lasso tends to pick one of them and discard the others. The elastic-net penalty mixes these two; if predictors are correlated in groups, an $\alpha=0.5$ tends to select the groups in or out together. This is a higher level parameter, and users might pick a value upfront, else experiment with a few different values. One use of $\alpha$ is for numerical stability; for example, the elastic net with $\alpha = 1 - \epsilon$ for some small $\epsilon > 0$ performs much like the lasso, but removes any degeneracies and wild behavior caused by extreme correlations.
+over a grid of values of $\lambda$ covering the entire range. Here
+$l(y,\eta)$ is the negative log-likelihood contribution for
+observation $i$; e.g. for the Gaussian case it is
+$\frac{1}{2}(y-\eta)^2$. The _elastic-net_ penalty is controlled by
+$\alpha$, and bridges the gap between lasso ($\alpha=1$, the default)
+and ridge ($\alpha=0$). The tuning parameter $\lambda$ controls the
+overall strength of the penalty.
 
-The `glmnet` algorithms use cyclical coordinate descent, which successively optimizes the objective function over each parameter with others fixed, and cycles repeatedly until convergence. The package also makes use of the strong rules for efficient restriction of the active set. Due to highly efficient updates and techniques such as warm starts and active-set convergence, our algorithms can compute the solution path very fast.
+It is known that the ridge penalty shrinks the coefficients of
+correlated predictors towards each other while the lasso tends to pick
+one of them and discard the others. The elastic-net penalty mixes
+these two; if predictors are correlated in groups, an $\alpha=0.5$
+tends to select the groups in or out together. This is a higher level
+parameter, and users might pick a value upfront, else experiment with
+a few different values. One use of $\alpha$ is for numerical
+stability; for example, the elastic net with $\alpha = 1 - \epsilon$
+for some small $\epsilon > 0$ performs much like the lasso, but
+removes any degeneracies and wild behavior caused by extreme
+correlations.
 
-The code can handle sparse input-matrix formats, as well as range constraints on coefficients. The core of `glmnet` is a set of fortran subroutines, which make for very fast execution.
+The `glmnet` algorithms use cyclical coordinate descent, which
+successively optimizes the objective function over each parameter with
+others fixed, and cycles repeatedly until convergence. The package
+also makes use of the strong rules for efficient restriction of the
+active set. Due to highly efficient updates and techniques such as
+warm starts and active-set convergence, our algorithms can compute the
+solution path very fast.
 
-The package also includes methods for prediction and plotting, and a function that performs K-fold cross-validation.
+The code can handle sparse input-matrix formats, as well as range
+constraints on coefficients. The core of `glmnet` is a set of fortran
+subroutines, which make for very fast execution.
 
-<a id="install"></a>
+The package also includes methods for prediction and plotting, and a
+function that performs K-fold cross-validation.
+
+The theory and algorithms in this implementation are described in
+@glmnet, @coxnet, @strongrules and @block . 
+
 
 ## Installation
 
-Like many other R packages, the simplest way to obtain `glmnet` is to install it directly from CRAN. Type the following command in R console:
+Like many other R packages, the simplest way to obtain `glmnet` is to
+install it directly from CRAN. Type the following command in R
+console:
 
 ```{r, eval=FALSE}
 install.packages("glmnet", repos = "https://cran.us.r-project.org")
 ```
 
-Users may change the `repos` options depending on their locations and preferences. Other options such as the directories where to install the packages can be altered in the command. For more details, see `help(install.packages)`.
+Users may change the `repos` options depending on their locations and
+preferences. Other options such as the directories where to install
+the packages can be altered in the command. For more details, see
+`help(install.packages)`.
 
-Here the R package has been downloaded and installed to the default directories.
+Here the R package has been downloaded and installed to the default
+directories.
 
-Alternatively, users can download the package source at https://cran.r-project.org/package=glmnet and type Unix commands to install it to the desired location.
-
-[Back to Top](#top)
-
-<a id="qs"></a>
+Alternatively, users can download the package source from
+[CRAN](https://cran.r-project.org/package=glmnet) and type Unix
+commands to install it to the desired location.
 
 ## Quick Start
 
@@ -117,6 +141,7 @@ coef(fit,s=0.1)
 (why `s` and not `lambda`? In case later we want to allow one to specify the model size in other ways.)
 Users can also make predictions at specific $\lambda$'s with new input data:
 ```{r}
+set.seed(29)
 nx = matrix(rnorm(10*20),10,20)
 predict(fit,newx=nx,s=c(0.1,0.05))
 ```
@@ -153,10 +178,6 @@ predict(cvfit, newx = x[1:5,], s = "lambda.min")
 `newx` is for the new input matrix and `s`, as before, is the value(s) of $\lambda$ at which predictions are made.
 
 That is the end of `glmnet` 101. With the tools introduced so far, users are able to fit the entire elastic net family, including ridge regression, using squared-error loss. In the package, there are many more options that give users a great deal of flexibility. To learn more, move on to later sections.
-
-[Back to Top](#top)
-
-<a id="lin"></a>
 
 ## Linear Regression
 
@@ -447,9 +468,6 @@ As before, the first one is the value at which the minimal mean squared error is
 
 Prediction for `cv.glmnet` object works almost the same as for `glmnet` object. We omit the details here.
 
-[Back to Top](#top)
-<a id="log"></a>
-
 ## Logistic Regression
 
 Logistic regression  is another widely-used model when the response is categorical. If there are two possible outcomes, we use the binomial distribution, else we use the multinomial.
@@ -601,10 +619,6 @@ Users may wish to predict at the optimally selected $\lambda$:
 predict(cvfit, newx = x[1:10,], s = "lambda.min", type = "class")
 ```
 
-[Back to Top](#top)
-
-<a id="poi"></a>
-
 ## Poisson Models
 
 Poisson regression is used to model count data under the assumption of Poisson error, or otherwise non-negative data where the mean and variance are proportional. Like the Gaussian and binomial model, the Poisson is a member of the exponential family of distributions. We usually model its positive mean on the log scale:   $\log \mu(x) = \beta_0+\beta' x$.
@@ -677,10 +691,6 @@ coef(cvfit, s = opt.lam)
 ```
 The `predict` method is similar and we do not repeat it here.
 
-[Back to Top](#top)
-
-<a id="cox"></a>
-
 ## Cox Models
 
 The Cox proportional hazards model is commonly used for the study of the relationship beteween predictor variables and survival time. In the usual survival analysis framework, we have data of the form $(y_1, x_1, \delta_1), \ldots, (y_n, x_n, \delta_n)$ where $y_i$, the observed time, is a time of failure if $\delta_i$ is 1 or right-censoring if $\delta_i$ is 0. We also let $t_1 < t_2 < \ldots < t_m$ be the increasing list of unique failure times, and $j(i)$ denote the index of the observation failing at time $t_i$.
@@ -705,7 +715,7 @@ We use a pre-generated set of sample data and response. Users can load their own
 data(CoxExample)
 y[1:5,]
 ```
-The `Surv` function in the package `survival` can create such a matrix. Note, however, that the `coxph` and related linear models can handle interval and other fors of censoring, while glmnet can only handle right censoring in its present form.
+The `Surv` function in the package `survival` can create such a matrix. Note, however, that the `coxph` and related linear models can handle interval and other forms of censoring, while glmnet can only handle right censoring in its present form.
 
 We apply the `glmnet` function to compute the solution path under default settings.
 ```{r}
@@ -754,10 +764,6 @@ index.min
 coef.min
 ```
 
-[Back to Top](#top)
-
-<a id="spa"></a>
-
 ## Sparse Matrices
 
  Our package supports sparse input matrices, which allow efficient storage and operations of large matrices but with only a few nonzero entries. It is available for all families except for the `cox` family. The usage of sparse matrices (inherit from class `"sparseMatrix"` as in package `Matrix`) in `glmnet ` is the same as if a regular matrix is provided.
@@ -792,11 +798,6 @@ x = rnorm(25)
 nx = sparseMatrix(i = i, j = j, x = x, dims = c(5, 20))
 predict(cvfit, newx = nx, s = "lambda.min")
 ```
-
-[Back to Top](#top)
-
-
-<a id="con"></a>
 
 ## Appendix 0: Convergence Criteria
 
@@ -835,10 +836,6 @@ $\hat\beta^o$ is the coefficient vector before we entered this inner
 loop, and $\hat\beta^n$ the converged solution for this inner
 loop. Hence if this Newton step had no impact, we declare outer-loop convergence.
 
-
-[Back to Top](#top)
-
-<a id="int"></a>
 
 ## Appendix 1: Internal Parameters
 
@@ -889,9 +886,6 @@ The current settings are obtained as follows.
 ```{r}
 glmnet.control()
 ```
-[Back to Top](#top)
-
-<a id="cmp"></a>
 
 ## Appendix 2: Comparison with Other Packages
 Some people may want to use `glmnet` to solve the Lasso or elastic-net problem at a single $\lambda$. We compare here the solution by `glmnet` with other packages (such as CVX), and also as an illustration of parameter settings in this situation.
@@ -961,21 +955,4 @@ colnames(cmp) = c("beta_glmnet", "beta_lars", "beta_CVX")
 cmp
 ```
 
-[Back to Top](#top)
-
-
 ## References
-
-
-<p>Jerome Friedman, Trevor Hastie and Rob Tibshirani. (2008). <br>
-<a href="http://www.jstatsoft.org/v33/i01/">Regularization Paths for Generalized Linear Models via Coordinate Descent</a><br>
-<em>Journal of Statistical Software</em>, Vol. 33(1), 1-22 Feb 2010.</p>
-<p>Noah Simon, Jerome Friedman, Trevor Hastie and Rob Tibshirani. (2011).<br>
-<a href="http://www.jstatsoft.org/v39/i05/">Regularization Paths for Cox's Proportional Hazards Model via Coordinate Descent</a><br>
-<em>Journal of Statistical Software</em>, Vol. 39(5) 1-13.</p>
-<p>Robert Tibshirani, Jacob Bien, Jerome Friedman, Trevor Hastie, Noah Simon, Jonathan Taylor, Ryan J. Tibshirani. (2010).<br>
-<a href="http://www-stat.stanford.edu/~tibs/ftp/strong.pdf">Strong Rules for Discarding Predictors in Lasso-type Problems</a><br>
-<em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em>, 74(2), 245-266.</p>
-<p> Noah Simon, Jerome Friedman and Trevor Hastie (2013). <br>
-<a href="http://www.stanford.edu/~hastie/Papers/multi_response.pdf">A Blockwise Descent Algorithm for Group-penalized Multiresponse and Multinomial Regression </a><br>
-<i>(in arXiv, submitted) </i></p>

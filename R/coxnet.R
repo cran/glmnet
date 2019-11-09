@@ -2,11 +2,12 @@ coxnet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
   if(!is.matrix(y)||!all(match(c("time","status"),dimnames(y)[[2]],0)))stop("Cox model requires a matrix with columns 'time' (>0) and 'status'  (binary) as a response; a 'Surv' object suffices",call.=FALSE)
   ty=as.double(y[,"time"])
   tevent=as.double(y[,"status"])
+  ty=ty+(1-tevent)*100*.Machine$double.eps## ties issue
   if(any(ty<=0))stop("negative event times encountered;  not permitted for Cox family")
   maxit=as.integer(maxit)
   weights=as.double(weights)
      if(is.null(offset)){
-    offset=ty*0 
+    offset=ty*0
     is.offset=FALSE}
   else{
     storage.mode(offset)="double"
@@ -20,7 +21,7 @@ coxnet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
               ca=double(nx*nlam),
               ia=integer(nx),
               nin=integer(nlam),
-              nulldev=double(1),  
+              nulldev=double(1),
               dev=double(nlam),
               alm=double(nlam),
               nlp=integer(1),

@@ -1,53 +1,36 @@
-cv.coxnet <-
-    function (outlist, lambda, x, y, weights, offset, foldid, type.measure,
-              grouped, keep = FALSE, alignment="lambda")
-{
-    if (!is.null(offset)) {
-        is.offset = TRUE
-        offset = drop(offset)
-    }
-    else is.offset = FALSE
+cv.coxnet <- function(predmat,y,type.measure,weights,foldid,grouped){
+    ## Note, all the work got done in buildPredmat.coxnetlist for deviance; a special case
+devtrue=type.measure=="deviance"
     nfolds = max(foldid)
+
     if ((length(weights)/nfolds < 10) && !grouped) {
-        warning("Option grouped=TRUE enforced for cv.coxnet, since < 3 observations per fold",
+        warning("Option grouped=TRUE enforced for cv.coxnet, since < 10 observations per fold",
                 call. = FALSE)
-        grouped = TRUE
     }
-    cvraw = matrix(NA, nfolds, length(lambda))
-    nlambda=length(lambda)
-    for (i in seq(nfolds)) {
-        which = foldid == i
-        fitobj = outlist[[i]]
-        coefmat = switch(alignment,
-                         fraction=predict(fitobj, type = "coeff"),
-                         lambda=predict(fitobj, type = "coeff", s = lambda)
-                         )
-        nlami=min(ncol(coefmat),nlambda)
-        if (grouped) {
-            plfull = coxnet.deviance(x = x, y = y, offset = offset,
-                                     weights = weights, beta = coefmat)
-            plminusk = coxnet.deviance(x = x[!which, ], y = y[!which, ],
-                                offset = offset[!which], weights = weights[!which],beta = coefmat)
-            cvraw[i, seq(nlami)] = (plfull - plminusk)[seq(nlami)]
 
-        }
-        else {
-            plk = coxnet.deviance(x = x[which, ], y = y[which,], offset = offset[which],
-                                  weights = weights[which], beta = coefmat)
-            cvraw[i, seq(nlami)] = plk[seq(nlami)]
-        }
-        if(nlami<nlambda)cvraw[i,seq(from=nlami,to=nlambda)]=cvraw[i,nlami]
-
+    if(devtrue){
+        cvraw=attr(predmat,"cvraw")
+        status = y[, "status"]
+        N = nfolds - apply(is.na(cvraw), 2, sum)
+        weights = as.vector(tapply(weights * status, foldid, sum))
+        cvraw = cvraw/weights
     }
-    status = y[, "status"]
-    N = nfolds - apply(is.na(cvraw), 2, sum)
-    weights = as.vector(tapply(weights * status, foldid, sum))
-    cvraw = cvraw/weights
-    cvm = apply(cvraw, 2, weighted.mean, w = weights, na.rm = TRUE)
-    cvsd = sqrt(apply(scale(cvraw, cvm, FALSE)^2, 2, weighted.mean,
-                      w = weights, na.rm = TRUE)/(N - 1))
-    out = list(cvm = cvm, cvsd = cvsd, type.measure = type.measure)
-    if (keep)
-        warning("keep=TRUE not implemented for coxnet")
-    out
+    else
+    {
+        nlambda=ncol(predmat)
+        nlams=rep(nlambda,nfolds)
+        cvraw = matrix(NA, nfolds, nlambda)
+        good = matrix(0, nfolds, nlambda)
+        for (i in seq(nfolds)) {
+            good[i, seq(nlams[i])] = 1
+            which = foldid == i
+            for (j in seq(nlams[i])) {
+                cvraw[i, j] = Cindex(predmat[which,j],y[which, ], weights[which])
+            }
+        }
+        N = apply(good, 2, sum)
+        weights = tapply(weights, foldid, sum)
+        }
+    list(cvraw=cvraw,weights=weights,N=N,type.measure=type.measure,grouped=FALSE)
+
 }

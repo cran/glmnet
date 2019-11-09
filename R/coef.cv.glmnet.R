@@ -1,6 +1,8 @@
+#' @method coef cv.glmnet
+#' @export
 coef.cv.glmnet=function(object,s=c("lambda.1se","lambda.min"),...){
     if(is.numeric(s))lambda=s
-  else 
+  else
     if(is.character(s)){
       s=match.arg(s)
       lambda=object[[s]]

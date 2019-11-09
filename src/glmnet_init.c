@@ -11,6 +11,15 @@
 #define _(String) (String)
 #endif
 
+/* New addition */
+extern SEXP storePB(SEXP tpb, SEXP env);
+static const R_CallMethodDef CallEntries[] = {
+  {"storePB", (DL_FUNC) &storePB, 2},
+  {NULL, NULL, 0}
+};
+
+/* End of new addition */
+
 #define FDEF(name)  {#name, (DL_FUNC) &F77_SUB(name), sizeof(name ## _t)/sizeof(name ## _t[0]), name ##_t}
 void F77_SUB(coxnet)(
 		     double *parm,
@@ -627,7 +636,8 @@ void F77_SUB(get_int_parms)(
 			    int *mnlam,
 			    double *rsqmax,
 			    double *pmin,
-			    double *exmx
+			    double *exmx,
+			    int *itrace
 			    );
 
 static R_NativePrimitiveArgType get_int_parms_t[] = {
@@ -637,7 +647,8 @@ static R_NativePrimitiveArgType get_int_parms_t[] = {
   INTSXP,
   REALSXP,
   REALSXP,
-  REALSXP
+  REALSXP,
+  INTSXP
 };
 void F77_SUB(chg_fract_dev)(
 			    double *fdev
@@ -688,6 +699,15 @@ void F77_SUB(chg_max_exp)(
 static R_NativePrimitiveArgType chg_max_exp_t[] = {
   REALSXP
 };
+
+void F77_SUB(chg_itrace)(
+			      int *itrace
+			      );
+
+static R_NativePrimitiveArgType chg_itrace_t[] = {
+  INTSXP
+};
+
 void F77_SUB(chg_bnorm)(
 			double *prec,
 			int *mxit
@@ -726,13 +746,14 @@ static R_FortranMethodDef fMethods[] = {
   FDEF(chg_min_lambdas) ,
   FDEF(chg_min_null_prob) ,
   FDEF(chg_max_exp) ,
+  FDEF(chg_itrace) ,  
   FDEF(chg_bnorm) ,
   FDEF(get_bnorm) ,
   {NULL, NULL, 0}
 };
 
 void R_init_glmnet(DllInfo *dll){
-  R_registerRoutines(dll, NULL, NULL, fMethods, NULL);
+  R_registerRoutines(dll, NULL, CallEntries, fMethods, NULL);
   R_useDynamicSymbols(dll, FALSE);
 }
 #endif

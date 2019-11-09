@@ -1,8 +1,9 @@
 c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))             
-      subroutine get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)      
+      subroutine get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx,itrace
+     *)
       implicit double precision(a-h,o-z)                                
-      data sml0,eps0,big0,mnlam0,rsqmax0,pmin0,exmx0  /1.0d-5,1.0d-6,9.9
-     *d35,5,0.999,1.0d-9,250.0/
+      data sml0,eps0,big0,mnlam0,rsqmax0,pmin0,exmx0,itrace0  /1.0d-5,1.
+     *0d-6,9.9d35,5,0.999,1.0d-9,250.0,0/
       sml=sml0                                                          
       eps=eps0                                                          
       big=big0                                                          
@@ -10,6 +11,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       rsqmax=rsqmax0                                                    
       pmin=pmin0                                                        
       exmx=exmx0                                                        
+      itrace=itrace0                                                    
       return                                                            
       entry chg_fract_dev(arg)                                          
       sml0=arg                                                          
@@ -31,6 +33,9 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       return                                                            
       entry chg_max_exp(arg)                                            
       exmx0=arg                                                         
+      return                                                            
+      entry chg_itrace(irg)                                             
+      itrace0=irg                                                       
       return                                                            
       end                                                               
       subroutine elnet(ka,parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,  flmin,u
@@ -193,7 +198,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       double precision, dimension (:,:), allocatable :: c               
       allocate(c(1:ni,1:nx),stat=jerr)                                  
       if(jerr.ne.0) return;                                             
-      call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx,itrace)     
       allocate(a(1:ni),stat=jerr)                                       
       if(jerr.ne.0) return                                              
       allocate(mm(1:ni),stat=jerr)                                      
@@ -202,6 +207,8 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       if(jerr.ne.0) return                                              
       bta=beta                                                          
       omb=1.0-bta                                                       
+      alm=0.0                                                           
+      alf=1.0                                                           
       if(flmin .ge. 1.0)goto 10271                                      
       eqs=max(eps,flmin)                                                
       alf=eqs**(1.0/(nlam-1))                                           
@@ -213,8 +220,8 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       nin=nlp                                                           
       iz=0                                                              
       mnl=min(mnlam,nlam)                                               
-      alm=0.0                                                           
       do 10281 m=1,nlam                                                 
+      if(itrace.ne.0) call setpb(m-1)                                   
       if(flmin .lt. 1.0)goto 10301                                      
       alm=ulam(m)                                                       
       goto 10291                                                        
@@ -474,7 +481,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       integer ju(ni),ia(nx),kin(nlam)                                   
       double precision, dimension (:), allocatable :: a,g               
       integer, dimension (:), allocatable :: mm,ix                      
-      call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx,itrace)     
       allocate(a(1:ni),stat=jerr)                                       
       if(jerr.ne.0) return                                              
       allocate(mm(1:ni),stat=jerr)                                      
@@ -505,6 +512,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
 10781 continue                                                          
       continue                                                          
       do 10791 m=1,nlam                                                 
+      if(itrace.ne.0) call setpb(m-1)                                   
       alm0=alm                                                          
       if(flmin .lt. 1.0)goto 10811                                      
       alm=ulam(m)                                                       
@@ -765,6 +773,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       implicit double precision(a-h,o-z)                                
       double precision x(*),y(no),w(no),g(ni),xm(ni),xs(ni),xv(ni)      
       integer ix(*),jx(*),ju(ni)                                        
+      jerr = jerr*1                                                     
       w=w/sum(w)                                                        
       if(intr .ne. 0)goto 11221                                         
       ym=0.0                                                            
@@ -834,7 +843,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       double precision, dimension (:,:), allocatable :: c               
       allocate(c(1:ni,1:nx),stat=jerr)                                  
       if(jerr.ne.0) return;                                             
-      call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx,itrace)     
       allocate(a(1:ni),stat=jerr)                                       
       if(jerr.ne.0) return                                              
       allocate(mm(1:ni),stat=jerr)                                      
@@ -857,6 +866,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       iz=0                                                              
       mnl=min(mnlam,nlam)                                               
       do 11351 m=1,nlam                                                 
+      if(itrace.ne.0) call setpb(m-1)                                   
       if(flmin .lt. 1.0)goto 11371                                      
       alm=ulam(m)                                                       
       goto 11361                                                        
@@ -1051,6 +1061,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       implicit double precision(a-h,o-z)                                
       double precision x(*),y(no),w(no),xm(ni),xs(ni),xv(ni)            
       integer ix(*),jx(*),ju(ni)                                        
+      jerr = jerr*1                                                     
       w=w/sum(w)                                                        
       if(intr .ne. 0)goto 11711                                         
       ym=0.0                                                            
@@ -1107,7 +1118,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       integer ix(*),jx(*),ju(ni),ia(nx),kin(nlam)                       
       double precision, dimension (:), allocatable :: a,g               
       integer, dimension (:), allocatable :: mm,iy                      
-      call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx,itrace)     
       allocate(a(1:ni),stat=jerr)                                       
       if(jerr.ne.0) return                                              
       allocate(mm(1:ni),stat=jerr)                                      
@@ -1141,6 +1152,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
 11821 continue                                                          
       continue                                                          
       do 11831 m=1,nlam                                                 
+      if(itrace.ne.0) call setpb(m-1)                                   
       alm0=alm                                                          
       if(flmin .lt. 1.0)goto 11851                                      
       alm=ulam(m)                                                       
@@ -1556,7 +1568,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       integer ju(ni),m(nx),kin(nlam)                                    
       double precision, dimension (:), allocatable :: b,bs,v,r,xv,q,ga  
       integer, dimension (:), allocatable :: mm,ixx                     
-      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx,itrace)     
       allocate(b(0:ni),stat=jerr)                                       
       if(jerr.ne.0) return                                              
       allocate(xv(1:ni),stat=jerr)                                      
@@ -1653,6 +1665,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
 12851 continue                                                          
       continue                                                          
       do 12861 ilm=1,nlam                                               
+      if(itrace.ne.0) call setpb(ilm-1)                                 
       al0=al                                                            
       if(flmin .lt. 1.0)goto 12881                                      
       al=ulam(ilm)                                                      
@@ -1914,7 +1927,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       if(jerr.ne.0) return                                              
       allocate(q(1:no,1:nc),stat=jerr)                                  
       if(jerr.ne.0) return                                              
-      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx,itrace)     
       exmn=-exmx                                                        
       allocate(r(1:no),stat=jerr)                                       
       if(jerr.ne.0) return                                              
@@ -2049,6 +2062,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
 13641 continue                                                          
       continue                                                          
       do 13661 ilm=1,nlam                                               
+      if(itrace.ne.0) call setpb(ilm-1)                                 
       al0=al                                                            
       if(flmin .lt. 1.0)goto 13681                                      
       al=ulam(ilm)                                                      
@@ -2678,7 +2692,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       double precision, dimension (:), allocatable :: xm,b,bs,v,r       
       double precision, dimension (:), allocatable :: sc,xv,q,ga        
       integer, dimension (:), allocatable :: mm,ixx                     
-      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx,itrace)     
       allocate(b(0:ni),stat=jerr)                                       
       if(jerr.ne.0) return                                              
       allocate(xm(0:ni),stat=jerr)                                      
@@ -2790,6 +2804,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
 15231 continue                                                          
       continue                                                          
       do 15241 ilm=1,nlam                                               
+      if(itrace.ne.0) call setpb(ilm-1)                                 
       al0=al                                                            
       if(flmin .lt. 1.0)goto 15261                                      
       al=ulam(ilm)                                                      
@@ -3050,7 +3065,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       if(jerr.ne.0) return                                              
       allocate(q(1:no,1:nc),stat=jerr)                                  
       if(jerr.ne.0) return                                              
-      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx,itrace)     
       exmn=-exmx                                                        
       allocate(xm(0:ni),stat=jerr)                                      
       if(jerr.ne.0) return                                              
@@ -3197,6 +3212,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
 16001 continue                                                          
       continue                                                          
       do 16021 ilm=1,nlam                                               
+      if(itrace.ne.0) call setpb(ilm-1)                                 
       al0=al                                                            
       if(flmin .lt. 1.0)goto 16041                                      
       al=ulam(ilm)                                                      
@@ -3611,7 +3627,8 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       double precision, dimension (:), allocatable :: a,as,f,dq         
       double precision, dimension (:), allocatable :: e,uu,ga           
       integer, dimension (:), allocatable :: jp,kp,mm,ixx               
-      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx,itrace)     
+      isd = isd*1                                                       
       sml=sml*100.0                                                     
       devmax=devmax*0.99/0.999                                          
       allocate(e(1:no),stat=jerr)                                       
@@ -3697,6 +3714,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
 16941 continue                                                          
       continue                                                          
       do 16951 ilm=1,nlam                                               
+      if(itrace.ne.0) call setpb(ilm-1)                                 
       al0=al                                                            
       if(flmin .lt. 1.0)goto 16971                                      
       al=ulam(ilm)                                                      
@@ -4026,6 +4044,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       double precision d(no),dk(nk),f(no)                               
       integer kp(nk),jp(no)                                             
       double precision e(no),u(nk)                                      
+      ni = ni*1                                                         
       call usk(no,nk,kp,jp,e,u)                                         
       u=log(u)                                                          
       risk=dot_product(d,f)-dot_product(dk,u)                           
@@ -4164,8 +4183,9 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       integer ju(ni),m(nx),kin(nlam)                                    
       double precision, dimension (:), allocatable :: t,w,wr,v,a,f,as,ga
       integer, dimension (:), allocatable :: mm,ixx                     
-      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx,itrace)     
       sml=sml*10.0                                                      
+      isd = isd*1                                                       
       allocate(a(1:ni),stat=jerr)                                       
       if(jerr.ne.0) return                                              
       allocate(as(1:ni),stat=jerr)                                      
@@ -4255,6 +4275,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
 17981 continue                                                          
       continue                                                          
       do 17991 ilm=1,nlam                                               
+      if(itrace.ne.0) call setpb(ilm-1)                                 
       al0=al                                                            
       if(flmin .lt. 1.0)goto 18011                                      
       al=ulam(ilm)                                                      
@@ -4580,8 +4601,9 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       double precision, dimension (:), allocatable :: qy,t,w,wr,v       
       double precision, dimension (:), allocatable :: a,as,xm,ga        
       integer, dimension (:), allocatable :: mm,ixx                     
-      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx,itrace)     
       sml=sml*10.0                                                      
+      isd = isd*1                                                       
       allocate(a(1:ni),stat=jerr)                                       
       if(jerr.ne.0) return                                              
       allocate(as(1:ni),stat=jerr)                                      
@@ -4688,6 +4710,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
 18791 continue                                                          
       continue                                                          
       do 18801 ilm=1,nlam                                               
+      if(itrace.ne.0) call setpb(ilm-1)                                 
       al0=al                                                            
       if(flmin .lt. 1.0)goto 18821                                      
       al=ulam(ilm)                                                      
@@ -5080,8 +5103,8 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       deallocate(xm,xs,ym,ys,ju,xv,clt)                                 
       return                                                            
       end                                                               
-      subroutine multstandard1(no,ni,nr,x,y,w,isd,jsd,intr,ju, 			 xm,xs
-     *,ym,ys,xv,ys0,jerr)
+      subroutine multstandard1(no,ni,nr,x,y,w,isd,jsd,intr,ju,  xm,xs,ym
+     *,ys,xv,ys0,jerr)
       implicit double precision(a-h,o-z)                                
       double precision x(no,ni),y(no,nr),w(no),xm(ni),xs(ni),xv(ni),ym(n
      *r),ys(nr)
@@ -5189,7 +5212,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       double precision, dimension (:,:), allocatable :: a               
       allocate(a(1:nr,1:ni),stat=jerr)                                  
       if(jerr.ne.0) return                                              
-      call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx,itrace)     
       allocate(gj(1:nr),stat=jerr)                                      
       if(jerr.ne.0) return                                              
       allocate(gk(1:nr),stat=jerr)                                      
@@ -5232,6 +5255,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
 19801 continue                                                          
       continue                                                          
       do 19821 m=1,nlam                                                 
+      if(itrace.ne.0) call setpb(m-1)                                   
       alm0=alm                                                          
       if(flmin .lt. 1.0)goto 19841                                      
       alm=ulam(m)                                                       
@@ -5726,6 +5750,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       double precision x(*),y(no,nr),w(no),xm(ni),xs(ni),xv(ni),ym(nr),y
      *s(nr)
       integer ix(*),jx(*),ju(ni)                                        
+      jerr = jerr*1                                                     
       w=w/sum(w)                                                        
       if(intr .ne. 0)goto 20801                                         
       do 20811 j=1,ni                                                   
@@ -5819,7 +5844,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       double precision, dimension (:,:), allocatable :: a               
       allocate(a(1:nr,1:ni),stat=jerr)                                  
       if(jerr.ne.0) return                                              
-      call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx,itrace)     
       allocate(mm(1:ni),stat=jerr)                                      
       if(jerr.ne.0) return                                              
       allocate(g(1:ni),stat=jerr)                                       
@@ -5868,6 +5893,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
 21021 continue                                                          
       continue                                                          
       do 21041 m=1,nlam                                                 
+      if(itrace.ne.0) call setpb(m-1)                                   
       alm0=alm                                                          
       if(flmin .lt. 1.0)goto 21061                                      
       alm=ulam(m)                                                       
@@ -6076,7 +6102,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       if(jerr.ne.0) return                                              
       allocate(r(1:no,1:nc),stat=jerr)                                  
       if(jerr.ne.0) return                                              
-      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx,itrace)     
       exmn=-exmx                                                        
       allocate(mm(1:ni),stat=jerr)                                      
       if(jerr.ne.0) return                                              
@@ -6197,6 +6223,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       continue                                                          
       ga=sqrt(ga)                                                       
       do 21681 ilm=1,nlam                                               
+      if(itrace.ne.0) call setpb(ilm-1)                                 
       al0=al                                                            
       if(flmin .lt. 1.0)goto 21701                                      
       al=ulam(ilm)                                                      
@@ -6473,7 +6500,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       if(jerr.ne.0) return                                              
       allocate(r(1:no,1:nc),stat=jerr)                                  
       if(jerr.ne.0) return                                              
-      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx)            
+      call get_int_parms(sml,eps,big,mnlam,devmax,pmin,exmx,itrace)     
       exmn=-exmx                                                        
       allocate(mm(1:ni),stat=jerr)                                      
       if(jerr.ne.0) return                                              
@@ -6603,6 +6630,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       continue                                                          
       ga=sqrt(ga)                                                       
       do 22521 ilm=1,nlam                                               
+      if(itrace.ne.0) call setpb(ilm-1)                                 
       al0=al                                                            
       if(flmin .lt. 1.0)goto 22541                                      
       al=ulam(ilm)                                                      

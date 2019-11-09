@@ -1,3 +1,5 @@
+#' @method predict coxnet
+#' @export
 predict.coxnet=function(object,newx,s=NULL,type=c("link","response","coefficients","nonzero"),exact=FALSE,newoffset,...){
   type=match.arg(type)
   ###coxnet has no intercept, so we treat it separately

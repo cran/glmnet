@@ -51,6 +51,6 @@ plotCoef=function(beta,norm,lambda,df,dev,label=FALSE,xvar=c("norm","lambda","de
    ypos=beta[,ncol(beta)]
    text(xpos,ypos,paste(which),cex=.5,pos=pos)
  }
-         
+
 }
-    
+

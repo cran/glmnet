@@ -1,3 +1,8 @@
+#' @method plot mrelnet
+#' @param type.coef If \code{type.coef="2norm"} then a single curve per
+#' variable, else if \code{type.coef="coef"}, a coefficient plot per response
+#' @rdname plot.glmnet
+#' @export
 plot.mrelnet <-
   function(x, xvar=c("norm","lambda","dev"),label=FALSE,type.coef=c("coef","2norm"),...){
     type.coef=match.arg(type.coef)

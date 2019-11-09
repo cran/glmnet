@@ -1,0 +1,479 @@
+---
+title: "Relaxed fits and other additions in `glmnet` 3.0"
+author: "Trevor Hastie, Balasubramanian Narasimhan and Rob Tibshirani"
+date: "October 15, 2019"
+bibliography: assets/glmnet_refs.bib
+link-citations: true
+output:
+  pdf_document:
+    fig_caption: yes
+    toc: yes
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{Relaxed fits}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+## Introduction
+
+In our vignette "glmnet" we give details for fitting lasso and
+elastic-net regularized models, for
+CV and various aspects of glmnet modeling. In this vignette, we
+highlight some of the new tools and features in the major revision glmnet 3.0.
+
+The main edition is the introduction of the *relaxed lasso*. The idea
+is to take a glmnet fitted object, and then for each lambda, refit the
+variables in the active set without any penalization. This gives the
+`relaxed` fit (note, there have been other definitions of a relaxed
+fit, but this is the one we prefer). 
+This could of course be done for elastic net fits as well as lasso. 
+However, if the number of variables gets too close to the sample size
+N, the relaxed path will be truncated.
+Furthermore, for binomial and other nonlinear GLMs convergence can be
+an issue with our current implementation if the number of variables is
+too large, and perversely if the relaxed fit is too strong.
+
+Suppose the `glmnet` fitted linear predictor at $\lambda$ is
+$\hat\eta_\lambda(x)$ and the relaxed version is $\tilde
+\eta_\lambda(x)$. We also allow for shrinkage between the two:
+$$\tilde \eta_{\lambda,\gamma}=(1-\gamma)\tilde
+\eta_\lambda(x)+\gamma\hat\eta_\lambda(x).$$
+$\gamma\in[0,1]$ is an additional tuning parameter which can be
+selected by cross validation.
+
+The debiasing will potentially improve prediction performance, and CV
+will typically select a model with a smaller number of variables. 
+This procedure is very competitive with forward-stepwise and
+best-subset regression, and has a considerable speed advantage when
+the number of variables is large. This is especially true for
+best-subset, but even so for forward stepwise. The latter has to plod
+through the variables one-at-a-time, while glmnet will just plunge in
+and find a good active set.
+
+Further details may be found in @glmnet, @coxnet, @strongrules, @block
+and @best_subset.
+
+## Simple relaxed fit
+
+To get things going, we show the most basic use.
+We use the same data used in the `glmnet` vignette.
+
+```{r}
+library(glmnet)
+data(QuickStartExample)
+fit=glmnet(x,y, relax=TRUE)
+print(fit)
+```
+There is an extra column `%Dev R` where the `R` stands for "relaxed",
+which is the percent deviance explained by the relaxed fit. This is
+always higher than its neighboring column, which is the same for the
+penalized fit (on the training data).
+
+The fit object is class `relaxed`, which inherits from class `glmnet`.
+One can plot it, with additional flexibility.
+
+```{r}
+par(mfrow=c(1,3))
+plot(fit)
+plot(fit,gamma=0.5)
+plot(fit,gamma=0)
+```
+
+So again, `gamma=1` is the traditional `glmnet` fit, while `gamma=0`
+is the unpenalized fit, and `gamma=0.5` is a mixture of the two (at
+the coefficient level, and hence also the linear predictors).
+
+We can also select `gamma` using `cv.glmnet`, which by default uses
+the 5 values `c(0, 0.25, 0.5, 0.75, 1)`.
+
+```{r}
+cfit=cv.glmnet(x,y,relax=TRUE)
+plot(cfit)
+```
+
+The plot command has an `se.bands` option if you don't like the
+default shading of these bands.
+
+Just like before, you can make predictions from a CV object, and it
+uses the selected values for `lambda` and `gamma`.
+
+```{r, eval=FALSE}
+predict(cvfit,newx)
+```
+
+A new feature in `glmnet` is a print method for `cv.glmnet` and a
+`cv.relaxed` object.
+
+```{r}
+print(cfit)
+```
+
+## More details on relaxed fitting
+
+Although `glmnet` has a `relax` option, you can created a relaxed
+version by post-processing a `glmnet` object.
+
+```{r `relaxed`}
+fit=glmnet(x,y)
+fitr=relax.glmnet(fit,x=x,y=y)
+```
+This will rarely need to be done; one use case is if the original fit
+took a long time, and the user wanted to avoid refitting it.
+Note that in the call  the arguments are named, since they are
+passed in via the `...` argument to `relax.glmnet`.
+
+Needless to say, *any* of the families fit by `glmnet` can also be fit
+with the `relaxed` option. 
+
+As mentioned, a `relaxed` object is also a `glmnet` object. Apart from
+the class modification, it has an additional componet named `relaxed`
+which is itself a `glmnet` object, but with the relaxed coefficients.
+The default behavior of extractor functions like `predict` and `coef`,
+as well as `plot` will be to present results from the `glmnet` fit,
+unless a value of `gamma` is given different from the default value
+`gamma=1` (see the plots above). The `print` method gives additional
+info on the relaxed fit.
+
+Likewise, a `cv.relaxed` object inherits from class `cv.glmnet`. 
+Here the `predict` method by default uses the optimal relaxed fit; if
+predictions from the CV-optimal *original* `glmnet` fit are desired, one
+can directly use `predict.cv.glmnet`. Similarly for the `print`
+command, which we illustrate here.
+
+```{r}
+print(cfit)
+print.cv.glmnet(cfit)
+```
+
+## Relaxed fits and glms
+
+`glmnet` itself is used to fit the relaxed fits, by using a single
+value of zero
+for `lambda`. However, for nonlinear models such as binomial,
+multinomial and poisson, there can be convergence issues. This is
+because `glmnet` does not do stepsize optimization, rather relying on
+the pathwise fit to stay in the "quadratic" zone of the log
+likelihood. We have an optional `path=TRUE` option for `relax.glmnet`, which actually
+fits a regurized path toward the `lambda=0` solution, and thus avoids
+the issue. The default is `path=FALSE` since this option adds to the
+computing time.
+
+###  Forward stepwise and relaxed fit
+
+One use case for a relaxed fit is as a faster version of forward
+stepwise regression. With a large number `p` of variables, forward-stepwise regression can be tedious. Lasso on the other hand, because
+of its convexity, can plunge in and identify  good candidate sets of
+variables over 100 values of `lambda`, even though `p` could be in the
+10s of thousands. In a case like this, one can have `cv.glmnet` do the
+selection.
+
+```{r}
+fitr=cv.glmnet(x,y,gamma=0,relax=TRUE)
+plot(fitr)
+```
+
+Notice that we only allow `gamma=0`, so in this case we are not considering the blended fits.
+
+<a id="progress"></a>
+
+##  Progress bar
+
+We finally have a progress bar for `glmnet` and `cv.glmnet`. Ever run a
+job on a big dataset, and wonder how long it will take? Now you can
+use the `trace.it = TRUE` argument to these functions.
+
+```{r, eval=FALSE}
+fit=glmnet(x,y,trace=TRUE)
+```
+
+``##``
+
+`` |==================================           |65%``
+
+Here we abbreviated the argument to `trace`. This display changes in
+place as the fit is produced.
+Also very helpful with `cv.glmnet` 
+
+```{r, eval=FALSE}
+fit=cv.glmnet(x,y,trace=TRUE)
+```
+``##``
+
+`` Training``
+
+``   |=============================================| 100%``
+
+`` Fold: 1/10``
+
+``   |=============================================| 100%``
+
+`` Fold: 2/10``
+
+``   |=============================================| 100%``
+
+`` Fold: 3/10``
+
+``   |=============================================| 100%``
+
+`` Fold: 4/10``
+
+``   |=============================================| 100%``
+
+`` Fold: 5/10``
+
+``   |=============================================| 100%``
+
+`` Fold: 6/10``
+
+``   |=============================                |  70%``
+
+ 
+Tracing of the folds works a little differently when distributed
+computing is used. 
+ 
+Here the `trace` argument should be used in each call to `glmnet` or
+`cv.glmnet`. One can set this option session wide via a call to
+`glmnet.control` with its new `itrace` argument:
+
+```{r, eval=FALSE}
+glmnet.control(itrace=1)
+```
+
+To reset it, one makes a similar call and sets `itrace=0`.
+
+##   C index for Cox models 
+ 
+ We have a new performance measure for the Cox model: the Harrel *C index*. 
+ This is like the AUC measure of concordance for survival
+ data, but only considers comparable pairs. Pure concordance would
+ record the fraction of pairs for which the order of the death times
+ agree with the order of the predicted risk. But with survival data,
+ if an observation is right censored at a time *before* another
+ observation's death time, they are not comparable.
+ 
+```{r}
+ data(CoxExample)
+```
+ 
+```{r}
+ cvfit=cv.glmnet(x,y,family="cox",type.measure="C")
+ plot(cvfit)
+```
+
+##  Assessing models on test data
+
+Once we have fit a series of models using `glmnet`, we often assess
+their performance on a set of evaluation or test data. We usually go
+through the process of building a prediction matrix, and then deciding
+on the measure, and computing the values for a series of values for
+`lambda` and now `gamma`. Here we provide three functions for making
+these tasks easier.
+
+### Performance measures
+
+The function `assess.glmnet` computes the same performance measures produced by
+`cv.glmnet`, but  on a validation or test dataset. 
+
+```{r}
+data(BinomialExample)
+itrain=1:70
+fit=glmnet(x[itrain,],y[itrain],family="binomial",nlambda=20)
+assess.glmnet(fit,newx=x[-itrain,],newy=y[-itrain])
+```
+
+This produces a list with *all* the measures suitable for a binomial
+model, computed for the entire sequence of lambdas in the fit object.
+Here the function identifies the model family from the fit object.
+
+A second use case builds the prediction matrix first
+
+```{r, eval=FALSE}
+pred=predict(fit,newx=x[-itrain,])
+assess.glmnet(pred,newy=y[-itrain],family="binomial")
+```
+
+Here we have to provide the `family` as an argument; the results (not
+shown) are the same. Users can see the various measures suitable for
+each family via 
+
+```{r}
+glmnet.measures()
+```
+
+The assess function can also take the result of `cv.glmnet` as input.
+In this case the predictions are made at the optimal values for the
+parameter(s).
+
+```{r}
+cfit=cv.glmnet(x[itrain,],y[itrain],family="binomial", nlambda = 30)
+assess.glmnet(cfit,newx=x[-itrain,],newy=y[-itrain])
+```
+
+This used the default value of `s=lambda.1se`, just like `predict`
+would have done.
+Users can provide additional arguments that get passed on to predict:
+
+```{r}
+assess.glmnet(cfit,newx=x[-itrain,],newy=y[-itrain], s="lambda.min")
+```
+
+
+
+One interesting use case is to get the results of CV using other
+measures, via the `keep` argument. In this case the `fit.preval`
+object is a matrix of prevalidated predictions made using the folds `foldid`
+
+```{r}
+cfit=cv.glmnet(x,y,family="binomial",keep=TRUE, nlambda = 30)
+assess.glmnet(cfit$fit.preval,newy=y,family="binomial")
+```
+
+Users can verify that the first measure here `deviance` is identical
+to the component `cvm` on the `cfit` object.
+
+### ROC curves for binomial data
+
+In the special case of binomial models, users often would like to see
+the ROC curve for validation or test data. Here the function
+`roc.glmnet` provides the goodies. Its first argument is as in
+`assess.glmnet`. Here we illustrate one use case, using the
+prevlidated CV fit as before. 
+
+
+```{r}
+cfit=cv.glmnet(x,y,family="binomial", type.measure="auc", keep=TRUE)
+rocs=roc.glmnet(cfit$fit.preval,newy=y)
+which=match(cfit$lambda.min,cfit$lambda)
+plot(rocs[[which]],type="l")
+nopr=sapply(rocs,lines,col="grey")
+lines(rocs[[which]],lwd=2,col="red")
+```
+
+In this case `roc.glmnet` returns a list of cross-validated ROC data, one for each
+model along the path. In the third line we identify the CV
+winner. Then we plot all the curves in grey, and the winner in red.
+
+### Confusion matrices for classification
+
+For binomial and multinomial models, we often which to examine the
+classification performance on new data. The function
+`confusion.glmnet` will do that.
+
+```{r}
+data(MultinomialExample)
+set.seed(101)
+itrain=sample(1:500,400,replace=FALSE)
+cfit=cv.glmnet(x[itrain,],y[itrain],family="multinomial")
+cnf=confusion.glmnet(cfit,newx=x[-itrain,],newy=y[-itrain])
+print(cnf)
+```
+
+It produces a table of class `confusion.table` which inherits from
+calss `table`, and we also provide a print method.
+
+The first argument to `confusion.glmnet` should be either a `glmnet` object, or a
+`cv.glmnet` object, from which predictions can be made, or a
+matrix/array of predictions, such as the *kept* `fit.predval` object
+from `cv.glmnet`. 
+
+In the second case we need to specify the `family`,
+otherwise *confusion* can exist between `binomial` and `multinomial`
+prediction matrices.
+Here we show a multinomial example
+
+```{r}
+cfit=cv.glmnet(x,y,family="multinomial",type="class",keep=TRUE)
+cnf=confusion.glmnet(cfit$fit.preval,newy=y,family="multinomial")
+which=match(cfit$lambda.min,cfit$lambda)
+print(cnf[[which]])
+```
+Since the `fit.preval` object has predictions for the whole path, the
+result of `confusion.glmnet` here is a list of confusion tables. 
+We identify and print the one corresponding to the minimum
+classification error.
+
+
+## Fitting big and/or sparse GLMs
+
+We include a function `bigGlm` for fitting a single GLM model
+(unpenalized), but allowing all the options of `glmnet`.
+In other words, coefficient upper and/or lower bounds and sparse `x`
+matrices. This is not too much more than fitting a model with a single
+value of `lambda=0` (with some protection from edge cases).
+There is also a `predict` and `print` method.
+
+```{r}
+data(BinomialExample)
+fit=bigGlm(x,y,family="binomial",lower.limits=-1)
+print(fit)
+```
+
+## Producing x from mixed variables, and missing data
+
+We have created a function `makeX` that makes it easy to create the
+model matrix `x` needed as input to `glmnet`. It takes as input a data
+frame, which can contain vectors, matrices and factors. Some of the features are
+
+* Factors are *one-hot* encoded to form indicator matrices
+* Missing values in the resultant matrix can be replaced by the column
+  means
+* The `sparse` option returns a matrix in column-sparse format. This
+  is useful if the data are large, and factors have many levels.
+* Two dataframes can be provided, `train` and `test`. This ensures the
+  factor levels correspond, and also imputes missing data in the test
+  data from means in the training data.
+  
+  We start with a simple case with some factors.
+  
+```{r}
+set.seed(101)
+X = matrix(rnorm(20),10,2)
+X3=sample(letters[1:3],10,replace=TRUE)
+X4=sample(LETTERS[1:3],10,replace=TRUE)
+df=data.frame(X,X3,X4)
+makeX(df)
+```
+
+Or if a sparse output was desired:
+```{r}
+makeX(df,sparse=TRUE)
+```
+
+And now some missing values
+
+```{r}
+Xn=X
+Xn[3,1]=NA;Xn[5,2]=NA
+X3n=X3;
+X3n[6]=NA
+X4n=X4
+X4n[9]=NA
+dfn=data.frame(Xn,X3n,X4n)
+makeX(dfn)
+```
+which we can replace with column-mean imputations (and make sparse, if
+we like)
+
+```{r}
+makeX(dfn,na.impute=TRUE,sparse=TRUE)
+```
+
+Finally if a test set is available as well
+
+```{r}
+X = matrix(rnorm(10),5,2)
+X3=sample(letters[1:3],5,replace=TRUE)
+X4=sample(LETTERS[1:3],5,replace=TRUE)
+Xn=X
+Xn[3,1]=NA;Xn[5,2]=NA
+X3n=X3;
+X3n[1]=NA
+X4n=X4
+X4n[2]=NA
+dftn=data.frame(Xn,X3n,X4n)
+makeX(dfn,dftn,na.impute=TRUE, sparse=TRUE)
+```
+  
+
+## References

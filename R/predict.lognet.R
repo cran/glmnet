@@ -1,3 +1,5 @@
+#' @method predict lognet
+#' @export
 predict.lognet=function(object,newx,s=NULL,type=c("link","response","coefficients","class","nonzero"),exact=FALSE,newoffset,...){
   type=match.arg(type)
     ### remember that although the fortran lognet makes predictions

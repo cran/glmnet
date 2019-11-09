@@ -1,5 +1,5 @@
 cvtype <- function(type.measure="mse",subclass="elnet"){
-    type.measures = c("mse","deviance", "class", "auc", "mae")
+    type.measures = c("mse","deviance", "class", "auc", "mae","C")
     devname=switch(subclass,
                    elnet="Mean-squared Error",
                    lognet="Binomial Deviance",
@@ -9,12 +9,12 @@ cvtype <- function(type.measure="mse",subclass="elnet"){
                    mrelnet="Mean-squared Error"
                    )
     typenames = c(deviance = devname, mse = "Mean-Squared Error",
-    mae = "Mean Absolute Error",auc = "AUC", class = "Misclassification Error")
+    mae = "Mean Absolute Error",auc = "AUC", class = "Misclassification Error",C="C-index")
     subclass.ch=switch(subclass,
                    elnet=c(1,2,5),
                    lognet=c(2,3,4,1,5),
                    fishnet=c(2,1,5),
-                   coxnet=2,
+                   coxnet=c(2,6),
                    multnet=c(2,3,1,5),
                    mrelnet=c(1,2,5)
                    )

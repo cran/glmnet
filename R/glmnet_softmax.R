@@ -1,12 +1,15 @@
 glmnet_softmax <-
-  function (x) 
+  function (x,ignore_labels=FALSE)
 {
   d <- dim(x)
+  dd <- dimnames(x)[[2]]
+  if(is.null(dd) || !length(dd)) ignore_labels=TRUE
+
   nas=apply(is.na(x),1,any)
   if(any(nas)){
     pclass=rep(NA,d[1])
     if(sum(nas)<d[1]){
-      pclass2=glmnet_softmax(x[!nas,])
+      pclass2=glmnet_softmax(x[!nas,],ignore_labels)
       pclass[!nas]=pclass2
       if(is.factor(pclass2))pclass=factor(pclass,levels = seq(d[2]),labels=levels(pclass2))
     }
@@ -20,9 +23,7 @@ glmnet_softmax <-
       maxdist[l] <- x[l, i]
     }
     dd <- dimnames(x)[[2]]
-    pclass <- if (is.null(dd) || !length(dd)) 
-      pclass
-    else factor(pclass, levels = seq(d[2]), labels = dd)
+    if(!ignore_labels) pclass=factor(pclass, levels = seq(d[2]), labels = dd)
   }
   pclass
 }

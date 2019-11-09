@@ -1,3 +1,6 @@
+#' @method plot multnet
+#' @rdname plot.glmnet
+#' @export
 plot.multnet=function(x, xvar=c("norm","lambda","dev"),label=FALSE,type.coef=c("coef","2norm"),...){
   xvar=match.arg(xvar)
   type.coef=match.arg(type.coef)
@@ -22,5 +25,5 @@ plot.multnet=function(x, xvar=c("norm","lambda","dev"),label=FALSE,type.coef=c("
     dfseq=round(apply(dfmat,2,mean),1)
     plotCoef(coefnorm(beta,2),norm,x$lambda,dfseq,x$dev.ratio,label=label,xvar=xvar,ylab="Coefficient 2Norms",...)
   }
-  
+
   }

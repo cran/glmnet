@@ -1,3 +1,5 @@
+#' @method predict mrelnet
+#' @export
 predict.mrelnet=function(object, newx, s = NULL, type = c("link", "response",
                                       "coefficients", "nonzero"), exact = FALSE, newoffset, ...)
   {
