@@ -1,3 +1,7 @@
+# glmnet 3.0-1
+
+Minor fix to correct Depends in the DESCRIPTION to R (>= 3.6.0)
+
 # glmnet 3.0
 
  This is a major revision with much added functionality, listed

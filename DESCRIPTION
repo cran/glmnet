@@ -1,15 +1,15 @@
 Package: glmnet
 Type: Package
 Title: Lasso and Elastic-Net Regularized Generalized Linear Models
-Version: 3.0
-Date: 2019-11-07
+Version: 3.0-1
+Date: 2019-11-14
 Authors@R: c(person("Jerome", "Friedman", role=c("aut")),
 	     person("Trevor", "Hastie", role=c("aut", "cre"), email = "hastie@stanford.edu"),
 	     person("Rob", "Tibshirani", role=c("aut")),
 	     person("Balasubramanian", "Narasimhan", role=c("aut")),
 	     person("Noah", "Simon", role=c("aut")),
 	     person("Junyang", "Qian", role=c("ctb")))
-Depends: R (>= 3.5.0), Matrix (>= 1.0-6)
+Depends: R (>= 3.6.0), Matrix (>= 1.0-6)
 Imports: methods, utils, foreach, shape
 Suggests: survival, knitr, lars
 Description: Extremely efficient procedures for fitting the entire lasso or elastic-net regularization path for linear regression, logistic and multinomial regression models, Poisson regression and the Cox model. Two recent additions are the multiple-response Gaussian, and the grouped multinomial regression. The algorithm uses cyclical coordinate descent in a path-wise fashion, as described in the papers listed in the URL below.
@@ -21,7 +21,7 @@ URL: https://glmnet.stanford.edu,
         https://dx.doi.org/10.18637/jss.v039.i05
 RoxygenNote: 6.1.1
 NeedsCompilation: yes
-Packaged: 2019-11-07 18:55:21 UTC; hastie
+Packaged: 2019-11-14 21:01:50 UTC; hastie
 Author: Jerome Friedman [aut],
   Trevor Hastie [aut, cre],
   Rob Tibshirani [aut],
@@ -30,4 +30,4 @@ Author: Jerome Friedman [aut],
   Junyang Qian [ctb]
 Maintainer: Trevor Hastie <hastie@stanford.edu>
 Repository: CRAN
-Date/Publication: 2019-11-09 10:20:02 UTC
+Date/Publication: 2019-11-15 06:50:04 UTC

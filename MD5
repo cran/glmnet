@@ -1,6 +1,6 @@
-cc71f1a016150403102c3941375ebf6e *DESCRIPTION
+a1b826883554135c54c6fbc510affa3f *DESCRIPTION
 736b6561ca3bf55e4e378356c32581ca *NAMESPACE
-3287bd1cad34831a0b007e3808e71207 *NEWS.md
+f76bc6ceaa1552d85f662ab73709bf29 *NEWS.md
 ecfa66073d640bfafdb1f5fc44466141 *R/Cindex.R
 4bd3eb09b5b5e4d5dd4a6d885c734b0d *R/assess.coxnet.R
 fe3bbe3928ca6ad1b28e9b9bee0ab35f *R/assess.glmnet.R
@@ -102,13 +102,13 @@ beaffe6c0ae597f8803216e3bbd4a2d1 *data/QuickStartExample.RData
 c22d19c217bc163a2c38b84add608c31 *inst/CITATION
 f22779e1c8486853c9301836419f8220 *inst/doc/Coxnet.R
 72bfbc6589c6442d8f33e6e56cf414f3 *inst/doc/Coxnet.Rmd
-e86cb141eb7d023a1911d0843219646e *inst/doc/Coxnet.pdf
+ffb282984d00db4f74880e554fa1803e *inst/doc/Coxnet.pdf
 0626cfff426d60250a1f974475aafa9b *inst/doc/glmnet.R
 1085a7b8d861bec70ffdc10540f9c4bb *inst/doc/glmnet.Rmd
-65d75ee8472470f030bb9a1675d20321 *inst/doc/glmnet.pdf
+9e4192a5ab33a59d4f4117710fa07422 *inst/doc/glmnet.pdf
 89bd88dbeae63e44c7a3a83a40cae553 *inst/doc/relax.R
 9a02753803d77927adb06d655a99ecb0 *inst/doc/relax.Rmd
-03ea50df4ad0eea4d214f564f524a13e *inst/doc/relax.pdf
+19cd7bc5a6d27055da8d01cab4d1d006 *inst/doc/relax.pdf
 24d238928f7c189415fc20255fc99097 *inst/mortran/README.Rmd
 808c0ff579da4ab84dcb09f7216bcf3b *inst/mortran/glmnet5dpclean.m
 97cbb82f5259d0fadff9161fe7254016 *man/Cindex.Rd
