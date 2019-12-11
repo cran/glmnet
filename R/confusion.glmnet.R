@@ -48,7 +48,9 @@ confusion.glmnet=function(object,newx=NULL,newy,family=c("binomial","multinomial
         tab
         }
     if(ncol(classmat)>1)
-    apply(classmat,2,function(x,y)ctable(Predicted=x,True=y),y=newy)
+        ## convert to a dataframe, to prevent apply simplifying
+        lapply(data.frame(classmat,stringsAsFactors=FALSE,check.names=FALSE),
+               function(x,y)ctable(Predicted=x,True=y),y=newy)
     else(ctable(Predicted=classmat,True=newy))
 }
 

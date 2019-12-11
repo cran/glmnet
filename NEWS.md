@@ -1,3 +1,15 @@
+# glmnet 3.0-2
+
+Bug fixes
+
+* `confusion.glmnet` was sometimes not returning a list because of
+  apply collapsing structure
+* `cv.mrelnet` and `cv.multnet` dropping dimensions inappropriately
+* Fix to `storePB` to avoid segfault. Thanks [Tomas  Kalibera](https://github.com/kalibera)!
+* Changed the help for `assess.glmnet` and cousins to be more helpful!
+* Changed some logic in `lambda.interp` to avoid edge cases  (thanks
+  David Keplinger)
+  
 # glmnet 3.0-1
 
 Minor fix to correct Depends in the DESCRIPTION to R (>= 3.6.0)

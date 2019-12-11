@@ -13,7 +13,7 @@ cv.multnet <-function(predmat,y,type.measure,weights,foldid,grouped){
     ywt = apply(y, 1, sum)
     y = y/ywt
     weights = weights * ywt
-    N = nrow(y) - apply(is.na(predmat[, 1, ]), 2, sum)
+    N = nrow(y) - apply(is.na(predmat[, 1, ,drop=FALSE]), 2, sum)## dimensions could be lost if third dim=1
     bigY = array(y, dim(predmat))
     predmat=exp(predmat)
     predtot=apply(predmat,c(1,3),sum)

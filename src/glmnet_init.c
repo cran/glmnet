@@ -12,9 +12,9 @@
 #endif
 
 /* New addition */
-extern SEXP storePB(SEXP tpb, SEXP env);
+extern SEXP storePB(SEXP tpb);
 static const R_CallMethodDef CallEntries[] = {
-  {"storePB", (DL_FUNC) &storePB, 2},
+  {"storePB", (DL_FUNC) &storePB, 1},
   {NULL, NULL, 0}
 };
 

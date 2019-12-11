@@ -37,24 +37,36 @@
 #' list status and produce a single matrix or table.
 #' @author Trevor Hastie and Rob Tibshirani\cr Maintainer: Trevor Hastie
 #' <hastie@@stanford.edu>
-#' @seealso \code{cv.glmnet} and \code{glmnet.measures}
+#' @seealso \code{cv.glmnet}, \code{glmnet.measures} and \code{vignette("relax",package="glmnet")}
 #' @keywords models classification
 #' @examples
 #'
-#' x = matrix(rnorm(100 * 20), 100, 20)
-#' y = rnorm(100)
-#' g2 = sample(1:2, 100, replace = TRUE)
-#' g4 = sample(1:4, 100, replace = TRUE)
-#' fit1 = glmnet(x, y)
-#' assess.glmnet(fit1, newx = x, newy = y)
-#' preds = predict(fit1, newx = x[1:20, ], s = c(0.01, 0.005))
-#' assess.glmnet(preds, newy = y[1:20], family = "gaussian")
-#' fit2 = glmnet(x, g2, family = "binomial")
-#' plot(roc.glmnet(fit2, newx = x, newy = g2)[[20]])
-#' fit2c = cv.glmnet(x, g2, family = "binomial")
-#' plot(roc.glmnet(fit2c, newx = x, newy = g2, s = "lambda.min"))
-#' fit3 = glmnet(x, g4, family = "multinomial")
-#' confusion.glmnet(fit3, newx = x[1:50, ], newy = g4[1:50], s = 0.01)
+#' data(QuickStartExample)
+#' set.seed(11)
+#' train = sample(seq(length(y)),70,replace=FALSE)
+#' fit1 = glmnet(x[train,], y[train])
+#' assess.glmnet(fit1, newx = x[-train,], newy = y[-train])
+#' preds = predict(fit1, newx = x[-train, ], s = c(1, 0.25))
+#' assess.glmnet(preds, newy = y[-train], family = "gaussian")
+#' fit1c = cv.glmnet(x, y, keep = TRUE)
+#' fit1a = assess.glmnet(fit1c$fit.preval, newy=y,family="gaussian")
+#' plot(fit1c$lambda, log="x",fit1a$mae,xlab="Log Lambda",ylab="Mean Absolute Error")
+#' abline(v=fit1c$lambda.min, lty=2, col="red")
+#' data(BinomialExample)
+#' fit2 = glmnet(x[train,], y[train], family = "binomial")
+#' assess.glmnet(fit2,newx = x[-train,], newy=y[-train], s=0.1)
+#' plot(roc.glmnet(fit2, newx = x[-train,], newy=y[-train])[[10]])
+#' fit2c = cv.glmnet(x, y, family = "binomial", keep=TRUE)
+#' idmin = match(fit2c$lambda.min, fit2c$lambda)
+#' plot(roc.glmnet(fit2c$fit.preval, newy = y)[[idmin]])
+#' data(MultinomialExample)
+#' set.seed(103)
+#' train = sample(seq(length(y)),100,replace=FALSE)
+#' fit3 = glmnet(x[train,], y[train], family = "multinomial")
+#' confusion.glmnet(fit3, newx = x[-train, ], newy = y[-train], s = 0.01)
+#' fit3c = cv.glmnet(x, y, family = "multinomial", type.measure="class", keep=TRUE)
+#' idmin = match(fit3c$lambda.min, fit3c$lambda)
+#' confusion.glmnet(fit3c$fit.preval, newy = y, family="multinomial")[[idmin]]
 #'
 #' @export assess.glmnet
 assess.glmnet=function(object,newx=NULL,newy,weights=NULL,

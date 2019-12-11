@@ -5,8 +5,9 @@
 static SEXP pb;
 
 /* Save the progress bar */
-void storePB(SEXP tpb) {
+SEXP storePB(SEXP tpb) {
   pb = tpb;
+  return(R_NilValue);
 }
 
 /* Set Progress bar to value */

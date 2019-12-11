@@ -2,7 +2,7 @@ cv.mrelnet <- function(predmat,y,type.measure,weights,foldid,grouped){
     ndim = dim(y)
     nc = ndim[2]
     nobs = ndim[1]
-    N = nobs - apply(is.na(predmat[, 1, ]), 2, sum)
+    N = nobs - apply(is.na(predmat[, 1,,drop=FALSE ]), 2, sum)# dimensions could be lost if third dim=1
     bigY = array(y, dim(predmat))
     cvraw = switch(type.measure,
                    mse = apply((bigY - predmat)^2,c(1, 3), sum),

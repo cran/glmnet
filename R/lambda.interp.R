@@ -13,11 +13,13 @@ lambda.interp=function(lambda,s){
     sfrac=rep(1,nums)
   }
   else{
-      s[s > max(lambda)] = max(lambda)
-      s[s < min(lambda)] = min(lambda)
+      ## s[s > max(lambda)] = max(lambda)
+      ## s[s < min(lambda)] = min(lambda)
       k=length(lambda)
       sfrac <- (lambda[1]-s)/(lambda[1] - lambda[k])
       lambda <- (lambda[1] - lambda)/(lambda[1] - lambda[k])
+      sfrac[sfrac < min(lambda)] <- min(lambda)
+      sfrac[sfrac > max(lambda)] <- max(lambda)
       coord <- approx(lambda, seq(lambda), sfrac)$y
       left <- floor(coord)
       right <- ceiling(coord)
