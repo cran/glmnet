@@ -311,27 +311,26 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   y=drop(y) # we dont like matrix responses unless we need them
   np=dim(x)
    ###check dims
-  if(is.null(np)|(np[2]<=1))stop("x should be a matrix with 2 or more columns")
- nobs=as.integer(np[1])
+  if(is.null(np)){
+    nobs = as.integer(length(x))
+    nvars = as.integer(1)
+  }
+  else {
+    nobs = as.integer(np[1])
+    nvars = as.integer(np[2])
+  }
   if(missing(weights))weights=rep(1,nobs)
   else if(length(weights)!=nobs)stop(paste("number of elements in weights (",length(weights),") not equal to the number of rows of x (",nobs,")",sep=""))
-  nvars=as.integer(np[2])
   dimy=dim(y)
   nrowy=ifelse(is.null(dimy),length(y),dimy[1])
     if(nrowy!=nobs)stop(paste("number of observations in y (",nrowy,") not equal to the number of rows of x (",nobs,")",sep=""))
   vnames=colnames(x)
   if(is.null(vnames))vnames=paste("V",seq(nvars),sep="")
   ne=as.integer(dfmax)
-    nx=as.integer(pmax)
-    if(missing(exclude))exclude=integer(0)
-    if(any(penalty.factor==Inf)){
-        exclude=c(exclude,seq(nvars)[penalty.factor==Inf])
-        exclude=sort(unique(exclude))
-        }
-  if(length(exclude)>0){
+  nx=as.integer(pmax)
+  if(!missing(exclude)){
     jd=match(exclude,seq(nvars),0)
     if(!all(jd>0))stop("Some excluded variables out of range")
-    penalty.factor[jd]=1 #ow can change lambda sequence
     jd=as.integer(c(length(jd),jd))
   }else jd=as.integer(0)
     vp=as.double(penalty.factor)
@@ -368,7 +367,7 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
   }
   storage.mode(cl)="double"
   ### end check on limits
-
+  
   isd=as.integer(standardize)
   intr=as.integer(intercept)
   if(!missing(intercept)&&family=="cox")warning("Cox model has no intercept")
@@ -380,7 +379,7 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
     ulam=double(1)
   }
   else{
-     flmin=as.double(1)
+     flmin=as.double(1)    
     if(any(lambda<0))stop("lambdas should be non-negative")
     ulam=as.double(rev(sort(lambda)))
     nlam=as.integer(length(lambda))
