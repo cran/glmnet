@@ -1,4 +1,4 @@
-#' assess performace of a 'glmnet' object using test data.
+#' assess performance of a 'glmnet' object using test data.
 #'
 #' Given a test set, produce summary performance measures for the glmnet
 #' model(s)
@@ -80,18 +80,28 @@ assess.glmnet=function(object,newx=NULL,newy,weights=NULL,
         fam=family(object)
     }
     else{
-        fam=match.arg(family)
+        if(is.character(family))fam=match.arg(family)
+        else {
+            if(is.function(family))family=family()
+            if(!inherits(family,"family"))
+                stop("Invalid family argument; must be either character, function or family object")
+            fam=family
+            }
+
         predmat=object
         if(is.vector(predmat))predmat=as.matrix(predmat)
-        }
-    type.measures = glmnet.measures(fam)
+    }
+    famtype=fam
+    attr(predmat,"family")=fam
+    if(inherits(fam,"family"))famtype="GLM"
+    type.measures = glmnet.measures(famtype)
     y = drop(newy)
     dimy=dim(y)
     nrowy=ifelse(is.null(dimy),length(y),dimy[1])
     if (is.null(weights))
         weights = rep(1, nrowy)
-    subclass=switch(fam,gaussian="elnet",binomial="lognet",poisson="fishnet",multinomial="multnet",
-                    cox="coxnet",mgaussian="mrelnet")
+    subclass=switch(famtype,gaussian="elnet",binomial="lognet",poisson="fishnet",multinomial="multnet",
+                    cox="coxnet",mgaussian="mrelnet",GLM="glmnetfit")
     fun = paste("cv", subclass, sep = ".")
     if(subclass=="coxnet")fun="assess.coxnet"
     outlist=as.list(type.measures)

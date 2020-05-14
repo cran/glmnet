@@ -1,18 +1,19 @@
 Package: glmnet
 Type: Package
 Title: Lasso and Elastic-Net Regularized Generalized Linear Models
-Version: 3.0-2
-Date: 2019-12-09
+Version: 4.0
+Date: 2020-5-12
 Authors@R: c(person("Jerome", "Friedman", role=c("aut")),
 	     person("Trevor", "Hastie", role=c("aut", "cre"), email = "hastie@stanford.edu"),
 	     person("Rob", "Tibshirani", role=c("aut")),
 	     person("Balasubramanian", "Narasimhan", role=c("aut")),
+	     person("Kenneth","Tay",role=c("aut")),
 	     person("Noah", "Simon", role=c("aut")),
 	     person("Junyang", "Qian", role=c("ctb")))
 Depends: R (>= 3.6.0), Matrix (>= 1.0-6)
 Imports: methods, utils, foreach, shape
-Suggests: survival, knitr, lars
-Description: Extremely efficient procedures for fitting the entire lasso or elastic-net regularization path for linear regression, logistic and multinomial regression models, Poisson regression and the Cox model. Two recent additions are the multiple-response Gaussian, and the grouped multinomial regression. The algorithm uses cyclical coordinate descent in a path-wise fashion, as described in the papers listed in the URL below.
+Suggests: survival, knitr, lars, testthat
+Description: Extremely efficient procedures for fitting the entire lasso or elastic-net regularization path for linear regression, logistic and multinomial regression models, Poisson regression, Cox model,  multiple-response Gaussian, and the grouped multinomial regression. There are two new and important additions. The family argument can be a GLM family object, which opens the door to any programmed family. This comes with a modest computational cost, so when the built-in families suffice, they should be used instead.  The other novelty is the relax option, which refits each of the active sets in the path unpenalized. The algorithm uses cyclical coordinate descent in a path-wise fashion, as described in the papers listed in the URL below.
 License: GPL-2
 VignetteBuilder: knitr
 Encoding: UTF-8
@@ -21,13 +22,14 @@ URL: https://glmnet.stanford.edu,
         https://dx.doi.org/10.18637/jss.v039.i05
 RoxygenNote: 6.1.1
 NeedsCompilation: yes
-Packaged: 2019-12-11 01:55:13 UTC; hastie
+Packaged: 2020-05-13 05:20:55 UTC; hastie
 Author: Jerome Friedman [aut],
   Trevor Hastie [aut, cre],
   Rob Tibshirani [aut],
   Balasubramanian Narasimhan [aut],
+  Kenneth Tay [aut],
   Noah Simon [aut],
   Junyang Qian [ctb]
 Maintainer: Trevor Hastie <hastie@stanford.edu>
 Repository: CRAN
-Date/Publication: 2019-12-11 17:00:02 UTC
+Date/Publication: 2020-05-14 17:30:03 UTC

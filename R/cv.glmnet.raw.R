@@ -6,7 +6,7 @@ cv.glmnet.raw <-
 
   if (trace.it) cat("Training\n")
   glmnet.object = glmnet(x, y, weights = weights, offset = offset,
-    lambda = lambda, ...)
+    lambda = lambda, trace.it=trace.it,...)
   glmnet.object$call = glmnet.call
   subclass=class(glmnet.object)[[1]]
   type.measure=cvtype(type.measure,subclass)
@@ -51,17 +51,20 @@ cv.glmnet.raw <-
       else offset_sub = NULL
       outlist[[i]] = glmnet(x[!which, , drop = FALSE],
                y_sub, lambda = lambda, offset = offset_sub,
-               weights = weights[!which], ...)
+               weights = weights[!which],trace.it=trace.it, ...)
     }
   }
   lambda = glmnet.object$lambda
   class(outlist)=paste0(subclass,"list")
   predmat=buildPredmat(outlist,lambda,x,offset,foldid,alignment,y=y,weights=weights,
-                       grouped=grouped,type.measure=type.measure)
+                       grouped=grouped,type.measure=type.measure,family=family(glmnet.object))
 ### we include type.measure for the special case of coxnet with the deviance vs C-index discrepancy
+### family is included for the new GLM crowd
 ### Next we compute the measures
-  fun = paste("cv", subclass, sep = ".")
-  cvstuff = do.call(fun, list(predmat,y,type.measure,weights,foldid,grouped))
+#    if(subclass=="glmnetfit") attr(predmat,"family")=glmnet.object$family
+    fun = paste("cv", subclass, sep = ".")
+    cvstuff = do.call(fun, list(predmat,y,type.measure,weights,foldid,grouped))
+
   grouped=cvstuff$grouped
     if ((N/nfolds < 3) && grouped) {
     warning("Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold",

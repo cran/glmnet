@@ -5,7 +5,7 @@
 \alias{assess.glmnet}
 \alias{confusion.glmnet}
 \alias{roc.glmnet}
-\title{assess performace of a 'glmnet' object using test data.}
+\title{assess performance of a 'glmnet' object using test data.}
 \usage{
 assess.glmnet(object, newx = NULL, newy, weights = NULL,
   family = c("gaussian", "binomial", "poisson", "multinomial", "cox",

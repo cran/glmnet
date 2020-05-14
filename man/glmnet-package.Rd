@@ -48,9 +48,9 @@ Hazards Model via Coordinate Descent, Journal of Statistical Software, Vol.
 Robert., Bien, J., Friedman, J.,Hastie, T.,Simon, N.,Taylor, J. and
 Tibshirani, Ryan. (2012) \emph{Strong Rules for Discarding Predictors in
 Lasso-type Problems, JRSSB, vol 74},\cr
-\url{https://statweb.stanford.edu/~tibs/ftp/strong.pdf}\cr \emph{Stanford
-Statistics Technical Report}\cr \emph{Glmnet Vignette}
-\url{https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html}
+\url{https://statweb.stanford.edu/~tibs/ftp/strong.pdf}\cr
+\emph{Glmnet webpage with four vignettes}
+\url{https://glmnet.stanford.edu}
 }
 \author{
 Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr Maintainer:

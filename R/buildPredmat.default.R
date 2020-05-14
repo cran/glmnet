@@ -32,3 +32,4 @@ buildPredmat.default=function(outlist, lambda, x, offset, foldid, alignment,...)
 #' @export
 buildPredmat=function(outlist, lambda, x, offset, foldid, alignment,...)
     UseMethod("buildPredmat")
+

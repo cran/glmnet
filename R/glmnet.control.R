@@ -26,10 +26,14 @@
 #' factory default = 100
 #' @param itrace If 1 then progress bar is displayed when running \code{glmnet}
 #' and \code{cv.glmnet}. factory default = 0
+#' @param epsnr convergence threshold for \code{glmnet.fit}. factory default =
+#' 1.0e-8
+#' @param mxitnr maximum iterations for the IRLS loop in \code{glmnet.fit}. factory
+#' default = 25
 #' @param factory If \code{TRUE}, reset all the parameters to the factory
 #' default; default is \code{FALSE}
 #' @return A list with named elements as in the argument list
-#' @author Jerome Friedman, Trevor Hastie\cr Maintainer: Trevor Hastie
+#' @author Jerome Friedman, Kenneth Tay, Trevor Hastie\cr Maintainer: Trevor Hastie
 #' \email{hastie@@stanford.edu}
 #' @seealso \code{glmnet}
 #' @keywords models regression
@@ -43,13 +47,14 @@
 glmnet.control <-
   function (fdev = 1e-05, devmax = 0.999, eps = 1e-06, big = 9.9e+35,
             mnlam = 5, pmin = 1e-09, exmx = 250, prec = 1e-10, mxit = 100,
-            itrace = 0, factory = FALSE)
+            itrace = 0, epsnr = 1e-08, mxitnr = 25, factory = FALSE)
 {
   inquiry=!nargs()
    if (factory)
     invisible(glmnet.control(fdev = 1e-05, devmax = 0.999,
                              eps = 1e-06, big = 9.9e+35, mnlam = 5, pmin = 1e-09,
-                             exmx = 250, prec = 1e-10, mxit = 100, itrace = 0))
+                             exmx = 250, prec = 1e-10, mxit = 100, itrace = 0,
+                             epsnr = 1e-08, mxitnr = 25))
   else {
     if (!missing(fdev))
       .Fortran("chg_fract_dev", as.double(fdev), PACKAGE = "glmnet")
@@ -66,17 +71,23 @@ glmnet.control <-
     if (!missing(exmx))
       .Fortran("chg_max_exp", as.double(exmx), PACKAGE = "glmnet")
     if (!missing(prec) | !missing(mxit))
-      .Fortran("chg_bnorm", as.double(prec), as.integer(mxit),
-               PACKAGE = "glmnet")
+      .Fortran("chg_bnorm", as.double(prec), as.integer(mxit),PACKAGE = "glmnet")
     if (!missing(itrace))
       .Fortran("chg_itrace", as.integer(itrace), PACKAGE = "glmnet")
+    if (!missing(epsnr))
+        .Fortran("chg_epsnr", as.double(epsnr), PACKAGE = "glmnet")
+    if (!missing(mxitnr))
+        .Fortran("chg_mxitnr", as.integer(mxitnr), PACKAGE = "glmnet")
 
     value=c(.Fortran("get_int_parms", fdev = double(1),
-                         eps = double(1), big = double(1), mnlam = integer(1),
-                         devmax = double(1), pmin = double(1), exmx = double(1),
-                         itrace = integer(1),
-                         PACKAGE = "glmnet"), .Fortran("get_bnorm", prec = double(1),
-                           mxit = integer(1), PACKAGE = "glmnet"))
+                     eps = double(1), big = double(1), mnlam = integer(1),
+                     devmax = double(1), pmin = double(1), exmx = double(1),
+                     itrace = integer(1), PACKAGE = "glmnet"),
+            .Fortran("get_bnorm", prec = double(1),
+                     mxit = integer(1), PACKAGE = "glmnet"),
+            .Fortran("get_int_parms2",
+                         epsnr = double(1), mxitnr = integer(1),
+                         PACKAGE = "glmnet"))
     if(inquiry)value else invisible(value)
   }
 }

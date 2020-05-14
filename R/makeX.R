@@ -117,7 +117,7 @@ prepareX <-
         options(na.action=na.pass)
         on.exit(options(na.action=oldna))
         if(any(whichfac))
-            ctr=lapply(df[,whichfac], contrasts,contrast=FALSE)
+            ctr=lapply(df[,whichfac,drop=FALSE], contrasts,contrast=FALSE)
         else ctr=NULL
         if(sparse){
             m=sparse.model.matrix(~.-1,data=df,contrasts.arg=ctr,...)

@@ -130,7 +130,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       if(intr .ne. 0)goto 10141                                         
       ym=0.0                                                            
       y=v*y                                                             
-      ys=sqrt(dot_product(y,y)-dot_product(v,y)**2)                     
+      ys=sqrt(dot_product(y,y))                                         
       y=y/ys                                                            
       do 10151 j=1,ni                                                   
       if(ju(j).eq.0)goto 10151                                          
@@ -422,7 +422,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       if(intr .ne. 0)goto 10651                                         
       ym=0.0                                                            
       y=v*y                                                             
-      ys=sqrt(dot_product(y,y)-dot_product(v,y)**2)                     
+      ys=sqrt(dot_product(y,y))                                         
       y=y/ys                                                            
       do 10661 j=1,ni                                                   
       if(ju(j).eq.0)goto 10661                                          
@@ -777,7 +777,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       w=w/sum(w)                                                        
       if(intr .ne. 0)goto 11221                                         
       ym=0.0                                                            
-      ys=sqrt(dot_product(w,y**2)-dot_product(w,y)**2)                  
+      ys=sqrt(dot_product(w,y**2))                                      
       y=y/ys                                                            
       do 11231 j=1,ni                                                   
       if(ju(j).eq.0)goto 11231                                          
@@ -1065,7 +1065,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       w=w/sum(w)                                                        
       if(intr .ne. 0)goto 11711                                         
       ym=0.0                                                            
-      ys=sqrt(dot_product(w,y**2)-dot_product(w,y)**2)                  
+      ys=sqrt(dot_product(w,y**2))                                      
       y=y/ys                                                            
       do 11721 j=1,ni                                                   
       if(ju(j).eq.0)goto 11721                                          

@@ -18,7 +18,7 @@ cv.relaxed.raw <-
     glmnet.call$relax=TRUE
   if (trace.it) cat("Training\n")
   glmnet.object = relaxglmnet(x=x, y=y, weights = weights, offset = offset,
-    lambda = lambda, ...)
+    lambda = lambda, trace.it=trace.it,...)
   glmnet.object$call = glmnet.call
   subclass=class(glmnet.object)[[2]]# it is of class c("relaxed","subtype","glmnet")
   type.measure=cvtype(type.measure,subclass)
@@ -64,7 +64,7 @@ cv.relaxed.raw <-
       else offset_sub = NULL
       outlist[[i]] = relaxglmnet(x=x[!which, , drop = FALSE],
                y=y_sub, lambda = lambda, offset = offset_sub,
-               weights = weights[!which], ...)
+               weights = weights[!which],trace.it=trace.it, ...)
     }
   }
   lambda = glmnet.object$lambda
@@ -73,14 +73,17 @@ cv.relaxed.raw <-
   names(predmatlist)=paste("g",gamma,sep=":")
   outstuff=cvstufflist=predmatlist
 ### Even though the following is innefficient, It makes the code more modular
-  fun = paste("cv", subclass, sep = ".")
+###  fun = paste("cv", subclass, sep = ".")
   for(i in seq(along=gamma)){
-      predmatlist[[i]]=buildPredmat(outlist,
-                                    lambda=lambda,x=x,offset=offset,foldid=foldid,alignment=alignment,
-                                    y=y,weights=weights,grouped=grouped,
-                                    gamma=gamma[i]
-                                    )
-      cvstufflist[[i]]=do.call(fun, list(predmatlist[[i]],y,type.measure,weights,foldid,grouped))
+      predob=buildPredmat(outlist,
+                         lambda=lambda,x=x,offset=offset,foldid=foldid,alignment=alignment,
+                         y=y,weights=weights,grouped=grouped,
+                         gamma=gamma[i],family=family(glmnet.object)
+                         )
+#      if(subclass=="glmnetfit")attr{predob,"family")=glmnet.object$family #special case
+      predmatlist[[i]]=predob
+      fun = paste("cv", subclass, sep = ".")
+      cvstufflist[[i]] = do.call(fun, list(predmatlist[[i]],y,type.measure,weights,foldid,grouped))
   }
   grouped=all(sapply(cvstufflist,"[[","grouped"))
     if ((N/nfolds < 3) && grouped) {

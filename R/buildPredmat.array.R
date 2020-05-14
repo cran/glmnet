@@ -52,3 +52,12 @@ buildPredmat.lognetlist=function(outlist, lambda, x, offset, foldid, alignment,.
     attr(mat,"classnames")=outlist[[1]]$classnames
     mat
 }
+
+
+#' @method buildPredmat glmnetfitlist
+#' @export
+buildPredmat.glmnetfitlist=function(outlist, lambda, x, offset, foldid, alignment,family,...){
+    mat=buildPredmat.default(outlist, lambda, x, offset, foldid, alignment,...)
+    attr(mat,"family")=family
+    mat
+}

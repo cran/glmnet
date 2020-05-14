@@ -768,7 +768,8 @@ integer ju(ni);
 allocate(v(1:no),stat=jerr); if(jerr.ne.0) return;
 w=w/sum(w); v=sqrt(w);
 if intr.eq.0 < ym=0.0; y=v*y;
-   ys=sqrt(dot_product(y,y)-dot_product(v,y)**2); y=y/ys;
+" trevor changed 3/24/2020"
+   ys=sqrt(dot_product(y,y)); y=y/ys;
    <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; x(:,j)=v*x(:,j);
       xv(j)=dot_product(x(:,j),x(:,j));
       if isd.ne.0 < xbq=dot_product(v,x(:,j))**2; vc=xv(j)-xbq;
@@ -918,7 +919,8 @@ double precision x(no,ni),y(no),w(no),xm(ni),xs(ni),xv(ni); integer ju(ni);
 allocate(v(1:no),stat=jerr); if(jerr.ne.0) return;
 w=w/sum(w); v=sqrt(w);
 if intr.eq.0 < ym=0.0; y=v*y;
-   ys=sqrt(dot_product(y,y)-dot_product(v,y)**2); y=y/ys;
+"trevor changed 3/24/2020"
+   ys=sqrt(dot_product(y,y)); y=y/ys;
    <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; x(:,j)=v*x(:,j);
       xv(j)=dot_product(x(:,j),x(:,j));
       if isd.ne.0 < xbq=dot_product(v,x(:,j))**2; vc=xv(j)-xbq;
@@ -1113,7 +1115,8 @@ jerr = jerr*1;
 "End: Naras Edit"
 w=w/sum(w);
 if intr.eq.0 < ym=0.0;
-   ys=sqrt(dot_product(w,y**2)-dot_product(w,y)**2); y=y/ys;
+"trevor changed 3/24/2020"
+   ys=sqrt(dot_product(w,y**2)); y=y/ys;
    <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; jb=ix(j); je=ix(j+1)-1;
       xv(j)=dot_product(w(jx(jb:je)),x(jb:je)**2);
       if isd.ne.0 < xbq=dot_product(w(jx(jb:je)),x(jb:je))**2; vc=xv(j)-xbq;
@@ -1263,7 +1266,8 @@ jerr = jerr*1;
 "End: Naras Edit"
 w=w/sum(w);
 if intr.eq.0 < ym=0.0;
-   ys=sqrt(dot_product(w,y**2)-dot_product(w,y)**2); y=y/ys;
+"trevor changed 3/24/2020"
+   ys=sqrt(dot_product(w,y**2)); y=y/ys;
    <j=1,ni; if(ju(j).eq.0) next; xm(j)=0.0; jb=ix(j); je=ix(j+1)-1;
       xv(j)=dot_product(w(jx(jb:je)),x(jb:je)**2);
       if isd.ne.0 < xbq=dot_product(w(jx(jb:je)),x(jb:je))**2; vc=xv(j)-xbq;

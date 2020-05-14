@@ -16,7 +16,7 @@
 #' @import foreach
 #' @importFrom utils packageDescription
 #' @importFrom graphics abline axis matplot points segments text par plot
-#' @importFrom stats  approx  coef  median  predict  rmultinom  runif  weighted.mean family rnorm
+#' @importFrom stats  approx  coef  median  predict  rmultinom  runif  weighted.mean family rnorm gaussian binomial glm glm.fit
 #' @importFrom grDevices rainbow
 #'
 #' @examples
@@ -90,9 +90,9 @@ NULL
 #' Robert., Bien, J., Friedman, J.,Hastie, T.,Simon, N.,Taylor, J. and
 #' Tibshirani, Ryan. (2012) \emph{Strong Rules for Discarding Predictors in
 #' Lasso-type Problems, JRSSB, vol 74},\cr
-#' \url{https://statweb.stanford.edu/~tibs/ftp/strong.pdf}\cr \emph{Stanford
-#' Statistics Technical Report}\cr \emph{Glmnet Vignette}
-#' \url{https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html}
+#' \url{https://statweb.stanford.edu/~tibs/ftp/strong.pdf}\cr
+#' \emph{Glmnet webpage with four vignettes}
+#' \url{https://glmnet.stanford.edu}
 #' @keywords models regression package
 #' @examples
 #'

@@ -6,16 +6,16 @@
 \title{fit a GLM with lasso or elasticnet regularization}
 \usage{
 glmnet(x, y, family = c("gaussian", "binomial", "poisson", "multinomial",
-  "cox", "mgaussian"), weights, offset = NULL, alpha = 1,
+  "cox", "mgaussian"), weights = NULL, offset = NULL, alpha = 1,
   nlambda = 100, lambda.min.ratio = ifelse(nobs < nvars, 0.01, 1e-04),
   lambda = NULL, standardize = TRUE, intercept = TRUE,
   thresh = 1e-07, dfmax = nvars + 1, pmax = min(dfmax * 2 + 20,
-  nvars), exclude, penalty.factor = rep(1, nvars), lower.limits = -Inf,
-  upper.limits = Inf, maxit = 1e+05, type.gaussian = ifelse(nvars <
-  500, "covariance", "naive"), type.logistic = c("Newton",
-  "modified.Newton"), standardize.response = FALSE,
-  type.multinomial = c("ungrouped", "grouped"), relax = FALSE,
-  trace.it = 0, ...)
+  nvars), exclude = NULL, penalty.factor = rep(1, nvars),
+  lower.limits = -Inf, upper.limits = Inf, maxit = 1e+05,
+  type.gaussian = ifelse(nvars < 500, "covariance", "naive"),
+  type.logistic = c("Newton", "modified.Newton"),
+  standardize.response = FALSE, type.multinomial = c("ungrouped",
+  "grouped"), relax = FALSE, trace.it = 0, ...)
 
 relax.glmnet(fit, x, ..., maxp = n - 3, path = FALSE,
   check.args = TRUE)
@@ -41,7 +41,8 @@ right censored. The function \code{Surv()} in package \pkg{survival}
 produces such a matrix. For \code{family="mgaussian"}, \code{y} is a matrix
 of quantitative responses.}
 
-\item{family}{Response type (see above)}
+\item{family}{Response type (see above). Either a character string representing
+one of the built-in families, or else a \code{glm()} family object.}
 
 \item{weights}{observation weights. Can be total counts if responses are
 proportion matrices. Default is 1 for each observation}
@@ -215,8 +216,12 @@ logistic and multinomial, poisson, and Cox regression models.
 \details{
 The sequence of models implied by \code{lambda} is fit by coordinate
 descent. For \code{family="gaussian"} this is the lasso sequence if
-\code{alpha=1}, else it is the elasticnet sequence.  For the other families,
-this is a lasso or elasticnet regularization path for fitting the
+\code{alpha=1}, else it is the elasticnet sequence.
+
+From version 4.0 onwards, glmnet supports both the original built-in families,
+as well as \emph{any} family object as used by \code{stats:glm()}.
+The built in families are specifed via a character string. For all families,
+the object produced is a lasso or elasticnet regularization path for fitting the
 generalized linear regression paths, by maximizing the appropriate penalized
 log-likelihood (partial likelihood for the "cox" model). Sometimes the
 sequence is truncated before \code{nlambda} values of \code{lambda} have
@@ -236,8 +241,8 @@ standardizes y to have unit variance (using 1/n rather than 1/(n-1) formula)
 before computing its lambda sequence (and then unstandardizes the resulting
 coefficients); if you wish to reproduce/compare results with other software,
 best to supply a standardized y. The coefficients for any predictor
-variables with zero variance are set to zero for all values of lambda.  The
-latest two features in glmnet are the \code{family="mgaussian"} family and
+variables with zero variance are set to zero for all values of lambda.
+Two useful additional families  are the \code{family="mgaussian"} family and
 the \code{type.multinomial="grouped"} option for multinomial fitting. The
 former allows a multi-response gaussian model to be fit, using a "group
 -lasso" penalty on the coefficients for each variable. Tying the responses
@@ -251,7 +256,15 @@ like elasticnet. A small detail in the Cox model: if death times are tied
 with censored times, we assume the censored times occurred just
 \emph{before} the death times in computing the Breslow approximation; if
 users prefer the usual convention of \emph{after}, they can add a small
-number to all censoring times to achieve this effect.  If \code{relax=TRUE}
+number to all censoring times to achieve this effect.
+
+Version 4.0 and later allows for the family argument to be a S3 class \code{"family"} object
+(a list of functions and expressions).
+This opens the door to a wide variety of additional models. For example
+\code{family=binomial(link=cloglog)} or \code{family=negative.binomial(theta=1.5)} (from the MASS library).
+Note that the code runs faster for the built-in families.
+
+If \code{relax=TRUE}
 a duplicate sequence of models is produced, where each active set in the
 elastic-net path is refit without regularization. The result of this is a
 matching \code{"glmnet"} object which is stored on the original object in a
@@ -280,8 +293,9 @@ fit1m = glmnet(x, y, family = "mgaussian")
 plot(fit1m, type.coef = "2norm")
 
 # binomial
-g2 = sample(1:2, 100, replace = TRUE)
+g2 = sample(c(0,1), 100, replace = TRUE)
 fit2 = glmnet(x, g2, family = "binomial")
+fit2n = glmnet(x, g2, family = binomial(link=cloglog))
 fit2r = glmnet(x,g2, family = "binomial", relax=TRUE)
 fit2rp = glmnet(x,g2, family = "binomial", relax=TRUE, path=TRUE)
 
@@ -354,8 +368,9 @@ Lasso-type Problems, JRSSB vol 74},\cr
 Statistics Technical Report}\cr \url{https://arxiv.org/abs/1707.08692}\cr
 Hastie, T., Tibshirani, Robert, Tibshirani, Ryan (2019) \emph{Extended
 Comparisons of Best Subset Selection, Forward Stepwise Selection, and the
-Lasso}\cr \emph{Glmnet Vignette}
-\url{https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html}
+Lasso}\cr
+\emph{Glmnet webpage with four vignettes}
+\url{https://glmnet.stanford.edu}
 }
 \seealso{
 \code{print}, \code{predict}, \code{coef} and \code{plot} methods,

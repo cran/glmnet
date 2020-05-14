@@ -27,12 +27,17 @@ predictions can be made from the fitted models. It can also fit
 multi-response linear regression.
 
 The authors of glmnet are Jerome Friedman, Trevor Hastie, Rob
-Tibshirani and Noah Simon, and the R package is maintained by Trevor
+Tibshirani, Balasubramanian Narasimhan, Kenneth Tay and Noah Simon, with
+contribution from Junyang Qian, and the R package is maintained by Trevor
 Hastie. The matlab version of glmnet is maintained by Junyang
-Qian. This vignette describes the usage of glmnet in R.
-There is an additional vignette for the new `relaxed` features in
-`glmnet`, along with some new capabilities. There is as well a
-vignette devoted to Cox models in `glmnet`.
+Qian, and the Python version by B. Balakumar (although both are a few
+versions behind). This vignette describes the usage of glmnet in R.
+There are additional vignettes that should be useful:
+
+* one that describes in detail the  new `relaxed` features in `glmnet`, along with some new capabilities. 
+* a vignette devoted to Cox models in `glmnet`. 
+* the newest one that describes using `glm()` family objects.
+
 
 `glmnet` solves the following problem
 

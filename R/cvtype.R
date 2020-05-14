@@ -6,7 +6,8 @@ cvtype <- function(type.measure="mse",subclass="elnet"){
                    fishnet="Poisson Deviance",
                    coxnet="Partial Likelihood Deviance",
                    multnet="Multinomial Deviance",
-                   mrelnet="Mean-squared Error"
+                   mrelnet="Mean-squared Error",
+                   glmnetfit="GLM Deviance"
                    )
     typenames = c(deviance = devname, mse = "Mean-Squared Error",
     mae = "Mean Absolute Error",auc = "AUC", class = "Misclassification Error",C="C-index")
@@ -16,7 +17,8 @@ cvtype <- function(type.measure="mse",subclass="elnet"){
                    fishnet=c(2,1,5),
                    coxnet=c(2,6),
                    multnet=c(2,3,1,5),
-                   mrelnet=c(1,2,5)
+                   mrelnet=c(1,2,5),
+                   glmnetfit=c(2,1,5)
                    )
    subclass.type=type.measures[subclass.ch]
    if(type.measure=="default")type.measure=subclass.type[1]
@@ -26,7 +28,8 @@ cvtype <- function(type.measure="mse",subclass="elnet"){
                    fishnet="Poisson",
                    coxnet="Cox",
                    multnet="Multinomial",
-                   mrelnet="Multi-response Gaussian"
+                   mrelnet="Multi-response Gaussian",
+                   glmnetfit="GLM"
                    )
     if(!match(type.measure,subclass.type,FALSE)){
         type.measure=subclass.type[1]

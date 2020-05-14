@@ -65,7 +65,7 @@ follow this procedure.
 
 ```{r, eval = FALSE}
 library(SUtools)
-GLMNET_DIR  <- "~/GitHub/glmnet"
+GLMNET_DIR  <- "~/GITHUB/glmnet"
 mortran <- readLines(file.path(GLMNET_DIR, "inst", "mortran", "glmnet5dpclean.m"))
 fortran  <- generate_fortran(mortran)
 fixed_fortran  <- fix_unused_labels(fortran)

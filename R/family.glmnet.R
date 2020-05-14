@@ -7,6 +7,11 @@ family.glmnet=function(object,...){
     families[cl]
 }
 
+#' @method family glmnetfit
+#' @export
+family.glmnetfit=function(object,...) object$family
+
+
 #' @method family relaxed
 #' @export
 family.relaxed=function(object,...)family(object$relaxed)

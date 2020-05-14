@@ -6,7 +6,7 @@ cv.lognet <- function(predmat,y,type.measure,weights,foldid,grouped){
         y = as.factor(y)
         ntab = table(y)
         nc = as.integer(length(ntab))
-        y = diag(nc)[as.numeric(y), ]
+        y = diag(nc)[as.numeric(y), , drop=FALSE]
     }
     N = nrow(y)
     nfolds = max(foldid)

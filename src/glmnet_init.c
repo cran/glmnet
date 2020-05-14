@@ -727,6 +727,156 @@ static R_NativePrimitiveArgType get_bnorm_t[] = {
   INTSXP
 };
 
+void F77_SUB(wls)(
+double *alm0,
+double *almc,
+double *alpha,
+int *m,
+int *no,
+int *ni,
+double *x,
+double *r,
+double *v,
+int *intr,
+int *ju,
+double *vp,
+double *cl,
+int *nx,
+double *thr,
+int *maxit,
+double *a,
+double *aint,
+double *g,
+int *ia,
+int *ix,
+int *iz,
+int *mm,
+int *nino,
+double *rsqc,
+int *nlp,
+int *jerr
+);
+ 
+static R_NativePrimitiveArgType wls_t[] = {
+REALSXP,
+REALSXP,
+REALSXP,
+INTSXP,
+INTSXP,
+INTSXP,
+REALSXP,
+REALSXP,
+REALSXP,
+INTSXP,
+INTSXP,
+REALSXP,
+REALSXP,
+INTSXP,
+REALSXP,
+INTSXP,
+REALSXP,
+REALSXP,
+REALSXP,
+INTSXP,
+INTSXP,
+INTSXP,
+INTSXP,
+INTSXP,
+REALSXP,
+INTSXP,
+INTSXP
+};
+void F77_SUB(spwls)(
+double *alm0,
+double *almc,
+double *alpha,
+int *m,
+int *no,
+int *ni,
+double *x,
+int *ix,
+int *jx,
+double *xm,
+double *xs,
+double *r,
+double *v,
+int *intr,
+int *ju,
+double *vp,
+double *cl,
+int *nx,
+double *thr,
+int *maxit,
+double *a,
+double *aint,
+double *g,
+int *ia,
+int *iy,
+int *iz,
+int *mm,
+int *nino,
+double *rsqc,
+int *nlp,
+int *jerr
+);
+ 
+static R_NativePrimitiveArgType spwls_t[] = {
+REALSXP,
+REALSXP,
+REALSXP,
+INTSXP,
+INTSXP,
+INTSXP,
+REALSXP,
+INTSXP,
+INTSXP,
+REALSXP,
+REALSXP,
+REALSXP,
+REALSXP,
+INTSXP,
+INTSXP,
+REALSXP,
+REALSXP,
+INTSXP,
+REALSXP,
+INTSXP,
+REALSXP,
+REALSXP,
+REALSXP,
+INTSXP,
+INTSXP,
+INTSXP,
+INTSXP,
+INTSXP,
+REALSXP,
+INTSXP,
+INTSXP
+};
+void F77_SUB(get_int_parms2)(
+double *espnr,
+int *mxitnr
+);
+ 
+static R_NativePrimitiveArgType get_int_parms2_t[] = {
+REALSXP,
+INTSXP
+};
+void F77_SUB(chg_epsnr)(
+double *epsnr
+);
+ 
+static R_NativePrimitiveArgType chg_epsnr_t[] = {
+REALSXP
+};
+void F77_SUB(chg_mxitnr)(
+int *mxitnr
+);
+ 
+static R_NativePrimitiveArgType chg_mxitnr_t[] = {
+INTSXP
+};
+
 static R_FortranMethodDef fMethods[] = {
   FDEF(coxnet) ,
   FDEF(spelnet) ,
@@ -749,6 +899,11 @@ static R_FortranMethodDef fMethods[] = {
   FDEF(chg_itrace) ,  
   FDEF(chg_bnorm) ,
   FDEF(get_bnorm) ,
+  FDEF(wls) ,
+  FDEF(spwls) ,
+  FDEF(get_int_parms2) ,
+  FDEF(chg_epsnr) ,
+  FDEF(chg_mxitnr) ,
   {NULL, NULL, 0}
 };
 

@@ -6,7 +6,7 @@ cv.multnet <-function(predmat,y,type.measure,weights,foldid,grouped){
         y = as.factor(y)
         ntab = table(y)
         nc = as.integer(length(ntab))
-        y = diag(nc)[as.numeric(y), ]
+        y = diag(nc)[as.numeric(y), ,drop=FALSE]
     }
     else nc = nc[2]
 

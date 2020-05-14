@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from the source: README.Rmd -->
 
-# Lasso and Elastic-Net Regularized Generalized Linear Models
+# Lasso and Elastic-Net Regularized Generalized Linear Models <img src="man/figures/logo.png" width="100" align="right" />
 
 <!-- [![Travis-CI Build -->
 
@@ -38,6 +38,9 @@ Version 3.0 is a major release with several new features, including:
     appropriate.
   - A function for fitting unpenalized a single version of any of the
     GLMs of `glmnet`.
+
+Version 4.0 is a major release that allows for any GLM family, besides
+the built-in families.
 
 ## References
 
