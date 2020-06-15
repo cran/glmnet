@@ -8,7 +8,7 @@
 #' @param y a survival response object - a matrix with two columns "time" and
 #' "status"; see documentation for "glmnet"
 #' @param weights optional observation weights
-#' @author Rob Tibshirani\cr Maintainer: Trevor Hastie <hastie@@stanford.edu>
+#' @author Trevor Hastie  <hastie@@stanford.edu>
 #' @seealso \code{cv.glmnet}
 #' @references Harrel Jr, F. E. and Lee, K. L. and Mark, D. B. (1996)
 #' \emph{Tutorial in biostatistics: multivariable prognostic models: issues in
@@ -30,43 +30,16 @@
 #' y = cbind(time = ty, status = 1 - tcens)  # y=Surv(ty,1-tcens) with library(survival)
 #' fit = glmnet(x, y, family = "cox")
 #' pred = predict(fit, newx = x)
-#' Cindex(pred, y)
+#' apply(pred, 2, Cindex, y=y)
 #' cv.glmnet(x, y, family = "cox", type.measure = "C")
 #'
 #' @export Cindex
 Cindex=function(pred,y,weights=rep(1,nrow(y))){
-###  Written by Rob Tibshirani; edited by Trevor Hastie
-###  This function gives identical results to the summary function from coxph,
-###  and the concordance.index function in survcomp (with their default settings),
-###  and no ties in yhat.
-###  Works with ties in y. But does not agree with latter when yhat has ties.
-###  There are conflicting definitions for c-index in this case
-###
-###  Formula used  is
-###  Concordance = (num. all concordant pairs + num. tied pairs/2)/(num. total pairs including ties).
-###  with weights,  weights used are average wts for each pair (??)
-
-    status=y[,"status"]
-    ty=y[,"time"]
-    risksets=which(status==1)
-
-    weights=length(weights)*weights/sum(weights)
-    fun=function(riskset,ty,pred,weights){
-           total=concordant=0
-        i=riskset
-        rest=which(ty>ty[i])
-        if(length(rest)>0){
-
-            ww=(weights[rest]+weights[i])/2
-             total=sum(ww)
-          concordant = 1.0*sum(ww*(pred[rest]<pred[i]))+0.5*sum(ww*(pred[rest]==pred[i]))
-        }
-
-    return(c(concordant,total))
-}
-
-  out=  sapply(risksets,fun,ty,pred,weights)
-    cindex=sum(out[1,])/sum(out[2,])
-
-    return(cindex)
+###  This function links to the concordance function in the survival package
+    if(!is.Surv(y))y=Surv(y[,"time"],y[,"status"])
+    f=-pred
+    if(missing(weights))
+        concordance(y~f)$concordance
+    else
+        concordance(y~f,weights=weights)$concordance
 }

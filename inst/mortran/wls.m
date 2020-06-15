@@ -18,18 +18,18 @@
 "a, aint: warm start for coefs, intercept"
 "g: abs(dot_product(r,x(:,j)))"
 "ia: mapping nino to k"
-"ix: ever-active set"
+"iy: ever-active set (for compatibility with sparse version)"
 "iz: flag for loop. 0 for first lambda, 1 subsequently"
 "mm: mapping k to nino"
 "nino: no. of features that have ever been nonzero"
 "nlp: no. of passes over the data"
 "jerr: error code"
 subroutine wls(alm0,almc,alpha,m,no,ni,x,r,v,intr,ju,vp,cl,nx,thr,maxit,
-   a,aint,g,ia,ix,iz,mm,nino,rsqc,nlp,jerr);
+   a,aint,g,ia,iy,iz,mm,nino,rsqc,nlp,jerr);
 implicit double precision(a-h,o-z);
 double precision x(no,ni),r(no),a(ni),vp(ni),cl(2,ni);
 double precision v(no),g(ni);
-integer ix(ni),ia(nx),ju(ni),mm(ni);
+integer iy(ni),ia(nx),ju(ni),mm(ni);
 %fortran
       double precision, dimension (:), allocatable :: xv
 %mortran
@@ -39,7 +39,7 @@ allocate(xv(1:ni),stat=jerr); if(jerr.ne.0) return;
 <j=1,ni; if(ju(j).eq.0) next; g(j)=abs(dot_product(r,x(:,j)));>
 
 "compute xv"
-<j=1,ni; if(ix(j).gt.0) xv(j)=dot_product(v,x(:,j)**2);>
+<j=1,ni; if(iy(j).gt.0) xv(j)=dot_product(v,x(:,j)**2);>
 
 "compute xmz (for intercept later)"
 xmz = sum(v);
@@ -47,10 +47,10 @@ xmz = sum(v);
 "ab: lambda * alpha, dem: lambda * (1 - alpha)"
 ab=almc*alpha; dem=almc*(1.0-alpha); 
 
-"strong rules: ix(k) = 1 if we don't discard feature k"
+"strong rules: iy(k) = 1 if we don't discard feature k"
 tlam=alpha*(2.0*almc-alm0);
-<k=1,ni; if(ix(k).eq.1) next; if(ju(k).eq.0) next;
-  if(g(k).gt.tlam*vp(k)) <ix(k)=1; xv(k)=dot_product(v,x(:,k)**2);>
+<k=1,ni; if(iy(k).eq.1) next; if(ju(k).eq.0) next;
+  if(g(k).gt.tlam*vp(k)) <iy(k)=1; xv(k)=dot_product(v,x(:,k)**2);>
 >
 
 jz = 1;
@@ -61,7 +61,7 @@ loop < if(iz*jz.ne.0) go to :b:;
 
    <k=1,ni;
       "if feature discarded by strong rules, skip over it"  
-      if(ix(k).eq.0) next;
+      if(iy(k).eq.0) next;
 
       "check if ST threshold for descent is met"
       "if it goes to 0, set a(k) = 0.0"
@@ -109,10 +109,10 @@ loop < if(iz*jz.ne.0) go to :b:;
    "in wls, this leads to KKT checks. here, we exit"
    "the loop instead."
    if(dlx.lt.thr) < ixx=0;
-        <k=1,ni; if(ix(k).eq.1) next; if(ju(k).eq.0) next;
+        <k=1,ni; if(iy(k).eq.1) next; if(ju(k).eq.0) next;
             g(k)=abs(dot_product(r,x(:,k)));
             if g(k).gt.ab*vp(k) < 
-               ix(k)=1; xv(k)=dot_product(v,x(:,k)**2);
+               iy(k)=1; xv(k)=dot_product(v,x(:,k)**2);
                ixx=1;
             >
         >

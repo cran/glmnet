@@ -35,7 +35,7 @@ tcens = rbinom(n = N, prob = 0.3, size = 1)  # censoring indicator
 y = cbind(time = ty, status = 1 - tcens)  # y=Surv(ty,1-tcens) with library(survival)
 fit = glmnet(x, y, family = "cox")
 pred = predict(fit, newx = x)
-Cindex(pred, y)
+apply(pred, 2, Cindex, y=y)
 cv.glmnet(x, y, family = "cox", type.measure = "C")
 
 }
@@ -49,7 +49,7 @@ reducing error}, Statistics in Medicine, 15, pages 361--387.
 \code{cv.glmnet}
 }
 \author{
-Rob Tibshirani\cr Maintainer: Trevor Hastie \href{mailto:hastie@stanford.edu}{hastie@stanford.edu}
+Trevor Hastie  \href{mailto:hastie@stanford.edu}{hastie@stanford.edu}
 }
 \keyword{Cox}
 \keyword{cross-validation}

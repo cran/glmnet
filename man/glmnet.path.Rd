@@ -13,7 +13,7 @@ glmnet.path(x, y, weights = NULL, lambda = NULL, nlambda = 100,
 }
 \arguments{
 \item{x}{Input matrix, of dimension \code{nobs x nvars}; each row is an
-observation vector.}
+observation vector. Can be a sparse matrix.}
 
 \item{y}{Quantitative response variable.}
 
@@ -130,6 +130,5 @@ x <- matrix(rnorm(100 * 20), nrow = 100)
 y <- ifelse(rnorm(100) > 0, 1, 0)
 
 # binomial with probit link
-fit1 <- glmnet.path(x, y, family = binomial(link = "probit"))
-
+fit1 <- glmnet:::glmnet.path(x, y, family = binomial(link = "probit"))
 }

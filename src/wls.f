@@ -1,10 +1,10 @@
 c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))             
       subroutine wls(alm0,almc,alpha,m,no,ni,x,r,v,intr,ju,vp,cl,nx,thr,
-     *maxit,  a,aint,g,ia,ix,iz,mm,nino,rsqc,nlp,jerr)
+     *maxit,  a,aint,g,ia,iy,iz,mm,nino,rsqc,nlp,jerr)
       implicit double precision(a-h,o-z)                                
       double precision x(no,ni),r(no),a(ni),vp(ni),cl(2,ni)             
       double precision v(no),g(ni)                                      
-      integer ix(ni),ia(nx),ju(ni),mm(ni)                               
+      integer iy(ni),ia(nx),ju(ni),mm(ni)                               
       double precision, dimension (:), allocatable :: xv                
       allocate(xv(1:ni),stat=jerr)                                      
       if(jerr.ne.0) return                                              
@@ -14,7 +14,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
 10011 continue                                                          
       continue                                                          
       do 10021 j=1,ni                                                   
-      if(ix(j).gt.0) xv(j)=dot_product(v,x(:,j)**2)                     
+      if(iy(j).gt.0) xv(j)=dot_product(v,x(:,j)**2)                     
 10021 continue                                                          
       continue                                                          
       xmz = sum(v)                                                      
@@ -22,10 +22,10 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       dem=almc*(1.0-alpha)                                              
       tlam=alpha*(2.0*almc-alm0)                                        
       do 10031 k=1,ni                                                   
-      if(ix(k).eq.1)goto 10031                                          
+      if(iy(k).eq.1)goto 10031                                          
       if(ju(k).eq.0)goto 10031                                          
       if(g(k) .le. tlam*vp(k))goto 10051                                
-      ix(k)=1                                                           
+      iy(k)=1                                                           
       xv(k)=dot_product(v,x(:,k)**2)                                    
 10051 continue                                                          
 10031 continue                                                          
@@ -38,7 +38,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       nlp=nlp+1                                                         
       dlx=0.0                                                           
       do 10091 k=1,ni                                                   
-      if(ix(k).eq.0)goto 10091                                          
+      if(iy(k).eq.0)goto 10091                                          
       gk=dot_product(r,x(:,k))                                          
       ak=a(k)                                                           
       u=gk+ak*xv(k)                                                     
@@ -75,11 +75,11 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       if(dlx .ge. thr)goto 10181                                        
       ixx=0                                                             
       do 10191 k=1,ni                                                   
-      if(ix(k).eq.1)goto 10191                                          
+      if(iy(k).eq.1)goto 10191                                          
       if(ju(k).eq.0)goto 10191                                          
       g(k)=abs(dot_product(r,x(:,k)))                                   
       if(g(k) .le. ab*vp(k))goto 10211                                  
-      ix(k)=1                                                           
+      iy(k)=1                                                           
       xv(k)=dot_product(v,x(:,k)**2)                                    
       ixx=1                                                             
 10211 continue                                                          

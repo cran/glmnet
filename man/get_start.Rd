@@ -5,13 +5,14 @@
 \title{Get null deviance, starting mu and lambda max}
 \usage{
 get_start(x, y, weights, family, intercept, is.offset, offset, exclude, vp,
-  alpha, xm = NULL, xs = NULL)
+  alpha)
 }
 \arguments{
 \item{x}{Input matrix, of dimension \code{nobs x nvars}; each row is an
-observation vector. If it is a sparse matrix, it is assumed to be unstandardized
-and the user must also provide the \code{xm} and \code{xs} arguments. If it
-is not a sparse matrix, it is assumed to be standardized.}
+observation vector. If it is a sparse matrix, it is assumed to be unstandardized.
+It should have attributes \code{xm} and \code{xs}, where \code{xm(j)} and
+\code{xs(j)} are the centering and scaling factors for variable j respsectively.
+If it is not a sparse matrix, it is assumed to be standardized.}
 
 \item{y}{Quantitative response variable.}
 
@@ -33,12 +34,6 @@ a zero vector of the same length as \code{y}.}
 \item{vp}{Separate penalty factors can be applied to each coefficient.}
 
 \item{alpha}{The elasticnet mixing parameter, with \eqn{0 \le \alpha \le 1}.}
-
-\item{xm}{Vector of length \code{nvars}: \code{xm(j)} is the centering factor
-for variable j. User should only provide them if \code{x} is a sparse matrix.}
-
-\item{xs}{Vector of length \code{nvars}: \code{xs(j)} is the scaling factor
-for variable j. User should only provide them if \code{x} is a sparse matrix.}
 }
 \description{
 Return the null deviance, starting mu and lambda max values for
@@ -46,14 +41,12 @@ initialization. For internal use only.
 }
 \details{
 This function is called by \code{glmnet.path} for null deviance, starting mu
-and lambda max values. It is also called by \code{glmnet.fit} and
-\code{spglmnet.fit} when used without warmstart, but they only use the null
-deviance and starting mu values.
+and lambda max values. It is also called by \code{glmnet.fit} when used
+without warmstart, but they only use the null deviance and starting mu values.
 
-When \code{x} is not sparse, the \code{xm} and \code{xs} arguments are
-ignored (\code{x} is expected to already by centered and scaled). When
-\code{x} is sparse, these arguments represent the centering and scaling
-factors for \code{x}.
+When \code{x} is not sparse, it is expected to already by centered and scaled.
+When \code{x} is sparse, the function will get its attributes \code{xm} and
+\code{xs} for its centering and scaling factors.
 
 Note that whether \code{x} is centered & scaled or not, the values of \code{mu}
 and \code{nulldev} don't change. However, the value of \code{lambda_max} does

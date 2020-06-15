@@ -1,3 +1,10 @@
+# glmnet 4.0-2
+
+* Biggest change. Cindex and auc calculations now use the `concordance`
+  function from package `survival`
+* Minor changes. Allow coefficient warm starts for glmnet.fit. The print
+  method for glmnet now really prints %dDev rather than the fraction.
+
 # glmnet 4.0
 
 Major revision with added functionality. Any GLM family can be used

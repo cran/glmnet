@@ -12,7 +12,11 @@ glmnet.fit(x, y, weights, lambda, alpha = 1, offset = rep(0, nobs),
 }
 \arguments{
 \item{x}{Input matrix, of dimension \code{nobs x nvars}; each row is an
-observation vector.}
+observation vector. If it is a sparse matrix, it is assumed to be unstandardized.
+It should have attributes \code{xm} and \code{xs}, where \code{xm(j)} and
+\code{xs(j)} are the centering and scaling factors for variable j respsectively.
+If it is not a sparse matrix, it is assumed that any standardization needed
+has already been done.}
 
 \item{y}{Quantitative response variable.}
 
@@ -63,8 +67,10 @@ value (which will then be replicated), else a vector of length \code{nvars}.}
 \item{upper.limits}{Vector of upper limits for each coefficient; default
 \code{Inf}. See \code{lower.limits}.}
 
-\item{warm}{A \code{glmnetfit} object which can be used as a warm start.
-Default is \code{NULL}, indicating no warm start. For internal use only.}
+\item{warm}{Either a \code{glmnetfit} object or a list (with names \code{beta}
+and \code{a0} containing coefficients and intercept respectively) which can
+be used as a warm start. Default is \code{NULL}, indicating no warm start.
+For internal use only.}
 
 \item{from.glmnet.path}{Was \code{glmnet.fit()} called from \code{glmnet.path()}?
 Default is FALSE.This has implications for computation of the penalty factors.}

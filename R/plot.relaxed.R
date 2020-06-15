@@ -31,8 +31,8 @@ function (x, digits = max(3, getOption("digits") - 3), ...)
     cat("Relaxed\n\n")
     which=match(x$relaxed$lambda,x$lambda,0)
     rdev=rep(NA,length(x$lambda))
-    rdev[which]=signif(x$relaxed$dev.ratio, digits)
-    out=data.frame(Df = x$df, `%Dev` = signif(x$dev.ratio, digits), `%Dev R`=rdev,
+    rdev[which]=round(x$relaxed$dev.ratio*100, 2)
+    out=data.frame(Df = x$df, `%Dev` = round(x$dev.ratio*100, 2), `%Dev R`=rdev,
                     Lambda = signif(x$lambda, digits),check.names=FALSE,row.names=seq(along=rdev))
     class(out)=c("anova",class(out))
     print(out)
