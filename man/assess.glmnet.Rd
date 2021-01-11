@@ -7,12 +7,22 @@
 \alias{roc.glmnet}
 \title{assess performance of a 'glmnet' object using test data.}
 \usage{
-assess.glmnet(object, newx = NULL, newy, weights = NULL,
-  family = c("gaussian", "binomial", "poisson", "multinomial", "cox",
-  "mgaussian"), ...)
+assess.glmnet(
+  object,
+  newx = NULL,
+  newy,
+  weights = NULL,
+  family = c("gaussian", "binomial", "poisson", "multinomial", "cox", "mgaussian"),
+  ...
+)
 
-confusion.glmnet(object, newx = NULL, newy, family = c("binomial",
-  "multinomial"), ...)
+confusion.glmnet(
+  object,
+  newx = NULL,
+  newy,
+  family = c("binomial", "multinomial"),
+  ...
+)
 
 roc.glmnet(object, newx = NULL, newy, ...)
 }

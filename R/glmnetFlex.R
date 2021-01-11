@@ -99,7 +99,6 @@
 #'
 #' # binomial with probit link
 #' fit1 <- glmnet:::glmnet.path(x, y, family = binomial(link = "probit"))
-
 glmnet.path <- function(x, y, weights=NULL, lambda = NULL, nlambda = 100,
                         lambda.min.ratio = ifelse(nobs<nvars, 0.01, 0.0001),
                         alpha = 1.0, offset = NULL, family = gaussian(),
@@ -168,7 +167,14 @@ glmnet.path <- function(x, y, weights=NULL, lambda = NULL, nlambda = 100,
     vp = as.double(vp * nvars / sum(vp))
 
     # if all the non-excluded variables have zero variance, throw error
-    nzvar <- setdiff(which(apply(x, 2, max) != apply(x, 2, min)), exclude)
+    isconst <- function(x) 1 - (max(x) == min(x)) * 1
+    if (inherits(x, "sparseMatrix")) {
+        xt <- as(t(x), "dgCMatrix")
+        lx <- split(xt@x, xt@i)
+        const_vars <- sapply(lx, isconst)
+    }
+    else const_vars <- apply(x, 2, isconst)
+    nzvar <- setdiff(which(const_vars == 1), exclude)
     if (length(nzvar) == 0) stop("All used predictors have zero variance")
 
     ### check on limits
@@ -459,6 +465,18 @@ glmnet.fit <- function(x, y, weights, lambda, alpha = 1.0,
     is.offset <- !(missing(offset))
     if (is.offset == FALSE) {
         offset <- as.double(y * 0) #keeps the shape of y
+    } else if (is.null(offset)) {
+        offset <- rep(0, nobs)
+        is.offset = FALSE
+    }
+    # add xm and xs attributes if they are missing for sparse x
+    # glmnet.fit assumes that x is already standardized. Any standardization 
+    # the user wants should be done beforehand.
+    if (inherits(x, "sparseMatrix")) {
+        if ("xm" %in% names(attributes(x)) == FALSE) 
+            attr(x, "xm") <- rep(0.0, times = nvars)
+        if ("xs" %in% names(attributes(x)) == FALSE) 
+            attr(x, "xs") <- rep(0.0, times = nvars)
     }
 
     # if calling from glmnet.path(), we do not need to check on exclude
@@ -848,7 +866,13 @@ elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
             vp <- as.double(penalty.factor)
         }
         # compute ju
-        ju <- apply(x, 2, function(x) 1 - (max(x) == min(x)) * 1)
+        isconst <- function(x) 1 - (max(x) == min(x)) * 1
+        if (inherits(x, "sparseMatrix")) {
+            xt <- as(t(x), "dgCMatrix")
+            lx <- split(xt@x, xt@i)
+            ju <- sapply(lx, isconst)
+        }
+        else ju <- apply(x, 2, isconst)
         ju[exclude] <- 0
         ju <- as.integer(ju)
 
@@ -1017,24 +1041,28 @@ get_start <- function(x, y, weights, family, intercept, is.offset, offset,
     }
 
     # compute lambda max
-    ju <- apply(x, 2, function(x) 1 - (max(x) == min(x)) * 1)
+    isconst <- function(x) 1 - (max(x) == min(x)) * 1
+    if (inherits(x, "sparseMatrix")) {
+        xt <- as(t(x), "dgCMatrix")
+        lx <- split(xt@x, xt@i)
+        ju <- sapply(lx, isconst)
+    }
+    else ju <- apply(x, 2, isconst)
     ju[exclude] <- 0
     r <- y - mu
     eta <- family$linkfun(mu)
     v <- family$variance(mu)
     m.e <- family$mu.eta(eta)
     weights <- weights / sum(weights)
+    rv <- r / v * m.e * weights
     if (inherits(x, "sparseMatrix")) {
         xm <- attr(x, "xm")
         xs <- attr(x, "xs")
-        g <- unlist(lapply(1:nvars, function(j)
-            abs((sum(r / v * m.e * x[, j] * weights) -
-                     sum(r / v * m.e * weights) * xm[j]) / xs[j]))) * ju / ifelse(vp > 0, vp, 1)
+        g <- abs((drop(t(rv) %*% x) - sum(rv) * xm) / xs)
     } else {
-        g <- unlist(lapply(1:nvars, function(j)
-            abs(sum(r / v * m.e * x[, j] * weights)))) * ju / ifelse(vp > 0, vp, 1)
+        g <- abs(drop(t(rv) %*% x))
     }
-
+    g <- g * ju / ifelse(vp > 0, vp, 1)
     lambda_max <- max(g) / max(alpha, 1e-3)
 
     list(nulldev = nulldev, mu = mu, lambda_max = lambda_max)

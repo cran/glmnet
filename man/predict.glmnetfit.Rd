@@ -4,8 +4,15 @@
 \alias{predict.glmnetfit}
 \title{Get predictions from a \code{glmnetfit} fit object}
 \usage{
-\method{predict}{glmnetfit}(object, newx, s = NULL, type = c("link",
-  "response", "coefficients", "nonzero"), exact = FALSE, newoffset, ...)
+\method{predict}{glmnetfit}(
+  object,
+  newx,
+  s = NULL,
+  type = c("link", "response", "coefficients", "nonzero"),
+  exact = FALSE,
+  newoffset,
+  ...
+)
 }
 \arguments{
 \item{object}{Fitted "glmnetfit" object.}

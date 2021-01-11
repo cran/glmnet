@@ -2,39 +2,123 @@
 % Please edit documentation in R/coxnet.deviance.R
 \name{coxnet.deviance}
 \alias{coxnet.deviance}
-\title{compute deviance for cox model output}
+\alias{coxnet.deviance0}
+\alias{coxnet.deviance2}
+\alias{coxnet.deviance3}
+\title{Compute deviance for Cox model}
 \usage{
-coxnet.deviance(pred = NULL, y, x = 0, offset = NULL,
-  weights = NULL, beta = NULL)
+coxnet.deviance(
+  pred = NULL,
+  y,
+  x = NULL,
+  offset = NULL,
+  weights = NULL,
+  std.weights = TRUE,
+  beta = NULL
+)
+
+coxnet.deviance0(
+  pred = NULL,
+  y,
+  x = NULL,
+  offset = NULL,
+  weights = NULL,
+  std.weights = TRUE,
+  beta = NULL
+)
+
+coxnet.deviance2(
+  pred = NULL,
+  y,
+  x = NULL,
+  offset = NULL,
+  weights = NULL,
+  std.weights = TRUE,
+  beta = NULL
+)
+
+coxnet.deviance3(
+  pred = NULL,
+  y,
+  x = NULL,
+  offset = NULL,
+  weights = NULL,
+  std.weights = TRUE,
+  beta = NULL
+)
 }
 \arguments{
-\item{pred}{matrix of predictions}
+\item{pred}{Fit vector or matrix (usually from glmnet at a particular
+lambda or a sequence of lambdas).}
 
-\item{y}{a survival response matrix, as produced by \code{Surv}}
+\item{y}{Survival response variable, must be a \code{Surv} or
+\code{stratifySurv} object.}
 
-\item{x}{optional \code{x} matrix, if \code{pred} is \code{NULL}}
+\item{x}{Optional \code{x} matrix, to be supplied if \code{pred = NULL}.}
 
-\item{offset}{optional offset}
+\item{offset}{Optional offset vector.}
 
-\item{weights}{optional observation weights}
+\item{weights}{Observation weights (default is all equal to 1).}
 
-\item{beta}{optional coefficient vector/matrix, supplied if \code{pred=NULL}}
+\item{std.weights}{If TRUE (default), observation weights are standardized
+to sum to 1.}
+
+\item{beta}{Optional coefficient vector/matrix, to be supplied if
+\code{pred = NULL}.}
 }
 \value{
-a single or vector of deviances
+A vector of deviances, one for each column of predictions.
 }
 \description{
-Given a fit or coefficients, compute the deciance (-2 log partial likelihood) for
-right-censored survival data
+Compute the deviance (-2 log partial likelihood) for Cox model.
 }
 \details{
-\code{coxnet.deviance} computes the deviance for a single prediction, or a matrix of predictions
+Computes the deviance for a single set of predictions, or for a matrix
+of predictions. The user can either supply the predictions
+directly through the \code{pred} option, or by supplying the \code{x} matrix
+and \code{beta} coefficients. Uses the Breslow approach to ties.
+
+The function first checks if \code{pred} is passed: if so, it is used as
+the predictions. If \code{pred} is not passed but \code{x} and \code{beta}
+are passed, then these values are used to compute the predictions. If
+neither \code{x} nor \code{beta} are passed, then the predictions are all
+taken to be 0.
+
+\code{coxnet.deviance()} is a wrapper: it calls \code{coxnet.deviance0()}
+if the response is right-censored data, and calls \code{coxnet.deviance3()}
+if the response is (start, stop] survival data.
+
+\code{coxnet.deviance2()} gives the same output as \code{coxnet.deviance0()}
+but is written completely in R. It is not called by
+\code{coxnet.deviance()}, and is kept in the package for completeness.
+}
+\examples{
+set.seed(1)
+eta <- rnorm(10)
+time <- runif(10, min = 1, max = 10)
+d <- ifelse(rnorm(10) > 0, 1, 0)
+y <- survival::Surv(time, d)
+coxnet.deviance(pred = eta, y = y)
+
+# if pred not provided, it is set to zero vector
+coxnet.deviance(y = y)
+
+# example with x and beta
+x <- matrix(rnorm(10 * 3), nrow = 10)
+beta <- matrix(1:3, ncol = 1)
+coxnet.deviance(y = y, x = x, beta = beta)
+
+# example with (start, stop] data
+y2 <- survival::Surv(time, time + runif(10), d)
+coxnet.deviance(pred = eta, y = y2)
+
+# example with strata
+y2 <- stratifySurv(y, rep(1:2, length.out = 10))
+coxnet.deviance(pred = eta, y = y2)
+
 }
 \seealso{
 \code{coxgrad}
-}
-\author{
-Trevor Hastie\cr Maintainer: Trevor Hastie \href{mailto:hastie@stanford.edu}{hastie@stanford.edu}
 }
 \keyword{Cox}
 \keyword{model}

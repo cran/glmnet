@@ -4,11 +4,26 @@
 \alias{glmnet.fit}
 \title{Fit a GLM with elastic net regularization for a single value of lambda}
 \usage{
-glmnet.fit(x, y, weights, lambda, alpha = 1, offset = rep(0, nobs),
-  family = gaussian(), intercept = TRUE, thresh = 1e-10,
-  maxit = 1e+05, penalty.factor = rep(1, nvars), exclude = c(),
-  lower.limits = -Inf, upper.limits = Inf, warm = NULL,
-  from.glmnet.path = FALSE, save.fit = FALSE, trace.it = 0)
+glmnet.fit(
+  x,
+  y,
+  weights,
+  lambda,
+  alpha = 1,
+  offset = rep(0, nobs),
+  family = gaussian(),
+  intercept = TRUE,
+  thresh = 1e-10,
+  maxit = 1e+05,
+  penalty.factor = rep(1, nvars),
+  exclude = c(),
+  lower.limits = -Inf,
+  upper.limits = Inf,
+  warm = NULL,
+  from.glmnet.path = FALSE,
+  save.fit = FALSE,
+  trace.it = 0
+)
 }
 \arguments{
 \item{x}{Input matrix, of dimension \code{nobs x nvars}; each row is an

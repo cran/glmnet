@@ -1,9 +1,22 @@
+# glmnet 4.1
+
+Expanded scope for the Cox model.
+* We now allow (start, stop) data in
+  addition to the original right-censored all start at zero option.
+* Allow for strata as in `survival:coxph`
+* Allow for sparse X matrix with Cox models (was not available before)
+* Provide method for `survival:survfit`
+
+Vignettes are revised and reorganized.
+Additional index information stored on `cv.glmnet` objects, and
+included when printed.
+
 # glmnet 4.0-2
 
 * Biggest change. Cindex and auc calculations now use the `concordance`
   function from package `survival`
 * Minor changes. Allow coefficient warm starts for glmnet.fit. The print
-  method for glmnet now really prints %dDev rather than the fraction.
+  method for glmnet now really prints %Dev rather than the fraction.
 
 # glmnet 4.0
 

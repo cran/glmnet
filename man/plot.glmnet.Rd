@@ -8,17 +8,25 @@
 \alias{plot.relaxed}
 \title{plot coefficients from a "glmnet" object}
 \usage{
-\method{plot}{glmnet}(x, xvar = c("norm", "lambda", "dev"),
-  label = FALSE, ...)
+\method{plot}{glmnet}(x, xvar = c("norm", "lambda", "dev"), label = FALSE, ...)
 
-\method{plot}{mrelnet}(x, xvar = c("norm", "lambda", "dev"),
-  label = FALSE, type.coef = c("coef", "2norm"), ...)
+\method{plot}{mrelnet}(
+  x,
+  xvar = c("norm", "lambda", "dev"),
+  label = FALSE,
+  type.coef = c("coef", "2norm"),
+  ...
+)
 
-\method{plot}{multnet}(x, xvar = c("norm", "lambda", "dev"),
-  label = FALSE, type.coef = c("coef", "2norm"), ...)
+\method{plot}{multnet}(
+  x,
+  xvar = c("norm", "lambda", "dev"),
+  label = FALSE,
+  type.coef = c("coef", "2norm"),
+  ...
+)
 
-\method{plot}{relaxed}(x, xvar = c("lambda", "dev"), label = FALSE,
-  gamma = 1, ...)
+\method{plot}{relaxed}(x, xvar = c("lambda", "dev"), label = FALSE, gamma = 1, ...)
 }
 \arguments{
 \item{x}{fitted \code{"glmnet"} model}

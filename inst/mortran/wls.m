@@ -336,7 +336,7 @@ end;
 subroutine get_int_parms2(epsnr,mxitnr);
 implicit double precision(a-h,o-z);
 data epsnr0,mxitnr0
-  /1.0d-8,25/;
+  /1.0d-6,25/;
 epsnr=epsnr0; mxitnr=mxitnr0; 
 return;
 entry chg_epsnr(arg); epsnr0=arg; return;

@@ -4,11 +4,24 @@
 \alias{cv.glmnet}
 \title{Cross-validation for glmnet}
 \usage{
-cv.glmnet(x, y, weights = NULL, offset = NULL, lambda = NULL,
-  type.measure = c("default", "mse", "deviance", "class", "auc", "mae",
-  "C"), nfolds = 10, foldid = NULL, alignment = c("lambda",
-  "fraction"), grouped = TRUE, keep = FALSE, parallel = FALSE,
-  gamma = c(0, 0.25, 0.5, 0.75, 1), relax = FALSE, trace.it = 0, ...)
+cv.glmnet(
+  x,
+  y,
+  weights = NULL,
+  offset = NULL,
+  lambda = NULL,
+  type.measure = c("default", "mse", "deviance", "class", "auc", "mae", "C"),
+  nfolds = 10,
+  foldid = NULL,
+  alignment = c("lambda", "fraction"),
+  grouped = TRUE,
+  keep = FALSE,
+  parallel = FALSE,
+  gamma = c(0, 0.25, 0.5, 0.75, 1),
+  relax = FALSE,
+  trace.it = 0,
+  ...
+)
 }
 \arguments{
 \item{x}{\code{x} matrix as in \code{glmnet}.}
@@ -112,9 +125,10 @@ error is within 1 standard error of the minimum.} \item{fit.preval}{if
 \code{keep=TRUE}, this is the array of prevalidated fits. Some entries can
 be \code{NA}, if that and subsequent values of \code{lambda} are not reached
 for that fold} \item{foldid}{if \code{keep=TRUE}, the fold assignments used}
+\item{index}{a one column matrix with the indices of \code{lambda.min} and \code{lambda.1se} in the sequence of coefficients, fits etc.}
 \item{relaxed}{if \code{relax=TRUE}, this additional item has the CV info
 for each of the mixed fits. In particular it also selects \code{lambda,
-gamma} pairs corresponding to the 1SE rule, as well as the minimum error.}
+gamma} pairs corresponding to the 1se rule, as well as the minimum error. It also has a component \code{index}, a two-column matrix  which contains the \code{lambda} and \code{gamma} indices corresponding to the "min" and "1se" solutions.}
 }
 \description{
 Does k-fold cross-validation for glmnet, produces a plot, and returns a
@@ -137,7 +151,7 @@ are selected at random. Users can reduce this randomness by running
 If \code{relax=TRUE} then the values of \code{gamma} are used to mix the
 fits. If \eqn{\eta} is the fit for lasso/elastic net, and \eqn{\eta_R} is
 the relaxed fit (with unpenalized coefficients), then a relaxed fit mixed by
-\eqn{\gamma} is \deqn{\eta(\gamma)=(1-\gamma)\eta_R+\gamma\eta}. There is
+\eqn{\gamma} is \deqn{\eta(\gamma)=(1-\gamma)\eta_R+\gamma\eta.} There is
 practically no extra cost for having a lot of values for \code{gamma}.
 However, 5 seems sufficient for most purposes. CV then selects both
 \code{gamma} and \code{lambda}.

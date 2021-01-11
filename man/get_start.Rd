@@ -4,8 +4,18 @@
 \alias{get_start}
 \title{Get null deviance, starting mu and lambda max}
 \usage{
-get_start(x, y, weights, family, intercept, is.offset, offset, exclude, vp,
-  alpha)
+get_start(
+  x,
+  y,
+  weights,
+  family,
+  intercept,
+  is.offset,
+  offset,
+  exclude,
+  vp,
+  alpha
+)
 }
 \arguments{
 \item{x}{Input matrix, of dimension \code{nobs x nvars}; each row is an

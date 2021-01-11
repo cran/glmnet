@@ -4,10 +4,21 @@
 \alias{glmnet.control}
 \title{internal glmnet parameters}
 \usage{
-glmnet.control(fdev = 1e-05, devmax = 0.999, eps = 1e-06,
-  big = 9.9e+35, mnlam = 5, pmin = 1e-09, exmx = 250,
-  prec = 1e-10, mxit = 100, itrace = 0, epsnr = 1e-08,
-  mxitnr = 25, factory = FALSE)
+glmnet.control(
+  fdev = 1e-05,
+  devmax = 0.999,
+  eps = 1e-06,
+  big = 9.9e+35,
+  mnlam = 5,
+  pmin = 1e-09,
+  exmx = 250,
+  prec = 1e-10,
+  mxit = 100,
+  itrace = 0,
+  epsnr = 1e-06,
+  mxitnr = 25,
+  factory = FALSE
+)
 }
 \arguments{
 \item{fdev}{minimum fractional change in deviance for stopping path; factory
@@ -40,7 +51,7 @@ factory default = 100}
 and \code{cv.glmnet}. factory default = 0}
 
 \item{epsnr}{convergence threshold for \code{glmnet.fit}. factory default =
-1.0e-8}
+1.0e-6}
 
 \item{mxitnr}{maximum iterations for the IRLS loop in \code{glmnet.fit}. factory
 default = 25}

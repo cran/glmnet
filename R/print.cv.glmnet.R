@@ -39,8 +39,9 @@ print.cv.glmnet <- function(x, digits = max(3, getOption("digits") - 3), ...)
 
     optlams=c(x$lambda.min,x$lambda.1se)
     which=match(optlams,x$lambda)
-    mat=with(x,cbind(optlams,cvm[which],cvsd[which],nzero[which]))
-    dimnames(mat)=list(c("min","1se"),c("Lambda","Measure","SE","Nonzero"))
+    mat = with(x, cbind(optlams, which, cvm[which], cvsd[which], nzero[which]))
+    dimnames(mat) = list(c("min", "1se"), c("Lambda", "Index","Measure",
+                                            "SE", "Nonzero"))
     cat("Measure:", x$name,"\n\n")
 
     mat=data.frame(mat,check.names=FALSE)

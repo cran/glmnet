@@ -4,12 +4,26 @@
 \alias{glmnet.path}
 \title{Fit a GLM with elastic net regularization for a path of lambda values}
 \usage{
-glmnet.path(x, y, weights = NULL, lambda = NULL, nlambda = 100,
-  lambda.min.ratio = ifelse(nobs < nvars, 0.01, 1e-04), alpha = 1,
-  offset = NULL, family = gaussian(), standardize = TRUE,
-  intercept = TRUE, thresh = 1e-10, maxit = 1e+05,
-  penalty.factor = rep(1, nvars), exclude = integer(0),
-  lower.limits = -Inf, upper.limits = Inf, trace.it = 0)
+glmnet.path(
+  x,
+  y,
+  weights = NULL,
+  lambda = NULL,
+  nlambda = 100,
+  lambda.min.ratio = ifelse(nobs < nvars, 0.01, 1e-04),
+  alpha = 1,
+  offset = NULL,
+  family = gaussian(),
+  standardize = TRUE,
+  intercept = TRUE,
+  thresh = 1e-10,
+  maxit = 1e+05,
+  penalty.factor = rep(1, nvars),
+  exclude = integer(0),
+  lower.limits = -Inf,
+  upper.limits = Inf,
+  trace.it = 0
+)
 }
 \arguments{
 \item{x}{Input matrix, of dimension \code{nobs x nvars}; each row is an

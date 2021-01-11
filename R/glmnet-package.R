@@ -43,7 +43,7 @@ NULL
 #'
 #' @name glmnet-internal
 #' @aliases auc assess.coxnet auc.mat cvtype cvstats
-#' cvcompute getcoef getcoef.multinomial response.coxnet fix.lam error.bars
+#' cvcompute getcoef getcoef.multinomial fix.lam error.bars
 #' getmin elnet mrelnet lognet fishnet coefnorm coxnet cv.lognet cv.elnet
 #' cv.multnet cv.mrelnet cv.coxnet cv.fishnet cv.glmnet.raw cv.relaxed.raw
 #' blend.relaxed checkgamma.relax buildPredmat buildPredmat.mrelnetlist

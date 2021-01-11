@@ -92,6 +92,12 @@ makeX=function(train,test=NULL, na.impute=FALSE,sparse=FALSE,...){
         nte=nrow(test)
         df=rbind(df,test)
     }
+    ### bug fix because of change of default behavior of data.frame
+    ## check if any character columns
+    classes = sapply(df,class)
+    if (any(classes == "character"))
+        df <- as.data.frame(unclass(df), stringsAsFactors = TRUE)
+    ###
     x=prepareX(df,sparse=sparse)
     if(na.impute){
         xbar=colMeans(x[seq(ntr),],na.rm=TRUE)
@@ -112,6 +118,26 @@ prepareX <-
     function(df,sparse=FALSE,...){
         if(!inherits(df,"data.frame"))stop("first argument must be of class `data.frame`")
         whichfac=sapply(df,inherits,"factor")
+### bug fix if factor has one level only
+        ## Cannot get contrasts to do the job here, so do it manually
+        df_level <- lapply(df[,whichfac,drop = FALSE], levels)
+        nlevels <- sapply(df_level,length)
+        which <- nlevels == 1
+        if(any(which)){
+            whichfac1 = whichfac
+            whichfac1[whichfac] = which
+            dn <- names(df)
+            cx <- as.matrix(df[,whichfac1],drop=FALSE)
+            unimat <- array(1,dim=dim(cx))
+            cnames <- paste0(dn[whichfac1],unlist(df_level[which]))
+            unimat[is.na(cx)] <- NA
+            df[,whichfac1] <- data.frame(unimat)
+            dn[whichfac1] <- cnames
+            names(df) <- dn
+            whichfac[whichfac] = !which
+            warning(call. = FALSE,paste("Column(s) ",paste(cnames,collapse=", "), "are all 1, due to factors with a single level"))
+        }
+###
         oldna=options()$na.action
         cna=as.character(substitute(na.action))
         options(na.action=na.pass)

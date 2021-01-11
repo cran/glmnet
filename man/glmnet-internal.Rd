@@ -10,7 +10,6 @@
 \alias{cvcompute}
 \alias{getcoef}
 \alias{getcoef.multinomial}
-\alias{response.coxnet}
 \alias{fix.lam}
 \alias{error.bars}
 \alias{getmin}

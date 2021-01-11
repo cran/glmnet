@@ -5,26 +5,41 @@
 \alias{relax.glmnet}
 \title{fit a GLM with lasso or elasticnet regularization}
 \usage{
-glmnet(x, y, family = c("gaussian", "binomial", "poisson", "multinomial",
-  "cox", "mgaussian"), weights = NULL, offset = NULL, alpha = 1,
-  nlambda = 100, lambda.min.ratio = ifelse(nobs < nvars, 0.01, 1e-04),
-  lambda = NULL, standardize = TRUE, intercept = TRUE,
-  thresh = 1e-07, dfmax = nvars + 1, pmax = min(dfmax * 2 + 20,
-  nvars), exclude = NULL, penalty.factor = rep(1, nvars),
-  lower.limits = -Inf, upper.limits = Inf, maxit = 1e+05,
+glmnet(
+  x,
+  y,
+  family = c("gaussian", "binomial", "poisson", "multinomial", "cox", "mgaussian"),
+  weights = NULL,
+  offset = NULL,
+  alpha = 1,
+  nlambda = 100,
+  lambda.min.ratio = ifelse(nobs < nvars, 0.01, 1e-04),
+  lambda = NULL,
+  standardize = TRUE,
+  intercept = TRUE,
+  thresh = 1e-07,
+  dfmax = nvars + 1,
+  pmax = min(dfmax * 2 + 20, nvars),
+  exclude = NULL,
+  penalty.factor = rep(1, nvars),
+  lower.limits = -Inf,
+  upper.limits = Inf,
+  maxit = 1e+05,
   type.gaussian = ifelse(nvars < 500, "covariance", "naive"),
   type.logistic = c("Newton", "modified.Newton"),
-  standardize.response = FALSE, type.multinomial = c("ungrouped",
-  "grouped"), relax = FALSE, trace.it = 0, ...)
+  standardize.response = FALSE,
+  type.multinomial = c("ungrouped", "grouped"),
+  relax = FALSE,
+  trace.it = 0,
+  ...
+)
 
-relax.glmnet(fit, x, ..., maxp = n - 3, path = FALSE,
-  check.args = TRUE)
+relax.glmnet(fit, x, ..., maxp = n - 3, path = FALSE, check.args = TRUE)
 }
 \arguments{
 \item{x}{input matrix, of dimension nobs x nvars; each row is an observation
 vector. Can be in sparse matrix format (inherit from class
-\code{"sparseMatrix"} as in package \code{Matrix}; not yet available for
-\code{family="cox"})}
+\code{"sparseMatrix"} as in package \code{Matrix})}
 
 \item{y}{response variable. Quantitative for \code{family="gaussian"}, or
 \code{family="poisson"} (non-negative counts). For \code{family="binomial"}
@@ -32,17 +47,17 @@ should be either a factor with two levels, or a two-column matrix of counts
 or proportions (the second column is treated as the target class; for a
 factor, the last level in alphabetical order is the target class). For
 \code{family="multinomial"}, can be a \code{nc>=2} level factor, or a matrix
-with \code{nc} columns of counts or proportions.  For either
+with \code{nc} columns of counts or proportions. For either
 \code{"binomial"} or \code{"multinomial"}, if \code{y} is presented as a
-vector, it will be coerced into a factor. For \code{family="cox"}, \code{y}
-should be a two-column matrix with columns named 'time' and 'status'. The
-latter is a binary variable, with '1' indicating death, and '0' indicating
-right censored. The function \code{Surv()} in package \pkg{survival}
-produces such a matrix. For \code{family="mgaussian"}, \code{y} is a matrix
+vector, it will be coerced into a factor. For \code{family="cox"}, preferably
+a \code{Surv} object from the survival package: see Details section for
+more information. For \code{family="mgaussian"}, \code{y} is a matrix
 of quantitative responses.}
 
-\item{family}{Response type (see above). Either a character string representing
-one of the built-in families, or else a \code{glm()} family object.}
+\item{family}{Either a character string representing
+one of the built-in families, or else a \code{glm()} family object. For more
+information, see Details section below or the documentation for response
+type (above).}
 
 \item{weights}{observation weights. Can be total counts if responses are
 proportion matrices. Default is 1 for each observation}
@@ -218,8 +233,22 @@ The sequence of models implied by \code{lambda} is fit by coordinate
 descent. For \code{family="gaussian"} this is the lasso sequence if
 \code{alpha=1}, else it is the elasticnet sequence.
 
+The objective function for \code{"gaussian"} is \deqn{1/2 RSS/nobs +
+\lambda*penalty,} and for the other models it is \deqn{-loglik/nobs +
+\lambda*penalty.} Note also that for \code{"gaussian"}, \code{glmnet}
+standardizes y to have unit variance (using 1/n rather than 1/(n-1) formula)
+before computing its lambda sequence (and then unstandardizes the resulting
+coefficients); if you wish to reproduce/compare results with other software,
+best to supply a standardized y. The coefficients for any predictor
+variables with zero variance are set to zero for all values of lambda.
+\subsection{Details on \code{family} option}{
+
 From version 4.0 onwards, glmnet supports both the original built-in families,
 as well as \emph{any} family object as used by \code{stats:glm()}.
+This opens the door to a wide variety of additional models. For example
+\code{family=binomial(link=cloglog)} or \code{family=negative.binomial(theta=1.5)} (from the MASS library).
+Note that the code runs faster for the built-in families.
+
 The built in families are specifed via a character string. For all families,
 the object produced is a lasso or elasticnet regularization path for fitting the
 generalized linear regression paths, by maximizing the appropriate penalized
@@ -233,16 +262,8 @@ where each class is represented by a linear model (on the log-scale). The
 penalties take care of redundancies. A two-class \code{"multinomial"} model
 will produce the same fit as the corresponding \code{"binomial"} model,
 except the pair of coefficient matrices will be equal in magnitude and
-opposite in sign, and half the \code{"binomial"} values.  Note that the
-objective function for \code{"gaussian"} is \deqn{1/2 RSS/nobs +
-\lambda*penalty,} and for the other models it is \deqn{-loglik/nobs +
-\lambda*penalty.} Note also that for \code{"gaussian"}, \code{glmnet}
-standardizes y to have unit variance (using 1/n rather than 1/(n-1) formula)
-before computing its lambda sequence (and then unstandardizes the resulting
-coefficients); if you wish to reproduce/compare results with other software,
-best to supply a standardized y. The coefficients for any predictor
-variables with zero variance are set to zero for all values of lambda.
-Two useful additional families  are the \code{family="mgaussian"} family and
+opposite in sign, and half the \code{"binomial"} values.
+Two useful additional families are the \code{family="mgaussian"} family and
 the \code{type.multinomial="grouped"} option for multinomial fitting. The
 former allows a multi-response gaussian model to be fit, using a "group
 -lasso" penalty on the coefficients for each variable. Tying the responses
@@ -257,12 +278,23 @@ with censored times, we assume the censored times occurred just
 \emph{before} the death times in computing the Breslow approximation; if
 users prefer the usual convention of \emph{after}, they can add a small
 number to all censoring times to achieve this effect.
+}
 
-Version 4.0 and later allows for the family argument to be a S3 class \code{"family"} object
-(a list of functions and expressions).
-This opens the door to a wide variety of additional models. For example
-\code{family=binomial(link=cloglog)} or \code{family=negative.binomial(theta=1.5)} (from the MASS library).
-Note that the code runs faster for the built-in families.
+\subsection{Details on response for \code{family="cox"}}{
+
+For Cox models, the response should preferably be a \code{Surv} object,
+created by the \code{Surv()} function in \pkg{survival} package. For
+right-censored data, this object should have type "right", and for
+(start, stop] data, it should have type "counting". To fit stratified Cox
+models, strata should be added to the response via the \code{stratifySurv()}
+function before passing the response to \code{glmnet()}. (For backward
+compatibility, right-censored data can also be passed as a
+two-column matrix with columns named 'time' and 'status'. The
+latter is a binary variable, with '1' indicating death, and '0' indicating
+right censored.)
+}
+
+\subsection{Details on \code{relax} option}{
 
 If \code{relax=TRUE}
 a duplicate sequence of models is produced, where each active set in the
@@ -273,6 +305,7 @@ Generally users will not call \code{relax.glmnet} directly, unless the
 original 'glmnet' object took a long time to fit. But if they do, they must
 supply the fit, and all the original arguments used to create that fit. They
 can limit the length of the relaxed path via 'maxp'.
+}
 }
 \examples{
 
@@ -332,6 +365,22 @@ y = cbind(time = ty, status = 1 - tcens)  # y=Surv(ty,1-tcens) with library(surv
 fit = glmnet(x, y, family = "cox")
 plot(fit)
 
+# Cox example with (start, stop] data
+set.seed(2)
+nobs <- 100; nvars <- 15
+xvec <- rnorm(nobs * nvars)
+xvec[sample.int(nobs * nvars, size = 0.4 * nobs * nvars)] <- 0
+x <- matrix(xvec, nrow = nobs)
+start_time <- runif(100, min = 0, max = 5)
+stop_time <- start_time + runif(100, min = 0.1, max = 3)
+status <- rbinom(n = nobs, prob = 0.3, size = 1)
+jsurv_ss <- survival::Surv(start_time, stop_time, status)
+fit <- glmnet(x, jsurv_ss, family = "cox")
+
+# Cox example with strata
+jsurv_ss2 <- stratifySurv(jsurv_ss, rep(1:2, each = 50))
+fit <- glmnet(x, jsurv_ss2, family = "cox")
+
 # Sparse
 n = 10000
 p = 200
@@ -355,22 +404,21 @@ system.time(fit2n <- glmnet(x, y))
 \references{
 Friedman, J., Hastie, T. and Tibshirani, R. (2008)
 \emph{Regularization Paths for Generalized Linear Models via Coordinate
-Descent}, \url{https://web.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
-\emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\cr
-\url{https://www.jstatsoft.org/v33/i01/}\cr Simon, N., Friedman, J., Hastie,
-T., Tibshirani, R. (2011) \emph{Regularization Paths for Cox's Proportional
+Descent (2010), Journal of Statistical Software, Vol. 33(1), 1-22},
+\url{https://web.stanford.edu/~hastie/Papers/glmnet.pdf}.\cr
+Simon, N., Friedman, J., Hastie, T. and Tibshirani, R. (2011)
+\emph{Regularization Paths for Cox's Proportional
 Hazards Model via Coordinate Descent, Journal of Statistical Software, Vol.
-39(5) 1-13}\cr \url{https://www.jstatsoft.org/v39/i05/}\cr Tibshirani,
+39(5), 1-13}, \url{https://www.jstatsoft.org/v39/i05/}.\cr Tibshirani,
 Robert, Bien, J., Friedman, J., Hastie, T.,Simon, N.,Taylor, J. and
 Tibshirani, Ryan. (2012) \emph{Strong Rules for Discarding Predictors in
-Lasso-type Problems, JRSSB vol 74},\cr
-\url{https://statweb.stanford.edu/~tibs/ftp/strong.pdf}\cr \emph{Stanford
-Statistics Technical Report}\cr \url{https://arxiv.org/abs/1707.08692}\cr
-Hastie, T., Tibshirani, Robert, Tibshirani, Ryan (2019) \emph{Extended
+Lasso-type Problems, JRSSB, Vol. 74(2), 245-266},
+\url{https://statweb.stanford.edu/~tibs/ftp/strong.pdf}.\cr
+Hastie, T., Tibshirani, Robert and Tibshirani, Ryan. \emph{Extended
 Comparisons of Best Subset Selection, Forward Stepwise Selection, and the
-Lasso}\cr
-\emph{Glmnet webpage with four vignettes}
-\url{https://glmnet.stanford.edu}
+Lasso (2017), Stanford Statistics Technical Report},
+\url{https://arxiv.org/abs/1707.08692}.\cr
+Glmnet webpage with four vignettes, \url{https://glmnet.stanford.edu}.
 }
 \seealso{
 \code{print}, \code{predict}, \code{coef} and \code{plot} methods,
@@ -378,7 +426,7 @@ and the \code{cv.glmnet} function.
 }
 \author{
 Jerome Friedman, Trevor Hastie, Balasubramanian Narasimhan, Noah
-Simon and Rob Tibshirani\cr Maintainer: Trevor Hastie
+Simon, Kenneth Tay and Rob Tibshirani\cr Maintainer: Trevor Hastie
 \email{hastie@stanford.edu}
 }
 \keyword{models}

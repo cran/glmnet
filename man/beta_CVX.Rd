@@ -5,7 +5,9 @@
 \alias{x}
 \alias{y}
 \title{Simulated data for the glmnet vignette}
-\format{Data objects used to demonstrate features in the glmnet vignette}
+\format{
+Data objects used to demonstrate features in the glmnet vignette
+}
 \description{
 Simple simulated data, used to demonstrate the features of glmnet
 }

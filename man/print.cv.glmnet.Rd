@@ -5,8 +5,7 @@
 \alias{print.cv.relaxed}
 \title{print a cross-validated glmnet object}
 \usage{
-\method{print}{cv.glmnet}(x, digits = max(3, getOption("digits") - 3),
-  ...)
+\method{print}{cv.glmnet}(x, digits = max(3, getOption("digits") - 3), ...)
 }
 \arguments{
 \item{x}{fitted 'cv.glmnet' object}

@@ -25,16 +25,16 @@ buildPredmat.coxnetlist <-
             if (grouped) {
                 plfull = coxnet.deviance(x = x, y = y, offset = offset,
                                          weights = weights, beta = coefmat)
-                plminusk = coxnet.deviance(x = x[!which, ],
-                                           y = y[!which, ], offset = offset[!which],
-                                           weights = weights[!which],beta = coefmat)
+                plminusk = coxnet.deviance(x = x[!which, ], y = y[!which, ], 
+                                           offset = offset[!which],
+                                           weights = weights[!which], 
+                                           beta = coefmat)
                 cvraw[i, seq(nlami)] = (plfull - plminusk)[seq(nlami)]
             }
             else {
-                plk = coxnet.deviance(x = x[which, ],
-                                      y = y[which,
-                                            ], offset = offset[which], weights = weights[which],
-                                      beta = coefmat)
+                plk = coxnet.deviance(x = x[which, ], y = y[which, ], 
+                                      offset = offset[which], 
+                                      weights = weights[which], beta = coefmat)
                 cvraw[i, seq(nlami)] = plk[seq(nlami)]
             }
         }

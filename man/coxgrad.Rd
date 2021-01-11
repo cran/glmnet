@@ -2,37 +2,72 @@
 % Please edit documentation in R/coxgrad.R
 \name{coxgrad}
 \alias{coxgrad}
-\title{compute gradient for cox model}
+\alias{coxgrad2}
+\alias{coxgrad3}
+\title{Compute gradient for Cox model}
 \usage{
-coxgrad(f, time, d, w, eps = 1e-05)
+coxgrad(eta, y, w, std.weights = TRUE, diag.hessian = FALSE)
+
+coxgrad2(eta, y, w, std.weights = TRUE, diag.hessian = FALSE)
+
+coxgrad3(eta, y, w, std.weights = TRUE, diag.hessian = FALSE)
 }
 \arguments{
-\item{f}{fit vector}
+\item{eta}{Fit vector (usually from glmnet at a particular lambda).}
 
-\item{time}{time vector (can have ties)}
+\item{y}{Survival response variable, must be a \code{Surv} or
+\code{stratifySurv} object.}
 
-\item{d}{death/censoring indicator 1/0}
+\item{w}{Observation weights (default is all equal to 1).}
 
-\item{w}{observation weights (default equal)}
+\item{std.weights}{If TRUE (default), observation weights are standardized
+to sum to 1.}
 
-\item{eps}{(default 0.00001) Breaks ties between death and censoring by making death times \code{eps} earlier}
+\item{diag.hessian}{If \code{TRUE}, compute the diagonal of the Hessian
+of the log partial likelihood as well. Default is \code{FALSE}.}
 }
 \value{
-a single gradient vector the same length as \code{f}
+A single gradient vector the same length as \code{eta}. If
+\code{diag.hessian=TRUE}, the diagonal of the Hessian is
+included as an attribute "diag_hessian".
 }
 \description{
-Compute the gradient of the partial likelihood at a particular fit
+Compute the gradient of the log partial likelihood at a particular fit for Cox
+model.
 }
 \details{
 Compute a gradient vector at the fitted vector for the log partial likelihood.
-This is like a residual vector, and useful for manual screening of predictors for \code{glmnet}
-in applications where \code{p} is very large (as in GWAS). Uses the Breslow approach to ties
+This is like a residual vector, and useful for manual screening of
+predictors for \code{glmnet} in applications where \code{p} is very large
+(as in GWAS). Uses the Breslow approach to ties.
+
+This function is essentially a wrapper: it checks whether the response
+provided is right-censored or (start, stop] survival data, and calls the
+appropriate internal routine. For right-censored data it calls
+\code{coxgrad2()}. For (start, stop] data, it calls \code{coxgrad3()}.
+}
+\examples{
+set.seed(1)
+eta <- rnorm(10)
+time <- runif(10, min = 1, max = 10)
+d <- ifelse(rnorm(10) > 0, 1, 0)
+y <- survival::Surv(time, d)
+coxgrad(eta, y)
+
+# return diagonal of Hessian as well
+coxgrad(eta, y, diag.hessian = TRUE)
+
+# example with (start, stop] data
+y2 <- survival::Surv(time, time + runif(10), d)
+coxgrad(eta, y2)
+
+# example with strata
+y2 <- stratifySurv(y, rep(1:2, length.out = 10))
+coxgrad(eta, y2)
+
 }
 \seealso{
 \code{coxnet.deviance}
-}
-\author{
-Trevor Hastie\cr Maintainer: Trevor Hastie \href{mailto:hastie@stanford.edu}{hastie@stanford.edu}
 }
 \keyword{Cox}
 \keyword{model}

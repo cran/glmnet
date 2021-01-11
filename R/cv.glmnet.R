@@ -19,7 +19,7 @@
 #' If \code{relax=TRUE} then the values of \code{gamma} are used to mix the
 #' fits. If \eqn{\eta} is the fit for lasso/elastic net, and \eqn{\eta_R} is
 #' the relaxed fit (with unpenalized coefficients), then a relaxed fit mixed by
-#' \eqn{\gamma} is \deqn{\eta(\gamma)=(1-\gamma)\eta_R+\gamma\eta}. There is
+#' \eqn{\gamma} is \deqn{\eta(\gamma)=(1-\gamma)\eta_R+\gamma\eta.} There is
 #' practically no extra cost for having a lot of values for \code{gamma}.
 #' However, 5 seems sufficient for most purposes. CV then selects both
 #' \code{gamma} and \code{lambda}.
@@ -74,7 +74,7 @@
 #' @param keep If \code{keep=TRUE}, a \emph{prevalidated} array is returned
 #' containing fitted values for each observation and each value of
 #' \code{lambda}. This means these fits are computed with this observation and
-#' the rest of its fold omitted. The \code{folid} vector is also returned.
+#' the rest of its fold omitted. The \code{foldid} vector is also returned.
 #' Default is keep=FALSE.  If \code{relax=TRUE}, then a list of such arrays is
 #' returned, one for each value of 'gamma'. Note: if the value 'gamma=1' is
 #' omitted, this case is included in the list since it corresponds to the
@@ -108,9 +108,10 @@
 #' \code{keep=TRUE}, this is the array of prevalidated fits. Some entries can
 #' be \code{NA}, if that and subsequent values of \code{lambda} are not reached
 #' for that fold} \item{foldid}{if \code{keep=TRUE}, the fold assignments used}
+#' \item{index}{a one column matrix with the indices of \code{lambda.min} and \code{lambda.1se} in the sequence of coefficients, fits etc.}
 #' \item{relaxed}{if \code{relax=TRUE}, this additional item has the CV info
 #' for each of the mixed fits. In particular it also selects \code{lambda,
-#' gamma} pairs corresponding to the 1SE rule, as well as the minimum error.}
+#' gamma} pairs corresponding to the 1se rule, as well as the minimum error. It also has a component \code{index}, a two-column matrix  which contains the \code{lambda} and \code{gamma} indices corresponding to the "min" and "1se" solutions.}
 #' @author Jerome Friedman, Trevor Hastie and Rob Tibshirani\cr Noah Simon
 #' helped develop the 'coxnet' function.\cr Jeffrey Wong and B. Narasimhan
 #' helped with the parallel option\cr Maintainer: Trevor Hastie

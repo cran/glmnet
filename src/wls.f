@@ -314,7 +314,7 @@ c     mortran 2.0     (version of 7/04/75 mod 7/4/87 (ajc))
       end                                                               
       subroutine get_int_parms2(epsnr,mxitnr)                           
       implicit double precision(a-h,o-z)                                
-      data epsnr0,mxitnr0  /1.0d-8,25/                                  
+      data epsnr0,mxitnr0  /1.0d-6,25/                                  
       epsnr=epsnr0                                                      
       mxitnr=mxitnr0                                                    
       return                                                            

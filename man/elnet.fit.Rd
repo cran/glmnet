@@ -4,10 +4,23 @@
 \alias{elnet.fit}
 \title{Solve weighted least squares (WLS) problem for a single lambda value}
 \usage{
-elnet.fit(x, y, weights, lambda, alpha = 1, intercept = TRUE,
-  thresh = 1e-07, maxit = 1e+05, penalty.factor = rep(1, nvars),
-  exclude = c(), lower.limits = -Inf, upper.limits = Inf,
-  warm = NULL, from.glmnet.fit = FALSE, save.fit = FALSE)
+elnet.fit(
+  x,
+  y,
+  weights,
+  lambda,
+  alpha = 1,
+  intercept = TRUE,
+  thresh = 1e-07,
+  maxit = 1e+05,
+  penalty.factor = rep(1, nvars),
+  exclude = c(),
+  lower.limits = -Inf,
+  upper.limits = Inf,
+  warm = NULL,
+  from.glmnet.fit = FALSE,
+  save.fit = FALSE
+)
 }
 \arguments{
 \item{x}{Input matrix, of dimension \code{nobs x nvars}; each row is an

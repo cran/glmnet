@@ -10,8 +10,23 @@
 #' descent. For \code{family="gaussian"} this is the lasso sequence if
 #' \code{alpha=1}, else it is the elasticnet sequence.
 #'
+#' The objective function for \code{"gaussian"} is \deqn{1/2 RSS/nobs +
+#' \lambda*penalty,} and for the other models it is \deqn{-loglik/nobs +
+#' \lambda*penalty.} Note also that for \code{"gaussian"}, \code{glmnet}
+#' standardizes y to have unit variance (using 1/n rather than 1/(n-1) formula)
+#' before computing its lambda sequence (and then unstandardizes the resulting
+#' coefficients); if you wish to reproduce/compare results with other software,
+#' best to supply a standardized y. The coefficients for any predictor
+#' variables with zero variance are set to zero for all values of lambda.
+#'
+#' ## Details on `family` option
+#'
 #' From version 4.0 onwards, glmnet supports both the original built-in families,
 #' as well as \emph{any} family object as used by `stats:glm()`.
+#' This opens the door to a wide variety of additional models. For example
+#' `family=binomial(link=cloglog)` or `family=negative.binomial(theta=1.5)` (from the MASS library).
+#' Note that the code runs faster for the built-in families.
+#'
 #' The built in families are specifed via a character string. For all families,
 #' the object produced is a lasso or elasticnet regularization path for fitting the
 #' generalized linear regression paths, by maximizing the appropriate penalized
@@ -25,16 +40,8 @@
 #' penalties take care of redundancies. A two-class \code{"multinomial"} model
 #' will produce the same fit as the corresponding \code{"binomial"} model,
 #' except the pair of coefficient matrices will be equal in magnitude and
-#' opposite in sign, and half the \code{"binomial"} values.  Note that the
-#' objective function for \code{"gaussian"} is \deqn{1/2 RSS/nobs +
-#' \lambda*penalty,} and for the other models it is \deqn{-loglik/nobs +
-#' \lambda*penalty.} Note also that for \code{"gaussian"}, \code{glmnet}
-#' standardizes y to have unit variance (using 1/n rather than 1/(n-1) formula)
-#' before computing its lambda sequence (and then unstandardizes the resulting
-#' coefficients); if you wish to reproduce/compare results with other software,
-#' best to supply a standardized y. The coefficients for any predictor
-#' variables with zero variance are set to zero for all values of lambda.
-#' Two useful additional families  are the \code{family="mgaussian"} family and
+#' opposite in sign, and half the \code{"binomial"} values.
+#' Two useful additional families are the \code{family="mgaussian"} family and
 #' the \code{type.multinomial="grouped"} option for multinomial fitting. The
 #' former allows a multi-response gaussian model to be fit, using a "group
 #' -lasso" penalty on the coefficients for each variable. Tying the responses
@@ -50,11 +57,20 @@
 #' users prefer the usual convention of \emph{after}, they can add a small
 #' number to all censoring times to achieve this effect.
 #'
-#' Version 4.0 and later allows for the family argument to be a S3 class `"family"` object
-#' (a list of functions and expressions).
-#' This opens the door to a wide variety of additional models. For example
-#' `family=binomial(link=cloglog)` or `family=negative.binomial(theta=1.5)` (from the MASS library).
-#' Note that the code runs faster for the built-in families.
+#' ## Details on response for `family="cox"`
+#'
+#' For Cox models, the response should preferably be a \code{Surv} object,
+#' created by the \code{Surv()} function in \pkg{survival} package. For
+#' right-censored data, this object should have type "right", and for
+#' (start, stop] data, it should have type "counting". To fit stratified Cox
+#' models, strata should be added to the response via the \code{stratifySurv()}
+#' function before passing the response to \code{glmnet()}. (For backward
+#' compatibility, right-censored data can also be passed as a
+#' two-column matrix with columns named 'time' and 'status'. The
+#' latter is a binary variable, with '1' indicating death, and '0' indicating
+#' right censored.)
+#'
+#' ## Details on `relax` option
 #'
 #' If \code{relax=TRUE}
 #' a duplicate sequence of models is produced, where each active set in the
@@ -68,24 +84,23 @@
 #'
 #' @param x input matrix, of dimension nobs x nvars; each row is an observation
 #' vector. Can be in sparse matrix format (inherit from class
-#' \code{"sparseMatrix"} as in package \code{Matrix}; not yet available for
-#' \code{family="cox"})
+#' \code{"sparseMatrix"} as in package \code{Matrix})
 #' @param y response variable. Quantitative for \code{family="gaussian"}, or
 #' \code{family="poisson"} (non-negative counts). For \code{family="binomial"}
 #' should be either a factor with two levels, or a two-column matrix of counts
 #' or proportions (the second column is treated as the target class; for a
 #' factor, the last level in alphabetical order is the target class). For
 #' \code{family="multinomial"}, can be a \code{nc>=2} level factor, or a matrix
-#' with \code{nc} columns of counts or proportions.  For either
+#' with \code{nc} columns of counts or proportions. For either
 #' \code{"binomial"} or \code{"multinomial"}, if \code{y} is presented as a
-#' vector, it will be coerced into a factor. For \code{family="cox"}, \code{y}
-#' should be a two-column matrix with columns named 'time' and 'status'. The
-#' latter is a binary variable, with '1' indicating death, and '0' indicating
-#' right censored. The function \code{Surv()} in package \pkg{survival}
-#' produces such a matrix. For \code{family="mgaussian"}, \code{y} is a matrix
+#' vector, it will be coerced into a factor. For \code{family="cox"}, preferably
+#' a \code{Surv} object from the survival package: see Details section for
+#' more information. For \code{family="mgaussian"}, \code{y} is a matrix
 #' of quantitative responses.
-#' @param family Response type (see above). Either a character string representing
-#' one of the built-in families, or else a `glm()` family object.
+#' @param family Either a character string representing
+#' one of the built-in families, or else a `glm()` family object. For more
+#' information, see Details section below or the documentation for response
+#' type (above).
 #' @param weights observation weights. Can be total counts if responses are
 #' proportion matrices. Default is 1 for each observation
 #' @param offset A vector of length \code{nobs} that is included in the linear
@@ -206,28 +221,27 @@
 #' additional item is another glmnet object with different values for
 #' \code{beta} and \code{dev.ratio}}
 #' @author Jerome Friedman, Trevor Hastie, Balasubramanian Narasimhan, Noah
-#' Simon and Rob Tibshirani\cr Maintainer: Trevor Hastie
+#' Simon, Kenneth Tay and Rob Tibshirani\cr Maintainer: Trevor Hastie
 #' \email{hastie@@stanford.edu}
 #' @seealso \code{print}, \code{predict}, \code{coef} and \code{plot} methods,
 #' and the \code{cv.glmnet} function.
 #' @references Friedman, J., Hastie, T. and Tibshirani, R. (2008)
 #' \emph{Regularization Paths for Generalized Linear Models via Coordinate
-#' Descent}, \url{https://web.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
-#' \emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\cr
-#' \url{https://www.jstatsoft.org/v33/i01/}\cr Simon, N., Friedman, J., Hastie,
-#' T., Tibshirani, R. (2011) \emph{Regularization Paths for Cox's Proportional
+#' Descent (2010), Journal of Statistical Software, Vol. 33(1), 1-22},
+#' \url{https://web.stanford.edu/~hastie/Papers/glmnet.pdf}.\cr
+#' Simon, N., Friedman, J., Hastie, T. and Tibshirani, R. (2011)
+#' \emph{Regularization Paths for Cox's Proportional
 #' Hazards Model via Coordinate Descent, Journal of Statistical Software, Vol.
-#' 39(5) 1-13}\cr \url{https://www.jstatsoft.org/v39/i05/}\cr Tibshirani,
+#' 39(5), 1-13}, \url{https://www.jstatsoft.org/v39/i05/}.\cr Tibshirani,
 #' Robert, Bien, J., Friedman, J., Hastie, T.,Simon, N.,Taylor, J. and
 #' Tibshirani, Ryan. (2012) \emph{Strong Rules for Discarding Predictors in
-#' Lasso-type Problems, JRSSB vol 74},\cr
-#' \url{https://statweb.stanford.edu/~tibs/ftp/strong.pdf}\cr \emph{Stanford
-#' Statistics Technical Report}\cr \url{https://arxiv.org/abs/1707.08692}\cr
-#' Hastie, T., Tibshirani, Robert, Tibshirani, Ryan (2019) \emph{Extended
+#' Lasso-type Problems, JRSSB, Vol. 74(2), 245-266},
+#' \url{https://statweb.stanford.edu/~tibs/ftp/strong.pdf}.\cr
+#' Hastie, T., Tibshirani, Robert and Tibshirani, Ryan. \emph{Extended
 #' Comparisons of Best Subset Selection, Forward Stepwise Selection, and the
-#' Lasso}\cr
-#' \emph{Glmnet webpage with four vignettes}
-#' \url{https://glmnet.stanford.edu}
+#' Lasso (2017), Stanford Statistics Technical Report},
+#' \url{https://arxiv.org/abs/1707.08692}.\cr
+#' Glmnet webpage with four vignettes, \url{https://glmnet.stanford.edu}.
 #' @keywords models regression
 #' @examples
 #'
@@ -287,6 +301,22 @@
 #' fit = glmnet(x, y, family = "cox")
 #' plot(fit)
 #'
+#' # Cox example with (start, stop] data
+#' set.seed(2)
+#' nobs <- 100; nvars <- 15
+#' xvec <- rnorm(nobs * nvars)
+#' xvec[sample.int(nobs * nvars, size = 0.4 * nobs * nvars)] <- 0
+#' x <- matrix(xvec, nrow = nobs)
+#' start_time <- runif(100, min = 0, max = 5)
+#' stop_time <- start_time + runif(100, min = 0.1, max = 3)
+#' status <- rbinom(n = nobs, prob = 0.3, size = 1)
+#' jsurv_ss <- survival::Surv(start_time, stop_time, status)
+#' fit <- glmnet(x, jsurv_ss, family = "cox")
+#'
+#' # Cox example with strata
+#' jsurv_ss2 <- stratifySurv(jsurv_ss, rep(1:2, each = 50))
+#' fit <- glmnet(x, jsurv_ss2, family = "cox")
+#'
 #' # Sparse
 #' n = 10000
 #' p = 200
@@ -322,145 +352,152 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
         ## new.call=this.call
         ## new.call[[1]]=as.name("glmnet.path")
         ## fit=eval(new.call, parent.frame())
-        if(missing(thresh))thresh=1e-10
         fit=glmnet.path(x,y,weights,lambda,nlambda,lambda.min.ratio,alpha,offset,family,
                         standardize,intercept,thresh=thresh,maxit,penalty.factor,exclude,lower.limits,
                         upper.limits,trace.it=trace.it)
         fit$call=this.call
-    }
-    else
-    {
-### Must have been a call to old glmnet
-### Prepare all the generic arguments, then hand off to family functions
-  family=match.arg(family)
-  if(alpha>1){
-    warning("alpha >1; set to 1")
-    alpha=1
-  }
-  if(alpha<0){
-    warning("alpha<0; set to 0")
-    alpha=0
-  }
-  alpha=as.double(alpha)
-  nlam=as.integer(nlambda)
-  y=drop(y) # we dont like matrix responses unless we need them
-  if(is.null(weights))weights=rep(1,nobs)
-  else if(length(weights)!=nobs)stop(paste("number of elements in weights (",length(weights),") not equal to the number of rows of x (",nobs,")",sep=""))
-  dimy=dim(y)
-  nrowy=ifelse(is.null(dimy),length(y),dimy[1])
-    if(nrowy!=nobs)stop(paste("number of observations in y (",nrowy,") not equal to the number of rows of x (",nobs,")",sep=""))
-  vnames=colnames(x)
-  if(is.null(vnames))vnames=paste("V",seq(nvars),sep="")
-  ne=as.integer(dfmax)
-    nx=as.integer(pmax)
-    if(is.null(exclude))exclude=integer(0)
-    if(any(penalty.factor==Inf)){
+    } else {
+      family=match.arg(family)
+      if (family == "cox" && use.cox.path(x, y)) {
+      # we should call the new cox.path()
+      fit <- cox.path(x,y,weights,offset,alpha,nlambda,lambda.min.ratio,
+                      lambda,standardize,thresh,exclude,penalty.factor,
+                      lower.limits,upper.limits,maxit,trace.it,...)
+      fit$call <- this.call
+    } else {
+      ### Must have been a call to old glmnet
+      ### Prepare all the generic arguments, then hand off to family functions
+      if(alpha>1){
+        warning("alpha >1; set to 1")
+        alpha=1
+      }
+      if(alpha<0){
+        warning("alpha<0; set to 0")
+        alpha=0
+      }
+      alpha=as.double(alpha)
+      nlam=as.integer(nlambda)
+      y=drop(y) # we dont like matrix responses unless we need them
+      if(is.null(weights))weights=rep(1,nobs)
+      else if(length(weights)!=nobs)stop(paste("number of elements in weights (",length(weights),") not equal to the number of rows of x (",nobs,")",sep=""))
+      dimy=dim(y)
+      nrowy=ifelse(is.null(dimy),length(y),dimy[1])
+      if(nrowy!=nobs)stop(paste("number of observations in y (",nrowy,") not equal to the number of rows of x (",nobs,")",sep=""))
+      vnames=colnames(x)
+      if(is.null(vnames))vnames=paste("V",seq(nvars),sep="")
+      ne=as.integer(dfmax)
+      nx=as.integer(pmax)
+      if(is.null(exclude))exclude=integer(0)
+      if(any(penalty.factor==Inf)){
         exclude=c(exclude,seq(nvars)[penalty.factor==Inf])
         exclude=sort(unique(exclude))
-        }
-  if(length(exclude)>0){
-    jd=match(exclude,seq(nvars),0)
-    if(!all(jd>0))stop("Some excluded variables out of range")
-    penalty.factor[jd]=1 #ow can change lambda sequence
-    jd=as.integer(c(length(jd),jd))
-  }else jd=as.integer(0)
-    vp=as.double(penalty.factor)
-    internal.parms=glmnet.control()
-    if(internal.parms$itrace)trace.it=1
-    else{
+      }
+      if(length(exclude)>0){
+        jd=match(exclude,seq(nvars),0)
+        if(!all(jd>0))stop("Some excluded variables out of range")
+        penalty.factor[jd]=1 #ow can change lambda sequence
+        jd=as.integer(c(length(jd),jd))
+      }else jd=as.integer(0)
+      vp=as.double(penalty.factor)
+      internal.parms=glmnet.control()
+      if(internal.parms$itrace)trace.it=1
+      else{
         if(trace.it){
-            glmnet.control(itrace=1)
-            on.exit(glmnet.control(itrace=0))
-            }
+          glmnet.control(itrace=1)
+          on.exit(glmnet.control(itrace=0))
         }
- ###check on limits
-  if(any(lower.limits>0)){stop("Lower limits should be non-positive")}
-  if(any(upper.limits<0)){stop("Upper limits should be non-negative")}
-  lower.limits[lower.limits==-Inf]=-internal.parms$big
-  upper.limits[upper.limits==Inf]=internal.parms$big
-  if(length(lower.limits)<nvars){
-    if(length(lower.limits)==1)lower.limits=rep(lower.limits,nvars)else stop("Require length 1 or nvars lower.limits")
-  }
-  else lower.limits=lower.limits[seq(nvars)]
-  if(length(upper.limits)<nvars){
-    if(length(upper.limits)==1)upper.limits=rep(upper.limits,nvars)else stop("Require length 1 or nvars upper.limits")
-  }
-  else upper.limits=upper.limits[seq(nvars)]
-  cl=rbind(lower.limits,upper.limits)
-  if(any(cl==0)){
-    ###Bounds of zero can mess with the lambda sequence and fdev; ie nothing happens and if fdev is not
-    ###zero, the path can stop
-    fdev=glmnet.control()$fdev
-    if(fdev!=0) {
-      glmnet.control(fdev=0)
-      on.exit(glmnet.control(fdev=fdev))
-    }
-  }
-  storage.mode(cl)="double"
-  ### end check on limits
+      }
+      ###check on limits
+      if(any(lower.limits>0)){stop("Lower limits should be non-positive")}
+      if(any(upper.limits<0)){stop("Upper limits should be non-negative")}
+      lower.limits[lower.limits==-Inf]=-internal.parms$big
+      upper.limits[upper.limits==Inf]=internal.parms$big
+      if(length(lower.limits)<nvars){
+        if(length(lower.limits)==1)lower.limits=rep(lower.limits,nvars)else stop("Require length 1 or nvars lower.limits")
+      }
+      else lower.limits=lower.limits[seq(nvars)]
+      if(length(upper.limits)<nvars){
+        if(length(upper.limits)==1)upper.limits=rep(upper.limits,nvars)else stop("Require length 1 or nvars upper.limits")
+      }
+      else upper.limits=upper.limits[seq(nvars)]
+      cl=rbind(lower.limits,upper.limits)
+      if(any(cl==0)){
+        ###Bounds of zero can mess with the lambda sequence and fdev; ie nothing happens and if fdev is not
+        ###zero, the path can stop
+        fdev=glmnet.control()$fdev
+        if(fdev!=0) {
+          glmnet.control(fdev=0)
+          on.exit(glmnet.control(fdev=fdev))
+        }
+      }
+      storage.mode(cl)="double"
+      ### end check on limits
 
-  isd=as.integer(standardize)
-  intr=as.integer(intercept)
-  if(!missing(intercept)&&family=="cox")warning("Cox model has no intercept")
-  jsd=as.integer(standardize.response)
-  thresh=as.double(thresh)
-  if(is.null(lambda)){
-     if(lambda.min.ratio>=1)stop("lambda.min.ratio should be less than 1")
-    flmin=as.double(lambda.min.ratio)
-    ulam=double(1)
-  }
-  else{
-     flmin=as.double(1)
-    if(any(lambda<0))stop("lambdas should be non-negative")
-    ulam=as.double(rev(sort(lambda)))
-    nlam=as.integer(length(lambda))
-  }
-  is.sparse=FALSE
-  ix=jx=NULL
-  if(inherits(x,"sparseMatrix")){##Sparse case
-    is.sparse=TRUE
-    x=as(x,"CsparseMatrix")
-    x=as(x,"dgCMatrix")
-    ix=as.integer(x@p+1)
-    jx=as.integer(x@i+1)
-    x=as.double(x@x)
-  }
-
-    if (trace.it) {
+      isd=as.integer(standardize)
+      intr=as.integer(intercept)
+      if(!missing(intercept)&&family=="cox")warning("Cox model has no intercept")
+      jsd=as.integer(standardize.response)
+      thresh=as.double(thresh)
+      if(is.null(lambda)){
+        if(lambda.min.ratio>=1)stop("lambda.min.ratio should be less than 1")
+        flmin=as.double(lambda.min.ratio)
+        ulam=double(1)
+      }
+      else{
+        flmin=as.double(1)
+        if(any(lambda<0))stop("lambdas should be non-negative")
+        ulam=as.double(rev(sort(lambda)))
+        nlam=as.integer(length(lambda))
+      }
+      is.sparse=FALSE
+      ix=jx=NULL
+      if(inherits(x,"sparseMatrix")){##Sparse case
+        is.sparse=TRUE
+        x=as(x,"CsparseMatrix")
+        x=as(x,"dgCMatrix")
+        ix=as.integer(x@p+1)
+        jx=as.integer(x@i+1)
+        xd=x@x
+      }
+      else xd <- x
+      storage.mode(xd) <- "double"
+      if (trace.it) {
         if (relax) cat("Training Fit\n")
         pb  <- createPB(min = 0, max = nlam, initial = 0, style = 3)
-    }
-  kopt=switch(match.arg(type.logistic),
-   "Newton"=0,#This means to use the exact Hessian
-    "modified.Newton"=1 # Use the upper bound
-    )
-  if(family=="multinomial"){
-      type.multinomial=match.arg(type.multinomial)
-      if(type.multinomial=="grouped")kopt=2 #overrules previous kopt
-    }
-  kopt=as.integer(kopt)
+      }
+      kopt=switch(match.arg(type.logistic),
+                  "Newton"=0,#This means to use the exact Hessian
+                  "modified.Newton"=1 # Use the upper bound
+                  )
+      if(family=="multinomial"){
+        type.multinomial=match.arg(type.multinomial)
+        if(type.multinomial=="grouped")kopt=2 #overrules previous kopt
+      }
+      kopt=as.integer(kopt)
 
-  fit=switch(family,
-    "gaussian"=elnet(x,is.sparse,ix,jx,y,weights,offset,type.gaussian,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit),
-    "poisson"=fishnet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit),
-    "binomial"=lognet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family),
-    "multinomial"=lognet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family),
-    "cox"=coxnet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit),
-    "mgaussian"=mrelnet(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,vnames,maxit)
-    )
-    if (trace.it) {
+      fit=switch(family,
+                 "gaussian"=elnet(xd,is.sparse,ix,jx,y,weights,offset,type.gaussian,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit),
+                 "poisson"=fishnet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit),
+                 "binomial"=lognet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family),
+                 "multinomial"=lognet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family),
+                 "cox"=coxnet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit),
+                 "mgaussian"=mrelnet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,vnames,maxit)
+                 )
+      if (trace.it) {
         utils::setTxtProgressBar(pb, nlam)
         close(pb)
+      }
+      if(is.null(lambda))fit$lambda=fix.lam(fit$lambda)##first lambda is infinity; changed to entry point
+      fit$call=this.call
+      fit$nobs=nobs
+      class(fit)=c(class(fit),"glmnet")
     }
-  if(is.null(lambda))fit$lambda=fix.lam(fit$lambda)##first lambda is infinity; changed to entry point
-fit$call=this.call
-  fit$nobs=nobs
-    class(fit)=c(class(fit),"glmnet")
     }
-    if(relax)
-        relax.glmnet(fit, x=x,y=y,weights=weights,offset=offset,
-                     lower.limits=lower.limits,upper.limits=upper.limits,penalty.factor=penalty.factor,
-                     check.args=FALSE,...)
-    else
-        fit
+
+  if(relax)
+    relax.glmnet(fit, x=x,y=y,weights=weights,offset=offset,
+                 lower.limits=lower.limits,upper.limits=upper.limits,penalty.factor=penalty.factor,
+                 check.args=FALSE,...)
+  else
+    fit
 }

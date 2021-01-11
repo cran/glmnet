@@ -27,7 +27,7 @@
 #' @param itrace If 1 then progress bar is displayed when running \code{glmnet}
 #' and \code{cv.glmnet}. factory default = 0
 #' @param epsnr convergence threshold for \code{glmnet.fit}. factory default =
-#' 1.0e-8
+#' 1.0e-6
 #' @param mxitnr maximum iterations for the IRLS loop in \code{glmnet.fit}. factory
 #' default = 25
 #' @param factory If \code{TRUE}, reset all the parameters to the factory
@@ -47,14 +47,14 @@
 glmnet.control <-
   function (fdev = 1e-05, devmax = 0.999, eps = 1e-06, big = 9.9e+35,
             mnlam = 5, pmin = 1e-09, exmx = 250, prec = 1e-10, mxit = 100,
-            itrace = 0, epsnr = 1e-08, mxitnr = 25, factory = FALSE)
+            itrace = 0, epsnr = 1e-06, mxitnr = 25, factory = FALSE)
 {
   inquiry=!nargs()
    if (factory)
     invisible(glmnet.control(fdev = 1e-05, devmax = 0.999,
                              eps = 1e-06, big = 9.9e+35, mnlam = 5, pmin = 1e-09,
                              exmx = 250, prec = 1e-10, mxit = 100, itrace = 0,
-                             epsnr = 1e-08, mxitnr = 25))
+                             epsnr = 1e-06, mxitnr = 25))
   else {
     if (!missing(fdev))
       .Fortran("chg_fract_dev", as.double(fdev), PACKAGE = "glmnet")

@@ -10,13 +10,13 @@ citEntry(entry = "Article",
   volume       = "33",
   number       = "1",
   pages        = "1--22",
-  url          = "http://www.jstatsoft.org/v33/i01/",
+  url          = "https://www.jstatsoft.org/v33/i01/",
 
   textVersion  =
   paste("Jerome Friedman, Trevor Hastie, Robert Tibshirani (2010).",
         "Regularization Paths for Generalized Linear Models via Coordinate Descent.",
         "Journal of Statistical Software, 33(1), 1-22.",
-        "URL http://www.jstatsoft.org/v33/i01/.")
+        "URL https://www.jstatsoft.org/v33/i01/.")
 )
 
 citEntry(entry = "Article",
@@ -30,13 +30,13 @@ citEntry(entry = "Article",
   volume       = "39",
   number       = "5",
   pages        = "1--13",
-  url          = "http://www.jstatsoft.org/v39/i05/",
+  url          = "https://www.jstatsoft.org/v39/i05/",
 
   textVersion  =
   paste("Noah Simon, Jerome Friedman, Trevor Hastie, Rob Tibshirani (2011).",
         "Regularization Paths for Cox's Proportional Hazards Model via Coordinate Descent.",
         "Journal of Statistical Software, 39(5), 1-13.",
-        "URL http://www.jstatsoft.org/v39/i05/."),
+        "URL https://www.jstatsoft.org/v39/i05/."),
   header       = "If coxnet is used, please also cite:"
 )
 
