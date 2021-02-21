@@ -151,31 +151,37 @@ glmnet.path <- function(x, y, weights=NULL, lambda = NULL, nlambda = 100,
     if (is.offset == FALSE) {
         offset <- as.double(y * 0) #keeps the shape of y
     }
-
-    # check and standardize penalty factors (to sum to nvars)
+    # infinite penalty factor vars are excluded
     if(any(penalty.factor == Inf)) {
         exclude = c(exclude, seq(nvars)[penalty.factor == Inf])
         exclude = sort(unique(exclude))
     }
+
+    ## Compute weighted mean and variance of columns of x, sensitive to sparse matrix
+    ## needed to detect constant columns below, and later if standarization
+    meansd <- weighted_mean_sd(x, weights)
+
+    ## look for constant variables, and if any, then add to exclude
+    const_vars <- meansd$sd == 0
+    nzvar <- setdiff(which(!const_vars), exclude)
+    # if all the non-excluded variables have zero variance, throw error
+    if (length(nzvar) == 0) stop("All used predictors have zero variance")
+
+    ## if any constant vars, add to exclude
+    if(any(const_vars)) {
+        exclude <- sort(unique(c(which(const_vars),exclude)))
+        meansd$sd[const_vars] <- 1.0 ## we divide later, and do not want bad numbers
+        }
     if(length(exclude) > 0) {
         jd = match(exclude, seq(nvars), 0)
         if(!all(jd > 0)) stop ("Some excluded variables out of range")
         penalty.factor[jd] = 1 # ow can change lambda sequence
     }
+    # check and standardize penalty factors (to sum to nvars)
     vp = pmax(0, penalty.factor)
     if (max(vp) <= 0) stop("All penalty factors are <= 0")
     vp = as.double(vp * nvars / sum(vp))
 
-    # if all the non-excluded variables have zero variance, throw error
-    isconst <- function(x) 1 - (max(x) == min(x)) * 1
-    if (inherits(x, "sparseMatrix")) {
-        xt <- as(t(x), "dgCMatrix")
-        lx <- split(xt@x, xt@i)
-        const_vars <- sapply(lx, isconst)
-    }
-    else const_vars <- apply(x, 2, isconst)
-    nzvar <- setdiff(which(const_vars == 1), exclude)
-    if (length(nzvar) == 0) stop("All used predictors have zero variance")
 
     ### check on limits
     control <- glmnet.control()
@@ -210,18 +216,17 @@ glmnet.path <- function(x, y, weights=NULL, lambda = NULL, nlambda = 100,
 
     # standardize x if necessary
     if (intercept) {
-        xm <- apply(x, 2, function(r) weighted.mean(r, weights))
+        xm <- meansd$mean
     } else {
         xm <- rep(0.0, times = nvars)
     }
     if (standardize) {
-        xs <- apply(x, 2, function(r) sqrt(weighted.mean(r^2, weights) -
-                                               weighted.mean(r, weights)^2))
+        xs <- meansd$sd
     } else {
         xs <- rep(1.0, times = nvars)
     }
     if (!inherits(x, "sparseMatrix")) {
-        x <- t((t(x) - xm) / xs)
+        x <- scale(x, xm, xs)
     } else {
         attr(x, "xm") <- xm
         attr(x, "xs") <- xs
@@ -470,13 +475,13 @@ glmnet.fit <- function(x, y, weights, lambda, alpha = 1.0,
         is.offset = FALSE
     }
     # add xm and xs attributes if they are missing for sparse x
-    # glmnet.fit assumes that x is already standardized. Any standardization 
+    # glmnet.fit assumes that x is already standardized. Any standardization
     # the user wants should be done beforehand.
     if (inherits(x, "sparseMatrix")) {
-        if ("xm" %in% names(attributes(x)) == FALSE) 
+        if ("xm" %in% names(attributes(x)) == FALSE)
             attr(x, "xm") <- rep(0.0, times = nvars)
-        if ("xs" %in% names(attributes(x)) == FALSE) 
-            attr(x, "xs") <- rep(0.0, times = nvars)
+        if ("xs" %in% names(attributes(x)) == FALSE)
+            attr(x, "xs") <- rep(1.0, times = nvars)
     }
 
     # if calling from glmnet.path(), we do not need to check on exclude
@@ -522,8 +527,6 @@ glmnet.fit <- function(x, y, weights, lambda, alpha = 1.0,
     else x
     valideta <- unless.null(family$valideta, function(eta) TRUE)
     validmu <- unless.null(family$validmu, function(mu) TRUE)
-
-
 
     # computation of null deviance (get mu in the process)
     if (is.null(warm)) {
@@ -653,6 +656,23 @@ glmnet.fit <- function(x, y, weights, lambda, alpha = 1.0,
             halved <- TRUE
             obj_val <- obj_function(y, mu, weights, family, lambda, alpha, start, vp)
             if (trace.it == 2) cat("Iteration", iter, " Halved step 2, Objective:", obj_val, fill = TRUE)
+        }
+        # extra halving step if objective function value actually increased
+        if (obj_val > obj_val_old + 1e-7) {
+            ii <- 1
+            while (obj_val > obj_val_old + 1e-7) {
+                if (ii > control$mxitnr)
+                    stop("inner loop 3; cannot correct step size", call. = FALSE)
+                ii <- ii + 1
+                start <- (start + coefold)/2
+                start_int <- (start_int + intold)/2
+                eta <- get_eta(x, start, start_int)
+                mu <- linkinv(eta <- eta + offset)
+                obj_val <- obj_function(y, mu, weights, family, lambda, alpha, start, vp)
+                if (trace.it == 2) cat("Iteration", iter, " Halved step 3, Objective:", 
+                                       obj_val, fill = TRUE)
+            }
+            halved <- TRUE
         }
 
         # if we did any halving, we have to update the coefficients, intercept
@@ -849,6 +869,7 @@ elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
 
         # if calling from glmnet.fit(), we do not need to check on exclude
         # and penalty.factor arguments as they have been prepared by glmnet.fit()
+        # Also exclude will include variance 0 columns
         if (!from.glmnet.fit) {
             # check and standardize penalty factors (to sum to nvars)
             if(any(penalty.factor == Inf)) {
@@ -866,13 +887,8 @@ elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
             vp <- as.double(penalty.factor)
         }
         # compute ju
-        isconst <- function(x) 1 - (max(x) == min(x)) * 1
-        if (inherits(x, "sparseMatrix")) {
-            xt <- as(t(x), "dgCMatrix")
-            lx <- split(xt@x, xt@i)
-            ju <- sapply(lx, isconst)
-        }
-        else ju <- apply(x, 2, isconst)
+        # assume that there are no constant variables
+        ju <- rep(1, nvars)
         ju[exclude] <- 0
         ju <- as.integer(ju)
 
@@ -1022,7 +1038,7 @@ get_start <- function(x, y, weights, family, intercept, is.offset, offset,
                                             weights = weights, offset = offset))
             mu <- tempfit$fitted.values
         } else {
-            mu <- rep(sum(weights * y) / sum(weights), times = nobs)
+            mu <- rep(weighted.mean(y,weights), times = nobs)
         }
     } else {
         mu <- family$linkinv(offset)
@@ -1033,22 +1049,21 @@ get_start <- function(x, y, weights, family, intercept, is.offset, offset,
     vp_zero <- setdiff(which(vp == 0), exclude)
     if (length(vp_zero) > 0) {
         tempx <- x[, vp_zero, drop = FALSE]
-        if (intercept) {
-            tempx <- cbind(tempx, 1)
+        if (inherits(tempx, "sparseMatrix")) {
+            tempfit <- glmnet.fit(tempx, y, intercept = intercept, family = family,
+                                  weights = weights/sum(weights), offset = offset, lambda = 0)
+            mu <- predict(tempfit, newx=tempx, newoffset=offset, type = "response")
+        } else {
+            if (intercept) {
+                tempx <- cbind(1,tempx)
+            }
+            tempfit <- glm.fit(tempx, y, family = family, weights = weights, offset = offset)
+            mu <- tempfit$fitted.values
         }
-        tempfit <- glm.fit(tempx, y, family = family, weights = weights, offset = offset)
-        mu <- tempfit$fitted.values
     }
-
     # compute lambda max
-    isconst <- function(x) 1 - (max(x) == min(x)) * 1
-    if (inherits(x, "sparseMatrix")) {
-        xt <- as(t(x), "dgCMatrix")
-        lx <- split(xt@x, xt@i)
-        ju <- sapply(lx, isconst)
-    }
-    else ju <- apply(x, 2, isconst)
-    ju[exclude] <- 0
+    ju <- rep(1, nvars)
+    ju[exclude] <- 0 # we have already included constant variables in exclude
     r <- y - mu
     eta <- family$linkfun(mu)
     v <- family$variance(mu)
@@ -1198,9 +1213,28 @@ predict.glmnetfit <- function(object, newx, s = NULL,
 #' @param a0 Intercept.
 get_eta <- function(x, beta, a0) {
     if (inherits(x, "sparseMatrix")) {
-        x@x <- x@x / rep.int(attr(x, "xs"), times = diff(x@p))
-        drop(x %*% beta - sum(beta * attr(x, "xm") / attr(x, "xs")) + a0)
+        beta <- drop(beta)/attr(x, "xs")
+        drop(x %*% beta - sum(beta * attr(x, "xm") ) + a0)
     } else {
         drop(x %*% beta + a0)
     }
+}
+
+#' Helper function to compute weighted mean and standard deviation
+#' 
+#' Helper function to compute weighted mean and standard deviation. 
+#' Deals gracefully whether x is sparse matrix or not.
+#' 
+#' @param x Observation matrix.
+#' @param weights Optional weight vector.
+#'
+#' @return A list with components.
+#' \item{mean}{vector of weighted means of columns of x}
+#' \item{sd}{vector of weighted standard deviations of columns of x}
+weighted_mean_sd <- function(x, weights=rep(1,nrow(x))){
+    weights <- weights/sum(weights)
+    xm <- drop(t(weights)%*%x)
+    xv <- drop(t(weights)%*%x^2)-xm^2
+    xv[abs(xv) < 10*.Machine$double.eps] <- 0
+    list(mean = xm, sd = sqrt(xv))
 }

@@ -33,7 +33,12 @@ cv.glmnet(
 \item{offset}{Offset vector (matrix) as in \code{glmnet}}
 
 \item{lambda}{Optional user-supplied lambda sequence; default is
-\code{NULL}, and \code{glmnet} chooses its own sequence}
+\code{NULL}, and \code{glmnet} chooses its own sequence. Note that this is done
+for the full model (master sequence), and separately for each fold.
+The fits are then alligned using the master sequence (see the \code{allignment}
+argument for additional details). Adapting \code{lambda} for each fold
+leads to better convergence. When \code{lambda} is supplied, the same sequence
+is used everywhere, but in some GLMs can lead to convergence issues.}
 
 \item{type.measure}{loss to use for cross-validation. Currently five
 options, not all available for all models. The default is
@@ -84,7 +89,7 @@ partial likelihood is computed only on the Kth fold}
 \item{keep}{If \code{keep=TRUE}, a \emph{prevalidated} array is returned
 containing fitted values for each observation and each value of
 \code{lambda}. This means these fits are computed with this observation and
-the rest of its fold omitted. The \code{folid} vector is also returned.
+the rest of its fold omitted. The \code{foldid} vector is also returned.
 Default is keep=FALSE.  If \code{relax=TRUE}, then a list of such arrays is
 returned, one for each value of 'gamma'. Note: if the value 'gamma=1' is
 omitted, this case is included in the list since it corresponds to the

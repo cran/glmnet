@@ -2,15 +2,9 @@
 % Please edit documentation in R/coxgrad.R
 \name{coxgrad}
 \alias{coxgrad}
-\alias{coxgrad2}
-\alias{coxgrad3}
 \title{Compute gradient for Cox model}
 \usage{
 coxgrad(eta, y, w, std.weights = TRUE, diag.hessian = FALSE)
-
-coxgrad2(eta, y, w, std.weights = TRUE, diag.hessian = FALSE)
-
-coxgrad3(eta, y, w, std.weights = TRUE, diag.hessian = FALSE)
 }
 \arguments{
 \item{eta}{Fit vector (usually from glmnet at a particular lambda).}
@@ -43,8 +37,7 @@ predictors for \code{glmnet} in applications where \code{p} is very large
 
 This function is essentially a wrapper: it checks whether the response
 provided is right-censored or (start, stop] survival data, and calls the
-appropriate internal routine. For right-censored data it calls
-\code{coxgrad2()}. For (start, stop] data, it calls \code{coxgrad3()}.
+appropriate internal routine.
 }
 \examples{
 set.seed(1)

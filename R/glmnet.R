@@ -458,8 +458,11 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
         ix=as.integer(x@p+1)
         jx=as.integer(x@i+1)
         xd=x@x
+      } else if (!inherits(x, "matrix")) {
+        xd <- data.matrix(x)
+      } else {
+        xd <- x
       }
-      else xd <- x
       storage.mode(xd) <- "double"
       if (trace.it) {
         if (relax) cat("Training Fit\n")

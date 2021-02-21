@@ -10,8 +10,7 @@
 #'
 #' This function is essentially a wrapper: it checks whether the response
 #' provided is right-censored or (start, stop] survival data, and calls the
-#' appropriate internal routine. For right-censored data it calls
-#' \code{coxgrad2()}. For (start, stop] data, it calls \code{coxgrad3()}.
+#' appropriate internal routine.
 #'
 #' @aliases coxgrad
 #' @param eta Fit vector (usually from glmnet at a particular lambda).
@@ -63,7 +62,7 @@ coxgrad <- function(eta, y, w, std.weights = TRUE, diag.hessian = FALSE) {
     }
 }
 
-#' @rdname coxgrad
+# coxgrad routine for right-censored data
 coxgrad2 <- function(eta, y, w, std.weights = TRUE, diag.hessian = FALSE) {
     if (missing(w)) w=rep(1,length(eta))
     if (std.weights) w=w/sum(w)
@@ -157,7 +156,7 @@ coxgrad2 <- function(eta, y, w, std.weights = TRUE, diag.hessian = FALSE) {
     }
 }
 
-#' @rdname coxgrad
+# coxgrad routine for (start, stop] data
 coxgrad3 <- function(eta, y, w, std.weights = TRUE, diag.hessian = FALSE) {
     if (missing(w)) w=rep(1,length(eta))
     if (std.weights) w=w/sum(w)

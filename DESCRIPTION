@@ -1,8 +1,8 @@
 Package: glmnet
 Type: Package
 Title: Lasso and Elastic-Net Regularized Generalized Linear Models
-Version: 4.1
-Date: 2021-01-10
+Version: 4.1-1
+Date: 2021-02-17
 Authors@R: c(person("Jerome", "Friedman", role=c("aut")),
 	     person("Trevor", "Hastie", role=c("aut", "cre"), email = "hastie@stanford.edu"),
 	     person("Rob", "Tibshirani", role=c("aut")),
@@ -22,7 +22,7 @@ URL: https://glmnet.stanford.edu,
         https://dx.doi.org/10.18637/jss.v039.i05
 RoxygenNote: 7.1.1
 NeedsCompilation: yes
-Packaged: 2021-01-11 00:03:32 UTC; hastie
+Packaged: 2021-02-18 01:22:34 UTC; hastie
 Author: Jerome Friedman [aut],
   Trevor Hastie [aut, cre],
   Rob Tibshirani [aut],
@@ -32,4 +32,4 @@ Author: Jerome Friedman [aut],
   Junyang Qian [ctb]
 Maintainer: Trevor Hastie <hastie@stanford.edu>
 Repository: CRAN
-Date/Publication: 2021-01-11 08:00:30 UTC
+Date/Publication: 2021-02-21 17:40:03 UTC

@@ -13,13 +13,9 @@
 #' neither \code{x} nor \code{beta} are passed, then the predictions are all
 #' taken to be 0.
 #' 
-#' \code{coxnet.deviance()} is a wrapper: it calls \code{coxnet.deviance0()}
-#' if the response is right-censored data, and calls \code{coxnet.deviance3()} 
-#' if the response is (start, stop] survival data. 
-#' 
-#' \code{coxnet.deviance2()} gives the same output as \code{coxnet.deviance0()}
-#' but is written completely in R. It is not called by 
-#' \code{coxnet.deviance()}, and is kept in the package for completeness.
+#' \code{coxnet.deviance()} is a wrapper: it calls the appropriate internal
+#' routine based on whether the response is right-censored data or 
+#' (start, stop] survival data. 
 #' 
 #' @aliases coxnet.deviance
 #' @param pred Fit vector or matrix (usually from glmnet at a particular 
@@ -84,7 +80,7 @@ coxnet.deviance <- function(pred = NULL, y, x = NULL, offset = NULL,
   }
 }
 
-#' @rdname coxnet.deviance
+# coxnet.deviance routine for right-censored data
 coxnet.deviance0 <- function(pred = NULL, y, x = NULL, offset = NULL, 
                              weights = NULL, std.weights = TRUE, beta = NULL) {
   ty <- y[, "time"]
@@ -186,7 +182,9 @@ coxnet.deviance0 <- function(pred = NULL, y, x = NULL, offset = NULL,
   }
 }
 
-#' @rdname coxnet.deviance
+# coxnet.deviance2 gives the same output as coxnet.deviance0()
+# but is written completely in R. It is not called by 
+# coxnet.deviance(), and is kept in the package for completeness.
 coxnet.deviance2 <- function(pred = NULL, y, x = NULL, offset = NULL, 
                              weights = NULL, std.weights = TRUE, beta = NULL) {
   if (!is.Surv(y)) stop("y must be a Surv object")
@@ -313,7 +311,7 @@ coxnet.deviance2 <- function(pred = NULL, y, x = NULL, offset = NULL,
   }
 }
 
-#' @rdname coxnet.deviance
+# coxnet.deviance routine for (start, stop] data
 coxnet.deviance3 <- function(pred = NULL, y, x = NULL, offset = NULL, 
                              weights = NULL, std.weights = TRUE, beta = NULL) {
   if (!is.Surv(y)) stop("y must be a Surv object")

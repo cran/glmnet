@@ -4,13 +4,13 @@
 \alias{stratifySurv}
 \title{Add strata to a Surv object}
 \usage{
-stratifySurv(y, strata)
+stratifySurv(y, strata = rep(1, length(y)))
 }
 \arguments{
 \item{y}{A Surv object.}
 
 \item{strata}{A vector of length equal to the number of observations in
-y, indicating strata membership.}
+y, indicating strata membership. Default is all belong to same strata.}
 }
 \value{
 An object of class \code{stratifySurv} (in addition to all the

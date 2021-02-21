@@ -63,7 +63,7 @@ relax.glmnet=function(fit,x,..., maxp = n-3, path=FALSE, check.args=TRUE){
         pi=sum(ind)
         if(pi>maxp)next #can only fit maxp coefficients
         exclude=excluders[!ind]
-        ifit=update(fit,lambda=lam0,exclude=exclude,...,relax=FALSE)
+        ifit=update(fit,x=x,lambda=lam0,exclude=exclude,...,relax=FALSE)
         nlam=ifit$dim[2]
         if (islistbeta) {
             a0[, wh] = ifit$a0[,nlam]

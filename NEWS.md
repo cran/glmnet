@@ -1,11 +1,21 @@
+# glmnet 4.1-1
+
+Fixed some bugs in the coxpath function to do with sparse X.
+* when some penalty factors are zero, and X is sparse, we should not
+  call GLM to get the start
+* apply does not work as intended with sparse X, so we now use matrix
+  multiplies instead in computing lambda_max
+* added documentation for `cv.glmnet` to explain implications of
+  supplying `lambda`  
+
 # glmnet 4.1
 
 Expanded scope for the Cox model.
 * We now allow (start, stop) data in
   addition to the original right-censored all start at zero option.
-* Allow for strata as in `survival:coxph`
+* Allow for strata as in `survival::coxph`
 * Allow for sparse X matrix with Cox models (was not available before)
-* Provide method for `survival:survfit`
+* Provide method for `survival::survfit`
 
 Vignettes are revised and reorganized.
 Additional index information stored on `cv.glmnet` objects, and

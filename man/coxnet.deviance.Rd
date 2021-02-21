@@ -2,42 +2,9 @@
 % Please edit documentation in R/coxnet.deviance.R
 \name{coxnet.deviance}
 \alias{coxnet.deviance}
-\alias{coxnet.deviance0}
-\alias{coxnet.deviance2}
-\alias{coxnet.deviance3}
 \title{Compute deviance for Cox model}
 \usage{
 coxnet.deviance(
-  pred = NULL,
-  y,
-  x = NULL,
-  offset = NULL,
-  weights = NULL,
-  std.weights = TRUE,
-  beta = NULL
-)
-
-coxnet.deviance0(
-  pred = NULL,
-  y,
-  x = NULL,
-  offset = NULL,
-  weights = NULL,
-  std.weights = TRUE,
-  beta = NULL
-)
-
-coxnet.deviance2(
-  pred = NULL,
-  y,
-  x = NULL,
-  offset = NULL,
-  weights = NULL,
-  std.weights = TRUE,
-  beta = NULL
-)
-
-coxnet.deviance3(
   pred = NULL,
   y,
   x = NULL,
@@ -84,13 +51,9 @@ are passed, then these values are used to compute the predictions. If
 neither \code{x} nor \code{beta} are passed, then the predictions are all
 taken to be 0.
 
-\code{coxnet.deviance()} is a wrapper: it calls \code{coxnet.deviance0()}
-if the response is right-censored data, and calls \code{coxnet.deviance3()}
-if the response is (start, stop] survival data.
-
-\code{coxnet.deviance2()} gives the same output as \code{coxnet.deviance0()}
-but is written completely in R. It is not called by
-\code{coxnet.deviance()}, and is kept in the package for completeness.
+\code{coxnet.deviance()} is a wrapper: it calls the appropriate internal
+routine based on whether the response is right-censored data or
+(start, stop] survival data.
 }
 \examples{
 set.seed(1)

@@ -18,37 +18,35 @@
 }
 
 #' Add strata to a Surv object
-#' 
+#'
 #' Helper function to add strata as an attribute to a Surv object. The
 #' output of this function can be used as the response in \code{glmnet()}
 #' for fitting stratified Cox models.
-#' 
+#'
 #' When fitting a stratified Cox model with \code{glmnet()}, strata should
 #' be added to a \code{Surv} response with this helper function. Note that
 #' it is not sufficient to add strata as an attribute to the \code{Surv}
 #' response manually: if the result does not have class \code{stratifySurv},
 #' subsetting of the response will not work properly.
-#' 
+#'
 #' @param y A Surv object.
 #' @param strata A vector of length equal to the number of observations in
-#' y, indicating strata membership.
-#' 
+#' y, indicating strata membership. Default is all belong to same strata.
+#'
 #' @return An object of class \code{stratifySurv} (in addition to all the
 #' classes \code{y} belonged to).
-#' 
-#' @examples 
+#'
+#' @examples
 #' y <- survival::Surv(1:10, rep(0:1, length.out = 10))
 #' strata <- rep(1:3, length.out = 10)
 #' y2 <- stratifySurv(y, strata)  # returns stratifySurv object
-#' 
+#'
 #' @importFrom survival is.Surv
 #' @export
-stratifySurv <- function(y, strata) {
+stratifySurv <- function(y, strata = rep(1, length(y))) {
   y <- response.coxnet(y)
-  
   if (length(y) != length(strata))
     stop("y and strata must have the same length (=nobs)")
-
   attr(y, "strata") <- strata
   y_class <- class(y)
   if (!("stratifySurv" %in% y_class)) class(y) <- c("stratifySurv", y_class)

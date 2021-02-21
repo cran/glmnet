@@ -29,7 +29,12 @@
 #' @param weights Observation weights; defaults to 1 per observation
 #' @param offset Offset vector (matrix) as in \code{glmnet}
 #' @param lambda Optional user-supplied lambda sequence; default is
-#' \code{NULL}, and \code{glmnet} chooses its own sequence
+#' \code{NULL}, and \code{glmnet} chooses its own sequence. Note that this is done
+#' for the full model (master sequence), and separately for each fold.
+#' The fits are then alligned using the master sequence (see the \code{allignment}
+#' argument for additional details). Adapting \code{lambda} for each fold
+#' leads to better convergence. When \code{lambda} is supplied, the same sequence
+#' is used everywhere, but in some GLMs can lead to convergence issues.
 #' @param type.measure loss to use for cross-validation. Currently five
 #' options, not all available for all models. The default is
 #' \code{type.measure="deviance"}, which uses squared-error for gaussian models
