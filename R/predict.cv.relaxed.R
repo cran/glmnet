@@ -11,6 +11,7 @@ function (object, newx, s = c("lambda.1se", "lambda.min"), gamma=c("gamma.1se","
     else if (is.character(s)) {
         s = match.arg(s)
         lambda = relaxed[[s]]
+        names(lambda)=s
         if(missing(gamma)){
             gamma=switch(s,
                          lambda.1se=relaxed[["gamma.1se"]],

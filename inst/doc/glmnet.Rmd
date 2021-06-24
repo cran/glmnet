@@ -100,6 +100,8 @@ library(glmnet)
 The default model used in the package is the Guassian linear model or "least squares", which we will demonstrate in this section. We load a set of data created beforehand for illustration:
 ```{r}
 data(QuickStartExample)
+x <- QuickStartExample$x
+y <- QuickStartExample$y
 ```
 The command loads an input matrix `x` and a response vector `y` from this saved R data archive.
 
@@ -401,6 +403,8 @@ are zero, but are shrunk by an amount depending on $\lambda$.
 We use a set of data generated beforehand for illustration. We fit a regularized multi-response Gaussian model to the data, with an object `mfit` returned.
 ```{r}
 data(MultiGaussianExample)
+x <- MultiGaussianExample$x
+y <- MultiGaussianExample$y
 mfit <- glmnet(x, y, family = "mgaussian")
 ```
 The `standardize.response` argument is only for `mgaussian` family. If `standardize.response = TRUE`, the response variables are standardized (default is `FALSE`).
@@ -454,6 +458,8 @@ latter is useful for grouped binomial data, or in applications where
 we have "soft" class membership, such as occurs in the EM algorithm.
 ```{r}
 data(BinomialExample)
+x <- BinomialExample$x
+y <- BinomialExample$y
 ```
 
 Other optional arguments of `glmnet` for binomial regression are almost same as those for Gaussian family. Don't forget to set `family` option to "binomial":
@@ -529,6 +535,8 @@ The standard Newton algorithm can be tedious here. Instead, for $q=1$ we use a s
 For the `family = "multinomial"` case, usage is similar to that for `family = "binomial"`. In this section we describe the differences. First, we load a set of generated data:
 ```{r}
 data(MultinomialExample)
+x <- MultinomialExample$x
+y <- MultinomialExample$y
 ```
 
 The response variable can be a `nc >= 2` level factor, or an `nc`-column matrix of counts or proportions. Internally glmnet will make the rows of this matrix sum to 1, and absorb the total mass into the weight for that observation. `offset` should be a `nobs x nc` matrix if one is provided.
@@ -575,6 +583,8 @@ $$
 First, we load a pre-generated set of Poisson data:
 ```{r}
 data(PoissonExample)
+x <- PoissonExample$x
+y <- PoissonExample$y
 ```
 
 We apply the function `glmnet` with `family = "poisson"`:
@@ -634,6 +644,8 @@ Once we have fit a series of models using `glmnet`, we often assess their perfor
 The function `assess.glmnet` computes the same performance measures produced by `cv.glmnet`, but on a validation or test dataset. 
 ```{r}
 data(BinomialExample)
+x <- BinomialExample$x
+y <- BinomialExample$y
 itrain <- 1:70
 fit <- glmnet(x[itrain, ], y[itrain], family = "binomial", nlambda = 5)
 assess.glmnet(fit, newx = x[-itrain, ], newy = y[-itrain])
@@ -695,6 +707,8 @@ lines(rocs[[best]], lwd = 2,col = "red")
 For binomial and multinomial models, we often wish to examine the classification performance on new data. The function `confusion.glmnet` will do that for us.
 ```{r}
 data(MultinomialExample)
+x <- MultinomialExample$x
+y <- MultinomialExample$y
 set.seed(101)
 itrain <- sample(1:500, 400, replace = FALSE)
 cfit <- cv.glmnet(x[itrain, ], y[itrain], family = "multinomial")
@@ -716,6 +730,123 @@ best <- cfit$index["min",]
 print(cnf[[best]])
 ```
 
+## Filtering variables
+
+The `exclude` argument to `glmnet` accepts a vector of indices, indicating which variables should be excluded from the fit, i.e. get zeros for their
+coefficients. From version 4.1-2, the `exclude` argument can accept a *function*. The idea is that variables can be filtered based on some of their properties (e.g. too sparse) before any models are fit. When performing cross-validation (CV), this filtering should be done separately inside each fold of `cv.glmnet`.
+
+Here is a typical filter function: it excludes variables that are more than 80% sparse.
+```{r}
+filter <- function(x, ...) which(colMeans(x == 0) > 0.8)
+```
+This function gets invoked inside the call to `glmnet`, and uses the supplied `x` to generate the indices.
+
+We give a simple example using this:
+```{r}
+set.seed(101)
+n <-500; p <- 50
+x <- matrix(rnorm(n * p), n, p)
+x[sample(seq(length(x)), 4 * n * p / 5)] <- 0
+y <- rnorm(n) + x %*% (rnorm(p) / 5) > 0
+excl <- filter(x)
+print(excl)
+fit.orig <- glmnet(x, y, family = "binomial", exclude = excl)
+fit.new  <- glmnet(x, y, family = "binomial", exclude = filter)
+all.equal(fit.orig, fit.new)
+```
+The fits are the same (the `call` component is all that differs).
+
+The nice thing with this approach is that `cv.glmnet` does the right thing: it applies the filter function separately to each training-fold `x`, and hence accounts for any bias that may be incurred by the filtering.
+```{r}
+cvfit.filt <- cv.glmnet(x, y, family = "binomial", exclude = filter)
+```
+ 
+The most general form of the filter function is
+```{r, eval=FALSE}
+filter <- function(x, y, weights, ...) {}
+```
+
+Yes, users can use `y` as well in their filtering criterion, and the observation weights if that makes sense. As we did above, some of
+the arguments can be omitted, but the `...` must always be there. We will give some useful examples of filter functions a bit later.
+
+An important point to note is that any other arguments in a user's filter function are *ignored*. So, what we should if we want one or more additional
+parameters to guide the filtering, such as the choice of `0.8` in our filter function above? The safest way to achieve this is to write a filter *generator* function, that produces a filter function as its output. We give an example:
+
+```{r}
+sparsity <- function(fraction = 0.7) {
+  function(x, ...) which(colMeans(x == 0) > fraction)
+}
+sparsity(0.5)
+```
+
+Here, `sparsity()` is a function that produces a function. The argument `fraction` is found in the environment of that function, and
+hence is *built in*. We can now run `cv.glmnet` as follows:
+
+```{r}
+foldid <- sample(rep(1:10,length.out = length(y)))
+cvfit.filt1 <- cv.glmnet(x, y, family = "binomial", foldid = foldid, 
+                         exclude = filter)
+cvfit.filt2 <- cv.glmnet(x, y, family = "binomial", foldid = foldid, 
+                         exclude = sparsity(0.8))
+all.equal(cvfit.filt1, cvfit.filt2)
+```
+
+These agree in the important parts.
+
+We end this section with some useful filtering functions. In genomics, where the `x` matrix can be very wide, we often filter features based on
+variance. We will use expression arrays as an example. All else being equal, we expect the variance of the gene expression of a gene to be
+higher if there is something *going on* across the samples, and we guess that that *something* is related to the response. Here is a function that efficiently computes the column-wise variance for a wide matrix, followed by a filter function that uses it.
+
+```{r}
+uvar <- function(x, means = FALSE) {
+  # if means = TRUE, the means and variances are returned, 
+  # otherwise just the variances
+  m <- colMeans(x)
+  n <- nrow(x)
+  x <- x - outer(rep(1,n),m)
+  v <- colSums(x^2) / (n - 1)
+  if (means) list(mean = m, var = v) else v
+}
+
+vfilter <- function(q = 0.3) {
+  function(x,...) {
+    v <- uvar(x)
+    which(v < quantile(v, q))
+  }
+}
+```
+
+Here, our filter function `vfilter()` is a function generator as discussed above, and will exclude the fraction `q` of variables with the lowest variance.
+	
+We can also use `y` as part of our filtering. This final example builds on the example above. Here the response `y` is binary, taking two values. We want to filter out variables with low values of the two-sample t-statistic with groups defined by `y`. Again, we present an efficient function for computing the t-statistics, and then the filter. (Notice that for convenience, our function `uvar` above can optionally return a mean vector and a variance vector.)
+
+```{r}
+ut.test <- function(x, y, s0 = 0) {
+  ni <- table(y); n <- sum(ni)
+  if(length(ni) != 2) stop("Only two-sample t-test here")
+  index <- seq(n)
+  mv <- tapply(index, y, function(i, x) uvar(x[i, ], means = TRUE), x = x)
+  ss <- ((ni[1] - 1) * mv[[1]]$var  + (ni[2] - 1) * mv[[2]]$var)
+  sd <- sqrt(ss * (1 / ni[[1]] + 1 / ni[[2]]) / (n - 2))
+  numer <- mv[[1]]$mean - mv[[2]]$mean
+  numer / (sd + s0)
+}
+
+tfilter <- function(q = 0.3, s0 = 0) {
+  function(x, y, ...) {
+    tstats <- ut.test(x, y, s0 = s0)
+    which(tstats < quantile(tstats, q))
+  }
+}
+```
+
+One might think that unsupervised filtering using just `x` before fitting the model is fair game, and perhaps need not be accounted for in cross-validation. This is an interesting issue, and one can argue that there could be some bias if it was not accounted for. But filtering using `x` and `y` *definitely* introduces potential bias. However, it can still give good results, as long as it it correctly accounted for when running CV.
+
+```{r}
+cvfit.filt3 <- cv.glmnet(x, y, family = "binomial", foldid = foldid, 
+                         exclude = tfilter(0.4))
+```
+
 ## Other Package Features
 
 In this section, we describe other features in the `glmnet` package that might be of interest to users.
@@ -727,6 +858,8 @@ Our package supports sparse input matrices, which allow the efficient storage an
 We load a set of sample data created beforehand. It loads `x`, a 100*20 sparse input matrix and `y`, the response vector.
 ```{r}
 data(SparseExample)
+x <- SparseExample$x
+y <- SparseExample$y
 class(x)
 ```
 Users can create a sparse matrix with the function `sparseMatrix` by
@@ -763,6 +896,8 @@ predict(cvfit, newx = nx, s = "lambda.min")
 The `glmnet` package includes a function `bigGlm` for fitting a single _unpenalized_ generalized linear model (GLM), but allowing all the options of `glmnet`. In other words, the user can set coefficient upper and/or lower bounds, and can provide the `x` matrix in sparse matrix format. This is not too much more than fitting a model with a single value of `lambda = 0` (with some protection from edge cases). `predict` and `print` methods can be called on the output.
 ```{r}
 data(BinomialExample)
+x <- BinomialExample$x
+y <- BinomialExample$y
 fit <- bigGlm(x, y, family = "binomial", lower.limits = -1)
 print(fit)
 ```
@@ -914,6 +1049,8 @@ There are several parameters that users can change:
 We illustrate how to change these control parameters through an example. Note that any changes made hold for the duration of the R session, or unless they are changed by the user with a subsequent call to `glmnet.control`.
 ```{r}
 data(QuickStartExample)
+x <- QuickStartExample$x
+y <- QuickStartExample$y
 fit <- glmnet(x, y)
 length(fit$lambda)  # number of lambda values fit
 ```
@@ -950,6 +1087,8 @@ where, say, $\lambda_0 = 8$.
 We first solve this using `glmnet`. Notice that there is no intercept term in the objective function, and the columns of $X$ are not necessarily standardized. Corresponding parameters have to be set to make it work correctly. In addition, there is a $1/(2n)$ factor before the quadratic term by default, so we need to adjust $\lambda$ accordingly. For the purpose of comparison, we set `thresh = 1e-20`. However, this is not necessary in many practical applications.
 ```{r, echo=FALSE}
 data(QuickStartExample)
+x <- QuickStartExample$x
+y <- QuickStartExample$y
 ```
 ```{r}
 np <- dim(x); n <- np[1]; p <-np[2]

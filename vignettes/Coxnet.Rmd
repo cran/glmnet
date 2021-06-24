@@ -70,6 +70,8 @@ We use a pre-generated set of sample data and response. `x` must be an $n\times 
 library(glmnet)
 library(survival)
 data(CoxExample)
+x <- CoxExample$x
+y <- CoxExample$y
 y[1:5, ]
 ```
 

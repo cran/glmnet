@@ -20,6 +20,8 @@ knitr::knit_hooks$set(output = function(x, options) {
 ## ----out.lines = 15-----------------------------------------------------------
 library(glmnet)
 data(QuickStartExample)
+x <- QuickStartExample$x
+y <- QuickStartExample$y
 fit <- glmnet(x, y, relax = TRUE)
 print(fit)
 

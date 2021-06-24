@@ -18,6 +18,7 @@ features of glmnet.
 \examples{
 
 data(QuickStartExample)
+x <- QuickStartExample$x; y <- QuickStartExample$y
 glmnet(x, y)
 
 }

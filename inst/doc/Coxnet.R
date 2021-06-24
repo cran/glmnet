@@ -21,6 +21,8 @@ knitr::knit_hooks$set(output = function(x, options) {
 library(glmnet)
 library(survival)
 data(CoxExample)
+x <- CoxExample$x
+y <- CoxExample$y
 y[1:5, ]
 
 ## -----------------------------------------------------------------------------

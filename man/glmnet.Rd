@@ -115,7 +115,13 @@ very large \code{nvars}, if a partial path is desired.}
 \item{pmax}{Limit the maximum number of variables ever to be nonzero}
 
 \item{exclude}{Indices of variables to be excluded from the model. Default
-is none. Equivalent to an infinite penalty factor (next item).}
+is none. Equivalent to an infinite penalty factor for the variables excluded (next item).
+Users can supply instead an \code{exclude} function that generates the list of indices.
+This function is most generally defined as \code{function(x, y, weights, ...)},
+and is called inside \code{glmnet} to generate the indices for excluded variables.
+The \code{...} argument is required, the others are optional.
+This is useful for filtering wide data, and works correctly with \code{cv.glmnet}.
+See the vignette 'Introduction' for examples.}
 
 \item{penalty.factor}{Separate penalty factors can be applied to each
 coefficient. This is a number that multiplies \code{lambda} to allow

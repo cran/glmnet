@@ -64,6 +64,8 @@ We demonstrate the most basic relaxed lasso fit as a first example. We load some
 ```{r out.lines = 15}
 library(glmnet)
 data(QuickStartExample)
+x <- QuickStartExample$x
+y <- QuickStartExample$y
 fit <- glmnet(x, y, relax = TRUE)
 print(fit)
 ```

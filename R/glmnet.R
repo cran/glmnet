@@ -146,7 +146,13 @@
 #' very large \code{nvars}, if a partial path is desired.
 #' @param pmax Limit the maximum number of variables ever to be nonzero
 #' @param exclude Indices of variables to be excluded from the model. Default
-#' is none. Equivalent to an infinite penalty factor (next item).
+#' is none. Equivalent to an infinite penalty factor for the variables excluded (next item).
+#' Users can supply instead an \code{exclude} function that generates the list of indices.
+#' This function is most generally defined as \code{function(x, y, weights, ...)},
+#' and is called inside \code{glmnet} to generate the indices for excluded variables.
+#' The \code{...} argument is required, the others are optional.
+#' This is useful for filtering wide data, and works correctly with \code{cv.glmnet}.
+#' See the vignette 'Introduction' for examples.
 #' @param penalty.factor Separate penalty factors can be applied to each
 #' coefficient. This is a number that multiplies \code{lambda} to allow
 #' differential shrinkage. Can be 0 for some variables, which implies no
@@ -346,6 +352,11 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
     if(is.null(np)|(np[2]<=1))stop("x should be a matrix with 2 or more columns")
     nobs=as.integer(np[1])
     nvars=as.integer(np[2])
+    if(is.null(weights))weights=rep(1,nobs)
+    else if(length(weights)!=nobs)stop(paste("number of elements in weights (",length(weights),") not equal to the number of rows of x (",nobs,")",sep=""))
+    if(is.function(exclude))exclude <- check.exclude(exclude(x=x,y=y,weights=weights),nvars)
+    if (length(penalty.factor) != nvars)
+        stop("the length of penalty.factor does not match the number of variables")
 
 ### See whether its a call to glmnet or to glmnet.path, based on family arg
     if(!is.character(family)){
@@ -378,8 +389,6 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
       alpha=as.double(alpha)
       nlam=as.integer(nlambda)
       y=drop(y) # we dont like matrix responses unless we need them
-      if(is.null(weights))weights=rep(1,nobs)
-      else if(length(weights)!=nobs)stop(paste("number of elements in weights (",length(weights),") not equal to the number of rows of x (",nobs,")",sep=""))
       dimy=dim(y)
       nrowy=ifelse(is.null(dimy),length(y),dimy[1])
       if(nrowy!=nobs)stop(paste("number of observations in y (",nrowy,") not equal to the number of rows of x (",nobs,")",sep=""))

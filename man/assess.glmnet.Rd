@@ -28,7 +28,7 @@ roc.glmnet(object, newx = NULL, newy, ...)
 }
 \arguments{
 \item{object}{Fitted \code{"glmnet"} or \code{"cv.glmnet"}, \code{"relaxed"}
-or \code{"cv.relaxed"} object, or a matrix of predictions (for
+or \code{"cv.relaxed"} object, OR a matrix of predictions (for
 \code{roc.glmnet} or \code{assess.glmnet}). For \code{roc.glmnet} the model
 must be a 'binomial', and for \code{confusion.glmnet} must be either
 'binomial' or 'multinomial'}
@@ -74,6 +74,7 @@ table or a list, with a print method.
 \examples{
 
 data(QuickStartExample)
+x <- QuickStartExample$x; y <- QuickStartExample$y
 set.seed(11)
 train = sample(seq(length(y)),70,replace=FALSE)
 fit1 = glmnet(x[train,], y[train])
@@ -85,6 +86,7 @@ fit1a = assess.glmnet(fit1c$fit.preval, newy=y,family="gaussian")
 plot(fit1c$lambda, log="x",fit1a$mae,xlab="Log Lambda",ylab="Mean Absolute Error")
 abline(v=fit1c$lambda.min, lty=2, col="red")
 data(BinomialExample)
+x <- BinomialExample$x; y <- BinomialExample$y
 fit2 = glmnet(x[train,], y[train], family = "binomial")
 assess.glmnet(fit2,newx = x[-train,], newy=y[-train], s=0.1)
 plot(roc.glmnet(fit2, newx = x[-train,], newy=y[-train])[[10]])
@@ -92,6 +94,7 @@ fit2c = cv.glmnet(x, y, family = "binomial", keep=TRUE)
 idmin = match(fit2c$lambda.min, fit2c$lambda)
 plot(roc.glmnet(fit2c$fit.preval, newy = y)[[idmin]])
 data(MultinomialExample)
+x <- MultinomialExample$x; y <- MultinomialExample$y
 set.seed(103)
 train = sample(seq(length(y)),100,replace=FALSE)
 fit3 = glmnet(x[train,], y[train], family = "multinomial")

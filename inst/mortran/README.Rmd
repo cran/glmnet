@@ -67,13 +67,22 @@ follow this procedure.
 library(SUtools)
 GLMNET_DIR  <- "~/GITHUB/glmnet"
 mortran <- readLines(file.path(GLMNET_DIR, "inst", "mortran", "glmnet5dpclean.m"))
-fortran  <- generate_fortran(mortran)
-fixed_fortran  <- fix_unused_labels(fortran)
+result  <- process_mortran(input_mortran_file = "glmnet5dpclean.m",
+                           pkg_name = "glmnet",
+                           control = sutools_control(fix_allocate = FALSE))
 ```
 
-The fixed fortran file can now be written out to a file. For example,
-you may choose to overwrite the old fortran with the new fortran.
+The fortran file can now be written out to a file. For example, you
+may choose to overwrite the old fortran with the new fortran.
 
 ```{r, eval = FALSE}
 writeLines(fixed_fortran, file.path(GLMNET_DIR, "src", "glmnet5dpclean.f"))
 ```
+
+## Maxit bug fixed
+
+Mortran would branch to :again: when convergence was not reached, and
+not check if maxit had been reached. On the new mac M1 this could get
+into a state with a degenerate example where it never
+terminated. Added a maxit check immediately after again throughout.
+

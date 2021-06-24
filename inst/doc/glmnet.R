@@ -26,6 +26,8 @@ library(glmnet)
 
 ## -----------------------------------------------------------------------------
 data(QuickStartExample)
+x <- QuickStartExample$x
+y <- QuickStartExample$y
 
 ## -----------------------------------------------------------------------------
 fit <- glmnet(x, y)
@@ -141,6 +143,8 @@ plot(pfit, label = TRUE)
 
 ## -----------------------------------------------------------------------------
 data(MultiGaussianExample)
+x <- MultiGaussianExample$x
+y <- MultiGaussianExample$y
 mfit <- glmnet(x, y, family = "mgaussian")
 
 ## -----------------------------------------------------------------------------
@@ -151,6 +155,8 @@ predict(mfit, newx = x[1:5,], s = c(0.1, 0.01))
 
 ## -----------------------------------------------------------------------------
 data(BinomialExample)
+x <- BinomialExample$x
+y <- BinomialExample$y
 
 ## -----------------------------------------------------------------------------
 fit <- glmnet(x, y, family = "binomial")
@@ -168,6 +174,8 @@ cvfit$lambda.1se
 
 ## -----------------------------------------------------------------------------
 data(MultinomialExample)
+x <- MultinomialExample$x
+y <- MultinomialExample$y
 
 ## -----------------------------------------------------------------------------
 fit <- glmnet(x, y, family = "multinomial", type.multinomial = "grouped")
@@ -182,6 +190,8 @@ predict(cvfit, newx = x[1:10,], s = "lambda.min", type = "class")
 
 ## -----------------------------------------------------------------------------
 data(PoissonExample)
+x <- PoissonExample$x
+y <- PoissonExample$y
 
 ## -----------------------------------------------------------------------------
 fit <- glmnet(x, y, family = "poisson")
@@ -198,6 +208,8 @@ cvfit <- cv.glmnet(x, y, family = "poisson")
 
 ## -----------------------------------------------------------------------------
 data(BinomialExample)
+x <- BinomialExample$x
+y <- BinomialExample$y
 itrain <- 1:70
 fit <- glmnet(x[itrain, ], y[itrain], family = "binomial", nlambda = 5)
 assess.glmnet(fit, newx = x[-itrain, ], newy = y[-itrain])
@@ -233,6 +245,8 @@ lines(rocs[[best]], lwd = 2,col = "red")
 
 ## -----------------------------------------------------------------------------
 data(MultinomialExample)
+x <- MultinomialExample$x
+y <- MultinomialExample$y
 set.seed(101)
 itrain <- sample(1:500, 400, replace = FALSE)
 cfit <- cv.glmnet(x[itrain, ], y[itrain], family = "multinomial")
@@ -248,7 +262,85 @@ best <- cfit$index["min",]
 print(cnf[[best]])
 
 ## -----------------------------------------------------------------------------
+filter <- function(x, ...) which(colMeans(x == 0) > 0.8)
+
+## -----------------------------------------------------------------------------
+set.seed(101)
+n <-500; p <- 50
+x <- matrix(rnorm(n * p), n, p)
+x[sample(seq(length(x)), 4 * n * p / 5)] <- 0
+y <- rnorm(n) + x %*% (rnorm(p) / 5) > 0
+excl <- filter(x)
+print(excl)
+fit.orig <- glmnet(x, y, family = "binomial", exclude = excl)
+fit.new  <- glmnet(x, y, family = "binomial", exclude = filter)
+all.equal(fit.orig, fit.new)
+
+## -----------------------------------------------------------------------------
+cvfit.filt <- cv.glmnet(x, y, family = "binomial", exclude = filter)
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  filter <- function(x, y, weights, ...) {}
+
+## -----------------------------------------------------------------------------
+sparsity <- function(fraction = 0.7) {
+  function(x, ...) which(colMeans(x == 0) > fraction)
+}
+sparsity(0.5)
+
+## -----------------------------------------------------------------------------
+foldid <- sample(rep(1:10,length.out = length(y)))
+cvfit.filt1 <- cv.glmnet(x, y, family = "binomial", foldid = foldid, 
+                         exclude = filter)
+cvfit.filt2 <- cv.glmnet(x, y, family = "binomial", foldid = foldid, 
+                         exclude = sparsity(0.8))
+all.equal(cvfit.filt1, cvfit.filt2)
+
+## -----------------------------------------------------------------------------
+uvar <- function(x, means = FALSE) {
+  # if means = TRUE, the means and variances are returned, 
+  # otherwise just the variances
+  m <- colMeans(x)
+  n <- nrow(x)
+  x <- x - outer(rep(1,n),m)
+  v <- colSums(x^2) / (n - 1)
+  if (means) list(mean = m, var = v) else v
+}
+
+vfilter <- function(q = 0.3) {
+  function(x,...) {
+    v <- uvar(x)
+    which(v < quantile(v, q))
+  }
+}
+
+## -----------------------------------------------------------------------------
+ut.test <- function(x, y, s0 = 0) {
+  ni <- table(y); n <- sum(ni)
+  if(length(ni) != 2) stop("Only two-sample t-test here")
+  index <- seq(n)
+  mv <- tapply(index, y, function(i, x) uvar(x[i, ], means = TRUE), x = x)
+  ss <- ((ni[1] - 1) * mv[[1]]$var  + (ni[2] - 1) * mv[[2]]$var)
+  sd <- sqrt(ss * (1 / ni[[1]] + 1 / ni[[2]]) / (n - 2))
+  numer <- mv[[1]]$mean - mv[[2]]$mean
+  numer / (sd + s0)
+}
+
+tfilter <- function(q = 0.3, s0 = 0) {
+  function(x, y, ...) {
+    tstats <- ut.test(x, y, s0 = s0)
+    which(tstats < quantile(tstats, q))
+  }
+}
+
+## -----------------------------------------------------------------------------
+cvfit.filt3 <- cv.glmnet(x, y, family = "binomial", foldid = foldid, 
+                         exclude = tfilter(0.4))
+
+## -----------------------------------------------------------------------------
 data(SparseExample)
+x <- SparseExample$x
+y <- SparseExample$y
 class(x)
 
 ## -----------------------------------------------------------------------------
@@ -267,6 +359,8 @@ predict(cvfit, newx = nx, s = "lambda.min")
 
 ## -----------------------------------------------------------------------------
 data(BinomialExample)
+x <- BinomialExample$x
+y <- BinomialExample$y
 fit <- bigGlm(x, y, family = "binomial", lower.limits = -1)
 print(fit)
 
@@ -315,6 +409,8 @@ makeX(dfn, dftn, sparse = TRUE)
 
 ## -----------------------------------------------------------------------------
 data(QuickStartExample)
+x <- QuickStartExample$x
+y <- QuickStartExample$y
 fit <- glmnet(x, y)
 length(fit$lambda)  # number of lambda values fit
 
@@ -331,6 +427,8 @@ glmnet.control()
 
 ## ---- echo=FALSE--------------------------------------------------------------
 data(QuickStartExample)
+x <- QuickStartExample$x
+y <- QuickStartExample$y
 
 ## -----------------------------------------------------------------------------
 np <- dim(x); n <- np[1]; p <-np[2]

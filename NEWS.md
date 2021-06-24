@@ -1,3 +1,14 @@
+# glmnet 4.1-2
+
+A new feature added, as well as some minor fixes to documentation.
+* The exclude argument has come to life. Users can now pass a function
+  that can take arguments x, y and weights, or a subset of these, for
+  filtering variables. Details in documentation and vignette.
+* Prediction with single `newx` observation failed before. This is
+  fixed.
+* Labeling of predictions from `cv.glmnet` improved.
+* Fixed a bug in mortran/fortran that caused program to loop ad infinitum
+
 # glmnet 4.1-1
 
 Fixed some bugs in the coxpath function to do with sparse X.

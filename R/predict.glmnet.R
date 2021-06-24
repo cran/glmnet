@@ -110,12 +110,17 @@ predict.glmnet=function(object,newx,s=NULL,type=c("link","response","coefficient
     lamlist=lambda.interp(lambda,s)
 
     nbeta=nbeta[,lamlist$left,drop=FALSE]%*%Diagonal(x=lamlist$frac) +nbeta[,lamlist$right,drop=FALSE]%*%Diagonal(x=1-lamlist$frac)
-    dimnames(nbeta)=list(vnames,paste(seq(along=s)))
+    namess=names(s)
+    if(is.null(namess))namess=paste0("s",seq(along=s))
+    dimnames(nbeta)=list(vnames,namess)
   }
   if(type=="coefficients")return(nbeta)
   if(type=="nonzero")return(nonzeroCoef(nbeta[-1,,drop=FALSE],bystep=TRUE))
   ###Check on newx
  if(inherits(newx, "sparseMatrix"))newx=as(newx,"dgCMatrix")
+ dx=dim(newx); p = object$dim[1]
+ if(is.null(dx))newx=matrix(newx,1,byrow=TRUE)
+ if(ncol(newx) != p)stop(paste0("The number of variables in newx must be ",p))
   nfit=as.matrix(cbind2(1,newx)%*%nbeta)
    if(object$offset){
     if(missing(newoffset))stop("No newoffset provided for prediction, yet offset used in fit of glmnet",call.=FALSE)
