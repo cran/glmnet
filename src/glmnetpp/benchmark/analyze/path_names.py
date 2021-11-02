@@ -1,0 +1,5 @@
+fig_dir = '../../docs/figs'
+bench_dir = '../../build/release/benchmark'
+data_dir = '../../docs/data'
+ref_dir = '../reference'
+data_scr_dir = '../data/script'

@@ -1,4 +1,4 @@
-elnet=function(x,is.sparse,ix,jx,y,weights,offset,type.gaussian=c("covariance","naive"),alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit){
+elnet=function(x,is.sparse,y,weights,offset,type.gaussian=c("covariance","naive"),alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,pb){
   maxit=as.integer(maxit)
   weights=as.double(weights)
   type.gaussian=match.arg(type.gaussian)
@@ -22,30 +22,29 @@ elnet=function(x,is.sparse,ix,jx,y,weights,offset,type.gaussian=c("covariance","
   nulldev=sum(weights* (y-ybar)^2)
 if(nulldev==0)stop("y is constant; gaussian glmnet fails at standardization step")
 
-
-fit=if(is.sparse).Fortran("spelnet",
-        ka,parm=alpha,nobs,nvars,x,ix,jx,y,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,
+fit=if(is.sparse) spelnet_exp(
+        ka,parm=alpha,x,y,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,pb,
         lmu=integer(1),
         a0=double(nlam),
-        ca=double(nx*nlam),
+        ca=matrix(0.0, nrow=nx, ncol=nlam),
         ia=integer(nx),
         nin=integer(nlam),
         rsq=double(nlam),
         alm=double(nlam),
         nlp=integer(1),
-        jerr=integer(1),PACKAGE="glmnet"
+        jerr=integer(1)
         )
-else .Fortran("elnet",
-          ka,parm=alpha,nobs,nvars,as.double(x),y,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,
-          lmu=integer(1),
-          a0=double(nlam),
-          ca=double(nx*nlam),
-          ia=integer(nx),
-          nin=integer(nlam),
-          rsq=double(nlam),
-          alm=double(nlam),
-          nlp=integer(1),
-          jerr=integer(1),PACKAGE="glmnet"
+else elnet_exp(
+        ka,parm=alpha,x,y,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,pb,
+        lmu=integer(1),
+        a0=double(nlam),
+        ca=matrix(0.0, nrow=nx, ncol=nlam),
+        ia=integer(nx),
+        nin=integer(nlam),
+        rsq=double(nlam),
+        alm=double(nlam),
+        nlp=integer(1),
+        jerr=integer(1)
           )
 if(fit$jerr!=0){
   errmsg=jerr(fit$jerr,maxit,pmax=nx,family="gaussian")

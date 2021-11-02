@@ -466,16 +466,30 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
         x=as(x,"dgCMatrix")
         ix=as.integer(x@p+1)
         jx=as.integer(x@i+1)
-        xd=x@x
+
+        # TODO: currently only changed gaussian family to C++ implementation.
+        # We need gaussian to take xd as the dgCMatrix itself.
+        # Other methods still require xd to be the compressed data vector.
+        if (family == "gaussian") {
+            xd <- x
+        } else {
+            xd <- x@x
+        }
+
       } else if (!inherits(x, "matrix")) {
         xd <- data.matrix(x)
       } else {
         xd <- x
       }
-      storage.mode(xd) <- "double"
+      # TODO: only coerce to vector of double if family is not supported by C++.
+      if (family != "gaussian") {
+          storage.mode(xd) <- "double"
+      }
       if (trace.it) {
         if (relax) cat("Training Fit\n")
         pb  <- createPB(min = 0, max = nlam, initial = 0, style = 3)
+      } else {
+        pb <- NULL # dummy initialize (won't be used, but still need to pass)
       }
       kopt=switch(match.arg(type.logistic),
                   "Newton"=0,#This means to use the exact Hessian
@@ -488,7 +502,7 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
       kopt=as.integer(kopt)
 
       fit=switch(family,
-                 "gaussian"=elnet(xd,is.sparse,ix,jx,y,weights,offset,type.gaussian,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit),
+                 "gaussian"=elnet(xd,is.sparse,y,weights,offset,type.gaussian,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,pb),
                  "poisson"=fishnet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit),
                  "binomial"=lognet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family),
                  "multinomial"=lognet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family),

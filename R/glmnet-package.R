@@ -19,6 +19,7 @@
 #' @importFrom stats  approx  coef  median  predict  rmultinom  runif  weighted.mean family rnorm gaussian binomial glm glm.fit
 #' @importFrom survival concordance Surv is.Surv
 #' @importFrom grDevices rainbow
+#' @importFrom Rcpp sourceCpp
 #'
 #' @examples
 #'

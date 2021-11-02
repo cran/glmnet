@@ -1,3 +1,14 @@
+# glmnet 4.1-3
+
+Some of the Fortran in glmnet has been replaced by C++, written by the
+newest member of our team, James Yang.
+* the `wls` routines (dense and sparse), that are the engines under the `glmnet.path`
+  function when we use programmable families, are now written in C++, and lead
+  to speedups of around 8x.
+* the family of elnet routines (sparse/dense, covariance/naive) for
+  `glmnet(...,family="gaussian")` are all in C++, and lead to speedups
+  around 4x.
+  
 # glmnet 4.1-2
 
 A new feature added, as well as some minor fixes to documentation.

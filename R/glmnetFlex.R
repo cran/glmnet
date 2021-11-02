@@ -862,6 +862,7 @@ elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
         nx <- warm$nx
         r <- warm$r
         rsqc <- warm$rsqc
+        xv <- warm$xv
         vp <- warm$vp
     } else {
         nobs <- as.integer(nrow(x))
@@ -919,6 +920,7 @@ elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
         nlp <- integer(1)
         r <- weights * y
         rsqc <- double(1)
+        xv <- double(nvars)
 
         # check if coefs were provided as warmstart: if so, use them
         if (!is.null(warm)) {
@@ -945,25 +947,22 @@ elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
     thr <- as.double(thresh)
     v <- as.double(weights)
 
+    a.new <- a
+    a.new[0] <- a.new[0] # induce a copy
+    
     # take out components of x and run FORTRAN subroutine
     if (inherits(x, "sparseMatrix")) {
         xm <- as.double(attr(x, "xm"))
         xs <- as.double(attr(x, "xs"))
-        ix <- as.integer(x@p + 1)
-        jx <- as.integer(x@i + 1)
-        x <- as.double(x@x)
-        wls_fit <- .Fortran("spwls",
-                            alm0=alm0,almc=almc,alpha=alpha,m=m,no=nobs,ni=nvars,
-                            x=x,ix=ix,jx=jx,xm=xm,xs=xs,r=r,v=v,intr=intr,ju=ju,vp=vp,cl=cl,nx=nx,thr=thr,
-                            maxit=maxit,a=a,aint=aint,g=g,ia=ia,iy=iy,iz=iz,mm=mm,
-                            nino=nino,rsqc=rsqc,nlp=nlp,jerr=jerr)
+        wls_fit <- spwls_exp(alm0=alm0,almc=almc,alpha=alpha,m=m,no=nobs,ni=nvars,
+                             x=x,xm=xm,xs=xs,r=r,xv=xv,v=v,intr=intr,ju=ju,vp=vp,cl=cl,nx=nx,thr=thr,
+                             maxit=maxit,a=a.new,aint=aint,g=g,ia=ia,iy=iy,iz=iz,mm=mm,
+                             nino=nino,rsqc=rsqc,nlp=nlp,jerr=jerr)
     } else {
-        x <- as.double(x)
-        wls_fit <- .Fortran("wls",
-                            alm0=alm0,almc=almc,alpha=alpha,m=m,no=nobs,ni=nvars,
-                            x=x,r=r,v=v,intr=intr,ju=ju,vp=vp,cl=cl,nx=nx,thr=thr,
-                            maxit=maxit,a=a,aint=aint,g=g,ia=ia,iy=iy,iz=iz,mm=mm,
-                            nino=nino,rsqc=rsqc,nlp=nlp,jerr=jerr)
+        wls_fit <- wls_exp(alm0=alm0,almc=almc,alpha=alpha,m=m,no=nobs,ni=nvars,
+                           x=x,r=r,xv=xv,v=v,intr=intr,ju=ju,vp=vp,cl=cl,nx=nx,thr=thr,
+                           maxit=maxit,a=a.new,aint=aint,g=g,ia=ia,iy=iy,iz=iz,mm=mm,
+                           nino=nino,rsqc=rsqc,nlp=nlp,jerr=jerr)
     }
 
     # if error code > 0, fatal error occurred: stop immediately
@@ -973,9 +972,12 @@ elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
         stop(errmsg$msg, call. = FALSE)
     } else if (wls_fit$jerr < 0)
         return(list(jerr = wls_fit$jerr))
-    warm_fit <- wls_fit[c("almc", "m", "no", "ni", "r", "ju", "vp", "cl", "nx",
+    warm_fit <- wls_fit[c("almc", "r", "xv", "ju", "vp", "cl", "nx",
                           "a", "aint", "g", "ia", "iy", "iz", "mm", "nino",
                           "rsqc", "nlp")]
+    warm_fit[['m']] <- m
+    warm_fit[['no']] <- nobs
+    warm_fit[['ni']] <- nvars
     class(warm_fit) <- "warmfit"
 
     beta <- Matrix::Matrix(wls_fit$a, sparse = TRUE)
