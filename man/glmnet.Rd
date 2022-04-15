@@ -411,20 +411,21 @@ system.time(fit2n <- glmnet(x, y))
 Friedman, J., Hastie, T. and Tibshirani, R. (2008)
 \emph{Regularization Paths for Generalized Linear Models via Coordinate
 Descent (2010), Journal of Statistical Software, Vol. 33(1), 1-22},
-\url{https://web.stanford.edu/~hastie/Papers/glmnet.pdf}.\cr
+\doi{10.18637/jss.v033.i01}.\cr
 Simon, N., Friedman, J., Hastie, T. and Tibshirani, R. (2011)
 \emph{Regularization Paths for Cox's Proportional
 Hazards Model via Coordinate Descent, Journal of Statistical Software, Vol.
-39(5), 1-13}, \url{https://www.jstatsoft.org/v39/i05/}.\cr Tibshirani,
-Robert, Bien, J., Friedman, J., Hastie, T.,Simon, N.,Taylor, J. and
+39(5), 1-13},
+\doi{10.18637/jss.v039.i05}.\cr
+Tibshirani,Robert, Bien, J., Friedman, J., Hastie, T.,Simon, N.,Taylor, J. and
 Tibshirani, Ryan. (2012) \emph{Strong Rules for Discarding Predictors in
 Lasso-type Problems, JRSSB, Vol. 74(2), 245-266},
-\url{https://statweb.stanford.edu/~tibs/ftp/strong.pdf}.\cr
-Hastie, T., Tibshirani, Robert and Tibshirani, Ryan. \emph{Extended
-Comparisons of Best Subset Selection, Forward Stepwise Selection, and the
-Lasso (2017), Stanford Statistics Technical Report},
+\url{https://arxiv.org/abs/1011.2234}.\cr
+Hastie, T., Tibshirani, Robert and Tibshirani, Ryan (2020) \emph{Best Subset,
+Forward Stepwise or Lasso? Analysis and Recommendations Based on Extensive Comparisons,
+Statist. Sc. Vol. 35(4), 579-592},
 \url{https://arxiv.org/abs/1707.08692}.\cr
-Glmnet webpage with four vignettes, \url{https://glmnet.stanford.edu}.
+Glmnet webpage with four vignettes: \url{https://glmnet.stanford.edu}.
 }
 \seealso{
 \code{print}, \code{predict}, \code{coef} and \code{plot} methods,

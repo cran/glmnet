@@ -1,5 +1,6 @@
 #pragma once
 #include "gtest/gtest.h"
+#include <testutil/thread.hpp>
 #include <Eigen/Core>
 
 namespace glmnetpp {
@@ -79,6 +80,21 @@ protected:
                 EXPECT_NEAR(m1(i,j), m2(i,j), tol); \
             } \
         } \
+    }
+
+    template <class PackType>
+    void run(PackType& actual,
+             PackType& expected,
+             int core1, int core2) const 
+    {
+        std::thread actual_thr([&]() { actual.fit(); });
+        std::thread expected_thr([&]() { expected.fit_old(); });
+
+        set_affinity(core1, actual_thr.native_handle());
+        set_affinity(core2, expected_thr.native_handle());
+
+        actual_thr.join();
+        expected_thr.join();
     }
 };
 

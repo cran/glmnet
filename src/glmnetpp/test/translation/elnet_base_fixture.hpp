@@ -1,8 +1,7 @@
 #pragma once
 #include <testutil/base_fixture.hpp>
 #include <testutil/data_util.hpp>
-#include <testutil/thread.hpp>
-#include <glmnetpp_bits/standardize.hpp>    // separately unit-tested
+#include <glmnetpp_bits/elnet_driver/standardize.hpp>    // separately unit-tested
 
 namespace glmnetpp {
 
@@ -51,7 +50,7 @@ struct ElnetBasePack
     }
 
     virtual void fit() =0;
-    virtual void fit_legacy() =0;
+    virtual void fit_old() =0;
 };
 
 struct elnet_base_fixture: 
@@ -88,20 +87,6 @@ protected:
     Eigen::VectorXi ju, ia;
     int nx, ne, maxit, nlam;
     double alpha, flmin;
-
-    void run(ElnetBasePack& actual,
-             ElnetBasePack& expected,
-             int core1, int core2) const 
-    {
-        std::thread actual_thr([&]() { actual.fit(); });
-        std::thread expected_thr([&]() { expected.fit_legacy(); });
-
-        set_affinity(core1, actual_thr.native_handle());
-        set_affinity(core2, expected_thr.native_handle());
-
-        actual_thr.join();
-        expected_thr.join();
-    }
 
     void check_pack(const ElnetBasePack& actual,
                     const ElnetBasePack& expected) const

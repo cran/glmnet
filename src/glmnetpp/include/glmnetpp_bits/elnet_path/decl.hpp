@@ -4,6 +4,13 @@
 
 namespace glmnetpp {
 
+template <class ElnetPathDerived>
+struct ElnetPathCRTPBase;
+
+struct ElnetPathBase;
+struct ElnetPathGaussianBase;
+struct ElnetPathBinomialBase;
+
 template <util::glm_type glm
         , util::mode_type<glm> mode
         , class ElnetPointPolicy=ElnetPoint<glm, mode> >
@@ -13,10 +20,5 @@ template <util::glm_type glm
         , util::mode_type<glm> mode
         , class SpElnetPointPolicy=SpElnetPoint<glm, mode> >
 struct SpElnetPath;
-
-template <class ElnetPathDerived>
-struct ElnetPathBase;
-
-struct ElnetPathGaussianBase;
 
 } // namespace glmnetpp

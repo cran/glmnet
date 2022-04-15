@@ -1,3 +1,4 @@
+#pragma once
 #include <thread>
 #ifdef GLMNETPP_HAS_PTHREAD
 #include <pthread.h>

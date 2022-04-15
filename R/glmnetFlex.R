@@ -446,7 +446,7 @@ glmnet.path <- function(x, y, weights=NULL, lambda = NULL, nlambda = 100,
 #' in the model.}
 #' \item{call}{The call that produced this object.}
 #' \item{nobs}{Number of observations.}
-#' \item{warm_fit}{If \code{save.fit=TRUE}, output of FORTRAN routine, used for
+#' \item{warm_fit}{If \code{save.fit=TRUE}, output of C++ routine, used for
 #' warm starts. For internal use only.}
 #' \item{family}{Family used for the model.}
 #' \item{converged}{A logical variable: was the algorithm judged to have
@@ -669,7 +669,7 @@ glmnet.fit <- function(x, y, weights, lambda, alpha = 1.0,
                 eta <- get_eta(x, start, start_int)
                 mu <- linkinv(eta <- eta + offset)
                 obj_val <- obj_function(y, mu, weights, family, lambda, alpha, start, vp)
-                if (trace.it == 2) cat("Iteration", iter, " Halved step 3, Objective:", 
+                if (trace.it == 2) cat("Iteration", iter, " Halved step 3, Objective:",
                                        obj_val, fill = TRUE)
             }
             halved <- TRUE
@@ -742,7 +742,7 @@ glmnet.fit <- function(x, y, weights, lambda, alpha = 1.0,
 #' in this package call \code{elnet.fit} as a subroutine. If a warm start object
 #' is provided, some of the other arguments in the function may be overriden.
 #'
-#' \code{elnet.fit} is essentially a wrapper around a FORTRAN subroutine which
+#' \code{elnet.fit} is essentially a wrapper around a C++ subroutine which
 #' minimizes
 #'
 #' \deqn{1/2 \sum w_i (y_i - X_i^T \beta)^2 + \sum \lambda \gamma_j
@@ -821,7 +821,7 @@ glmnet.fit <- function(x, y, weights, lambda, alpha = 1.0,
 #' Included for compability with glmnet output.}
 #' \item{call}{The call that produced this object.}
 #' \item{nobs}{Number of observations.}
-#' \item{warm_fit}{If \code{save.fit=TRUE}, output of FORTRAN routine, used for
+#' \item{warm_fit}{If \code{save.fit=TRUE}, output of C++ routine, used for
 #' warm starts. For internal use only.}
 #'
 elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
@@ -949,8 +949,8 @@ elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
 
     a.new <- a
     a.new[0] <- a.new[0] # induce a copy
-    
-    # take out components of x and run FORTRAN subroutine
+  
+    # take out components of x and run C++ subroutine
     if (inherits(x, "sparseMatrix")) {
         xm <- as.double(attr(x, "xm"))
         xs <- as.double(attr(x, "xs"))
@@ -1223,10 +1223,10 @@ get_eta <- function(x, beta, a0) {
 }
 
 #' Helper function to compute weighted mean and standard deviation
-#' 
-#' Helper function to compute weighted mean and standard deviation. 
+#'
+#' Helper function to compute weighted mean and standard deviation.
 #' Deals gracefully whether x is sparse matrix or not.
-#' 
+#'
 #' @param x Observation matrix.
 #' @param weights Optional weight vector.
 #'
@@ -1236,7 +1236,7 @@ get_eta <- function(x, beta, a0) {
 weighted_mean_sd <- function(x, weights=rep(1,nrow(x))){
     weights <- weights/sum(weights)
     xm <- drop(t(weights)%*%x)
-    xv <- drop(t(weights)%*%x^2)-xm^2
-    xv[abs(xv) < 10*.Machine$double.eps] <- 0
+    xv <- drop(t(weights)%*%scale(x,xm,FALSE)^2)
+    xv[xv < 10*.Machine$double.eps] <- 0
     list(mean = xm, sd = sqrt(xv))
 }

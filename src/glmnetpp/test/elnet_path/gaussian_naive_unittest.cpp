@@ -1,7 +1,7 @@
 #include <elnet_path/gaussian_base.hpp>
 #include <testutil/mock_pb.hpp>
 #include <testutil/translation/elnet2.hpp>
-#include <glmnetpp_bits/internal.hpp>
+#include <testutil/internal.hpp>
 #include <glmnetpp_bits/elnet_point/internal/gaussian_naive.hpp>
 #include <glmnetpp_bits/elnet_point/gaussian_naive.hpp>
 #include <glmnetpp_bits/elnet_path/base.hpp>
@@ -58,7 +58,7 @@ struct GaussianNaivePack
                 ao, ia, kin, rsqo, almo, nlp, jerr, mock_setpb, InternalParams());
     }
 
-    void fit_transl() override
+    void fit_old() override
     {
         transl::elnet2<double>(
                 alpha, ju, vp, cl, y, ne, nx, X, nlam,

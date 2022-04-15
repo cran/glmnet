@@ -9,6 +9,86 @@ spelnet_exp <- function(ka, parm, x, y, w, jd, vp, cl, ne, nx, nlam, flmin, ulam
     .Call('_glmnet_spelnet_exp', PACKAGE = 'glmnet', ka, parm, x, y, w, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, intr, maxit, pb, lmu, a0, ca, ia, nin, rsq, alm, nlp, jerr)
 }
 
+lognet_exp <- function(parm, x, y, g, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, intr, maxit, kopt, pb, lmu, a0, ca, ia, nin, nulldev, dev, alm, nlp, jerr) {
+    .Call('_glmnet_lognet_exp', PACKAGE = 'glmnet', parm, x, y, g, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, intr, maxit, kopt, pb, lmu, a0, ca, ia, nin, nulldev, dev, alm, nlp, jerr)
+}
+
+splognet_exp <- function(parm, x, y, g, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, intr, maxit, kopt, pb, lmu, a0, ca, ia, nin, nulldev, dev, alm, nlp, jerr) {
+    .Call('_glmnet_splognet_exp', PACKAGE = 'glmnet', parm, x, y, g, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, intr, maxit, kopt, pb, lmu, a0, ca, ia, nin, nulldev, dev, alm, nlp, jerr)
+}
+
+fishnet_exp <- function(parm, x, y, g, w, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, intr, maxit, pb, lmu, a0, ca, ia, nin, nulldev, dev, alm, nlp, jerr) {
+    .Call('_glmnet_fishnet_exp', PACKAGE = 'glmnet', parm, x, y, g, w, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, intr, maxit, pb, lmu, a0, ca, ia, nin, nulldev, dev, alm, nlp, jerr)
+}
+
+spfishnet_exp <- function(parm, x, y, g, w, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, intr, maxit, pb, lmu, a0, ca, ia, nin, nulldev, dev, alm, nlp, jerr) {
+    .Call('_glmnet_spfishnet_exp', PACKAGE = 'glmnet', parm, x, y, g, w, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, intr, maxit, pb, lmu, a0, ca, ia, nin, nulldev, dev, alm, nlp, jerr)
+}
+
+multelnet_exp <- function(parm, x, y, w, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, jsd, intr, maxit, pb, lmu, a0, ca, ia, nin, rsq, alm, nlp, jerr) {
+    .Call('_glmnet_multelnet_exp', PACKAGE = 'glmnet', parm, x, y, w, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, jsd, intr, maxit, pb, lmu, a0, ca, ia, nin, rsq, alm, nlp, jerr)
+}
+
+multspelnet_exp <- function(parm, x, y, w, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, jsd, intr, maxit, pb, lmu, a0, ca, ia, nin, rsq, alm, nlp, jerr) {
+    .Call('_glmnet_multspelnet_exp', PACKAGE = 'glmnet', parm, x, y, w, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, jsd, intr, maxit, pb, lmu, a0, ca, ia, nin, rsq, alm, nlp, jerr)
+}
+
+get_int_parms <- function(fdev, eps, big, mnlam, devmax, pmin, exmx, itrace) {
+    .Call('_glmnet_get_int_parms', PACKAGE = 'glmnet', fdev, eps, big, mnlam, devmax, pmin, exmx, itrace)
+}
+
+get_int_parms2 <- function(epsnr, mxitnr) {
+    .Call('_glmnet_get_int_parms2', PACKAGE = 'glmnet', epsnr, mxitnr)
+}
+
+chg_fract_dev <- function(arg) {
+    invisible(.Call('_glmnet_chg_fract_dev', PACKAGE = 'glmnet', arg))
+}
+
+chg_dev_max <- function(arg) {
+    invisible(.Call('_glmnet_chg_dev_max', PACKAGE = 'glmnet', arg))
+}
+
+chg_min_flmin <- function(arg) {
+    invisible(.Call('_glmnet_chg_min_flmin', PACKAGE = 'glmnet', arg))
+}
+
+chg_big <- function(arg) {
+    invisible(.Call('_glmnet_chg_big', PACKAGE = 'glmnet', arg))
+}
+
+chg_min_lambdas <- function(irg) {
+    invisible(.Call('_glmnet_chg_min_lambdas', PACKAGE = 'glmnet', irg))
+}
+
+chg_min_null_prob <- function(arg) {
+    invisible(.Call('_glmnet_chg_min_null_prob', PACKAGE = 'glmnet', arg))
+}
+
+chg_max_exp <- function(arg) {
+    invisible(.Call('_glmnet_chg_max_exp', PACKAGE = 'glmnet', arg))
+}
+
+chg_itrace <- function(irg) {
+    invisible(.Call('_glmnet_chg_itrace', PACKAGE = 'glmnet', irg))
+}
+
+chg_bnorm <- function(arg, irg) {
+    invisible(.Call('_glmnet_chg_bnorm', PACKAGE = 'glmnet', arg, irg))
+}
+
+get_bnorm <- function(prec, mxit) {
+    .Call('_glmnet_get_bnorm', PACKAGE = 'glmnet', prec, mxit)
+}
+
+chg_epsnr <- function(arg) {
+    invisible(.Call('_glmnet_chg_epsnr', PACKAGE = 'glmnet', arg))
+}
+
+chg_mxitnr <- function(irg) {
+    invisible(.Call('_glmnet_chg_mxitnr', PACKAGE = 'glmnet', irg))
+}
+
 wls_exp <- function(alm0, almc, alpha, m, no, ni, x, r, xv, v, intr, ju, vp, cl, nx, thr, maxit, a, aint, g, ia, iy, iz, mm, nino, rsqc, nlp, jerr) {
     .Call('_glmnet_wls_exp', PACKAGE = 'glmnet', alm0, almc, alpha, m, no, ni, x, r, xv, v, intr, ju, vp, cl, nx, thr, maxit, a, aint, g, ia, iy, iz, mm, nino, rsqc, nlp, jerr)
 }

@@ -57,37 +57,34 @@ glmnet.control <-
                              epsnr = 1e-06, mxitnr = 25))
   else {
     if (!missing(fdev))
-      .Fortran("chg_fract_dev", as.double(fdev), PACKAGE = "glmnet")
+      chg_fract_dev(as.double(fdev))
     if (!missing(devmax))
-      .Fortran("chg_dev_max", as.double(devmax), PACKAGE = "glmnet")
+      chg_dev_max(as.double(devmax))
     if (!missing(eps))
-      .Fortran("chg_min_flmin", as.double(eps), PACKAGE = "glmnet")
+      chg_min_flmin(as.double(eps))
     if (!missing(big))
-      .Fortran("chg_big", as.double(big), PACKAGE = "glmnet")
+      chg_big(as.double(big))
     if (!missing(mnlam))
-      .Fortran("chg_min_lambdas", as.integer(mnlam), PACKAGE = "glmnet")
+      chg_min_lambdas(as.integer(mnlam))
     if (!missing(pmin))
-      .Fortran("chg_min_null_prob", as.double(pmin), PACKAGE = "glmnet")
+      chg_min_null_prob(as.double(pmin))
     if (!missing(exmx))
-      .Fortran("chg_max_exp", as.double(exmx), PACKAGE = "glmnet")
+      chg_max_exp(as.double(exmx))
     if (!missing(prec) | !missing(mxit))
-      .Fortran("chg_bnorm", as.double(prec), as.integer(mxit),PACKAGE = "glmnet")
+      chg_bnorm(as.double(prec), as.integer(mxit))
     if (!missing(itrace))
-      .Fortran("chg_itrace", as.integer(itrace), PACKAGE = "glmnet")
+      chg_itrace(as.integer(itrace))
     if (!missing(epsnr))
-        .Fortran("chg_epsnr", as.double(epsnr), PACKAGE = "glmnet")
+        chg_epsnr(as.double(epsnr))
     if (!missing(mxitnr))
-        .Fortran("chg_mxitnr", as.integer(mxitnr), PACKAGE = "glmnet")
+        chg_mxitnr(as.integer(mxitnr))
 
-    value=c(.Fortran("get_int_parms", fdev = double(1),
+    value=c(get_int_parms(fdev = double(1),
                      eps = double(1), big = double(1), mnlam = integer(1),
                      devmax = double(1), pmin = double(1), exmx = double(1),
-                     itrace = integer(1), PACKAGE = "glmnet"),
-            .Fortran("get_bnorm", prec = double(1),
-                     mxit = integer(1), PACKAGE = "glmnet"),
-            .Fortran("get_int_parms2",
-                         epsnr = double(1), mxitnr = integer(1),
-                         PACKAGE = "glmnet"))
+                     itrace = integer(1)),
+            get_bnorm(prec = double(1), mxit = integer(1)),
+            get_int_parms2(epsnr = double(1), mxitnr = integer(1)))
     if(inquiry)value else invisible(value)
   }
 }

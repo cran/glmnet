@@ -3,8 +3,8 @@
 #include <vector>
 
 // have been separately unittested
-#include <glmnetpp_bits/chkvars.hpp>        
-#include <glmnetpp_bits/standardize.hpp> 
+#include <glmnetpp_bits/elnet_driver/chkvars.hpp>        
+#include <glmnetpp_bits/elnet_driver/standardize.hpp> 
 #include <testutil/translation/elnet1.hpp>
 #include <testutil/translation/elnet2.hpp>
 

@@ -58,39 +58,39 @@ public:
         , xs_(xs.data(), xs.size())
     {}
 
+    GLMNETPP_STRONG_INLINE
     void update_active(index_t k) {
-        base_t::update_active(k);
-
-        for (index_t j = 0; j < X_.cols(); ++j) {
-            if (this->is_excluded(j)) continue;
-
-            // Note: j == k case is after the is_active(j) check in legacy code.
-            // Since base_t::update_active adds mm_(k),
-            // it will now be considered active,
-            // so we have to first check this case.
-            if (j == k) { 
-                c_(j, nin_-1) = xv_(j); 
-                continue; 
-            }
-            if (this->is_active(j)) {
-                c_(j, nin_-1) = c_(k, mm_(j)-1); 
-                continue;
-            }
-
-            auto wx_k = X_.col(k).cwiseProduct(w_);
-            c_(j, nin_-1) = 
-                (X_.col(j).dot(wx_k) - xm_(j) * xm_(k)) 
-                / (xs_(j) * xs_(k));
-        }
+        base_t::update_active(k, 
+                [&](index_t j, index_t l) { 
+                    return compute_sp_cov(
+                            X_.col(j), X_.col(k), w_, xm_(j), xm_(k), xs_(j), xs_(k) );
+                });
     }
 
 private:
+    /*
+     * Computes weighted covariance between two features.
+     * It is assumed that both features are weighted by w
+     * and that the mean and standard deviation are weighted by w.
+     */
+    template <class X1Type, class X2Type, class WType>
+    GLMNETPP_STRONG_INLINE
+    static auto
+    compute_sp_cov(
+            const X1Type& x1,
+            const X2Type& x2,
+            const WType& w,
+            value_t xm1,
+            value_t xm2,
+            value_t xs1,
+            value_t xs2) 
+    {
+        auto wx2 = x2.cwiseProduct(w);
+        return (x1.dot(wx2) - xm1 * xm2) / (xs1 * xs2);
+    }
+
     using typename base_t::vec_t;
     using spmat_t = Eigen::SparseMatrix<value_t>; 
-    using base_t::c_;
-    using base_t::xv_;
-    using base_t::nin_;
-    using base_t::mm_;
 
     Eigen::Map<const vec_t> w_;     // weights for each column of X_
     Eigen::Map<const spmat_t> X_;   // data matrix (sparse)

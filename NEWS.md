@@ -1,3 +1,9 @@
+# glmnet 4.1-4
+
+Most of the Fortran code has been replaced by C++ by James Yang,
+leading to speedups in all cases. The exception is the Cox routine for 
+right censored data, which is still under development.
+
 # glmnet 4.1-3
 
 Some of the Fortran in glmnet has been replaced by C++, written by the

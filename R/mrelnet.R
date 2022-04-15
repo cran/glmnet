@@ -1,4 +1,4 @@
-mrelnet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,vnames,maxit){
+mrelnet=function(x,is.sparse,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,vnames,maxit,pb){
   maxit=as.integer(maxit)
   weights=as.double(weights)
 ### compute the null deviance
@@ -28,29 +28,29 @@ mrelnet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne
 
   storage.mode(nr)="integer"
 
-fit=if(is.sparse).Fortran("multspelnet",
-        parm=alpha,nobs,nvars,nr,x,ix,jx,y,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,maxit,
+fit=if(is.sparse) multspelnet_exp(
+        parm=alpha,x,y,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,maxit,pb,
         lmu=integer(1),
-        a0=double(nlam*nr),
+        a0=matrix(0.0,nr,nlam),
         ca=double(nx*nlam*nr),
         ia=integer(nx),
         nin=integer(nlam),
         rsq=double(nlam),
         alm=double(nlam),
         nlp=integer(1),
-        jerr=integer(1),PACKAGE="glmnet"
+        jerr=integer(1)
         )
-else .Fortran("multelnet",
-          parm=alpha,nobs,nvars,nr,as.double(x),y,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,maxit,
+else multelnet_exp(
+          parm=alpha,x,y,weights,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,maxit,pb,
           lmu=integer(1),
-          a0=double(nlam*nr),
+          a0=matrix(0.0,nr,nlam),
           ca=double(nx*nlam*nr),
           ia=integer(nx),
           nin=integer(nlam),
           rsq=double(nlam),
           alm=double(nlam),
           nlp=integer(1),
-          jerr=integer(1),PACKAGE="glmnet"
+          jerr=integer(1)
           )
 if(fit$jerr!=0){
   errmsg=jerr(fit$jerr,maxit,pmax=nx,family="mrelnet")

@@ -61,12 +61,14 @@
 #' \code{cv.glmnet}.
 #' @references Friedman, J., Hastie, T. and Tibshirani, R. (2008)
 #' \emph{Regularization Paths for Generalized Linear Models via Coordinate
-#' Descent}, \url{https://web.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
-#' \emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\cr
-#' \url{https://www.jstatsoft.org/v33/i01/}\cr Simon, N., Friedman, J., Hastie,
-#' T., Tibshirani, R. (2011) \emph{Regularization Paths for Cox's Proportional
+#' Descent (2010), Journal of Statistical Software, Vol. 33(1), 1-22},
+#' \doi{10.18637/jss.v033.i01}.\cr
+#' Simon, N., Friedman, J., Hastie, T. and Tibshirani, R. (2011)
+#' \emph{Regularization Paths for Cox's Proportional
 #' Hazards Model via Coordinate Descent, Journal of Statistical Software, Vol.
-#' 39(5) 1-13}\cr \url{https://www.jstatsoft.org/v39/i05/}
+#' 39(5), 1-13},
+#' \doi{10.18637/jss.v039.i05}.\cr
+#' Glmnet webpage with four vignettes, \url{https://glmnet.stanford.edu}.
 #' @keywords models regression
 #'
 #' @examples

@@ -1,7 +1,7 @@
 #include <cstddef>
 #include <RcppEigen.h>
 #include <glmnetpp>
-#include <glmnetpp_bits/util/mapped_sparse_matrix_wrapper.hpp>
+#include "driver.h"
 
 using namespace Rcpp;
 using namespace glmnetpp;
@@ -39,15 +39,22 @@ List wls_exp(
     int jerr
     )
 {
-    try {
-        wls(
-            alm0, almc, alpha, m, no, ni, x, r, xv, v, intr, ju,
-            vp, cl, nx, thr, maxit, a, aint, g, ia, iy, iz, mm, nino,
-            rsqc, nlp, jerr);
-    }
-    catch (const std::bad_alloc&) {
-        jerr = util::bad_alloc_error().err_code();
-    }
+    using internal_t = ElnetPointInternal<
+        util::glm_type::gaussian,
+        util::mode_type<util::glm_type::gaussian>::wls,
+        double, int, int>;
+    using elnet_point_t = ElnetPoint<
+        util::glm_type::gaussian,
+        util::mode_type<util::glm_type::gaussian>::wls,
+        internal_t>;
+    auto f = [&]() {
+        elnet_point_t elnet_point(
+                alm0, almc, alpha, x, r, xv, v, intr, ju, vp,
+                cl, nx, thr, maxit, a, aint, g, 
+                ia, iy, iz, mm, nino, rsqc, nlp);
+        elnet_point.fit(m, jerr);
+    };
+    run(f, jerr);
 
     return List::create(
             Named("almc")=almc,
@@ -105,18 +112,22 @@ List spwls_exp(
     int jerr
     )
 {
-    auto x_wrap = 
-        make_mapped_sparse_matrix_wrapper(x, xm, xs);
-    
-    try {
-        wls(
-            alm0, almc, alpha, m, no, ni, x_wrap, r, xv, v, intr, ju,
-            vp, cl, nx, thr, maxit, a, aint, g, ia, iy, iz, mm, nino,
-            rsqc, nlp, jerr);
-    }
-    catch (const std::bad_alloc&) {
-        jerr = util::bad_alloc_error().err_code();
-    }
+    using internal_t = SpElnetPointInternal<
+        util::glm_type::gaussian,
+        util::mode_type<util::glm_type::gaussian>::wls,
+        double, int, int>;
+    using elnet_point_t = SpElnetPoint<
+        util::glm_type::gaussian,
+        util::mode_type<util::glm_type::gaussian>::wls,
+        internal_t>;
+    auto f = [&]() {
+        elnet_point_t elnet_point(
+                alm0, almc, alpha, x, r, xm, xs, xv, v, intr, ju, vp,
+                cl, nx, thr, maxit, a, aint, g, 
+                ia, iy, iz, mm, nino, rsqc, nlp);
+        elnet_point.fit(m, jerr);
+    };
+    run(f, jerr);
 
     return List::create(
             Named("almc")=almc,

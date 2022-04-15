@@ -103,7 +103,7 @@ debugging).}
 Included for compability with glmnet output.}
 \item{call}{The call that produced this object.}
 \item{nobs}{Number of observations.}
-\item{warm_fit}{If \code{save.fit=TRUE}, output of FORTRAN routine, used for
+\item{warm_fit}{If \code{save.fit=TRUE}, output of C++ routine, used for
 warm starts. For internal use only.}
 }
 \description{
@@ -115,7 +115,7 @@ WARNING: Users should not call \code{elnet.fit} directly. Higher-level functions
 in this package call \code{elnet.fit} as a subroutine. If a warm start object
 is provided, some of the other arguments in the function may be overriden.
 
-\code{elnet.fit} is essentially a wrapper around a FORTRAN subroutine which
+\code{elnet.fit} is essentially a wrapper around a C++ subroutine which
 minimizes
 
 \deqn{1/2 \sum w_i (y_i - X_i^T \beta)^2 + \sum \lambda \gamma_j

@@ -1,4 +1,5 @@
-lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family){
+# Needs ix and jx for possible subsetting.
+lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family,pb){
   nc=dim(y)
   maxit=as.integer(maxit)
   if(is.null(nc)){
@@ -29,10 +30,7 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
   if(!all(o)){ #subset the data
     y=y[o,]
     if(is.sparse){ # we have to subset this beast with care
-      x=sparseMatrix(i=jx,p=ix-1,x=x,dims=c(nobs,nvars))[o,,drop=FALSE]
-      ix=as.integer(x@p+1)
-      jx=as.integer(x@i+1)
-      x=as.double(x@x)
+      x=sparseMatrix(i=jx,p=ix-1,x=x@x,dims=c(nobs,nvars))[o,,drop=FALSE]
     }
     else x=x[o,,drop=FALSE]
     nobs=sum(o)
@@ -42,14 +40,15 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
   if(family=="binomial"){
     if(nc>2)stop("More than two classes; use multinomial family instead in call to glmnet",call.=FALSE)
     nc=as.integer(1) # for calling lognet
-    y=y[,c(2,1)]#fortran lognet models the first column; we prefer the second (for 0/1 data)
+    y=y[,c(2,1)]#C++ lognet models the first column; we prefer the second (for 0/1 data)
   }
 
 
     storage.mode(y)="double"
     if(is.null(offset)){
       offset=y*0 #keeps the shape of y
-      is.offset=FALSE}
+      is.offset=FALSE
+    }
     else{
       offset=as.matrix(offset)
       if(!is.null(o))offset=offset[o,,drop=FALSE]# we might have zero weights
@@ -60,10 +59,15 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
       storage.mode(offset)="double"
       is.offset=TRUE
     }
-    fit=if(is.sparse) .Fortran("splognet",
-      parm=alpha,nobs,nvars,nc,x,ix,jx,y,offset,jd,vp,cl,ne=ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,kopt,
+
+    # C++ expects offset to have nc number of columns, as documented in Fortran.
+    # We do a final modification of offset to take only the first column, since we favor this when fitting.
+    if (nc == 1) offset=as.matrix(offset[,1], ncol=1)
+
+    fit=if(is.sparse) splognet_exp(
+      parm=alpha,x,y,offset,jd,vp,cl,ne=ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,kopt,pb,
                     lmu=integer(1),
-                    a0=double(nlam*nc),
+                    a0=matrix(0.0, nc, nlam),
                     ca=double(nx*nlam*nc),
                     ia=integer(nx),
                     nin=integer(nlam),
@@ -71,12 +75,12 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
                     dev=double(nlam),
                     alm=double(nlam),
                     nlp=integer(1),
-                    jerr=integer(1),PACKAGE="glmnet"
+                    jerr=integer(1)
                     )
-  else .Fortran("lognet",
-          parm=alpha,nobs,nvars,nc,as.double(x),y,offset,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,kopt,
+  else lognet_exp(
+          parm=alpha,x,y,offset,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,maxit,kopt,pb,
           lmu=integer(1),
-          a0=double(nlam*nc),
+          a0=matrix(0.0, nc, nlam),
           ca=double(nx*nlam*nc),
           ia=integer(nx),
           nin=integer(nlam),
@@ -84,7 +88,7 @@ lognet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,
           dev=double(nlam),
           alm=double(nlam),
           nlp=integer(1),
-          jerr=integer(1),PACKAGE="glmnet"
+          jerr=integer(1)
           )
 if(fit$jerr!=0){
   errmsg=jerr(fit$jerr,maxit,pmax=nx,family)

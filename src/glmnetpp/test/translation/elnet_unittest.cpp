@@ -76,7 +76,7 @@ struct ElnetPack
                 a0, ca, ia, nin, rsq, alm, nlp, jerr);
     }
 
-    void fit_legacy()
+    void fit_old()
     {
         int no = X.rows();
         int ni = X.cols();
@@ -169,16 +169,7 @@ TEST_P(elnet_fixture, elnet_test)
             maxit, nx, ne, nlam, alpha, flmin, isd, intr, ka,
             X, y, w, ulam, vp, cl, jd);
     ElnetPack expected(actual);
-    
-    std::thread actual_thr([&]() { actual.fit(); });
-    std::thread expected_thr([&]() { expected.fit_legacy(); });
-
-    set_affinity(0, actual_thr.native_handle());
-    set_affinity(1, expected_thr.native_handle());
-
-    actual_thr.join();
-    expected_thr.join();
-
+    run(actual, expected, 0, 1);
     check_pack(actual, expected);
 }
 

@@ -3,7 +3,7 @@
 #include <testutil/thread.hpp>
 #include <testutil/base_fixture.hpp>
 #include <Eigen/Core>
-#include <glmnetpp_bits/standardize.hpp>
+#include <glmnetpp_bits/elnet_driver/standardize.hpp>
 
 namespace glmnetpp {
 
@@ -55,7 +55,7 @@ struct GaussianPack
     }
 
     virtual void fit() =0;
-    virtual void fit_transl() =0;
+    virtual void fit_old() =0;
 };
 
 struct gaussian_fixture
@@ -88,20 +88,6 @@ protected:
     Eigen::VectorXi ju, ia;
     int nx, ne, maxit, nlam;
     double alpha, flmin;
-
-    void run(GaussianPack& actual,
-             GaussianPack& expected,
-             int core1, int core2) const 
-    {
-        std::thread actual_thr([&]() { actual.fit(); });
-        std::thread expected_thr([&]() { expected.fit_transl(); });
-
-        set_affinity(core1, actual_thr.native_handle());
-        set_affinity(core2, expected_thr.native_handle());
-
-        actual_thr.join();
-        expected_thr.join();
-    }
 
     void check_pack(const GaussianPack& actual,
                     const GaussianPack& expected)

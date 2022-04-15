@@ -234,20 +234,21 @@
 #' @references Friedman, J., Hastie, T. and Tibshirani, R. (2008)
 #' \emph{Regularization Paths for Generalized Linear Models via Coordinate
 #' Descent (2010), Journal of Statistical Software, Vol. 33(1), 1-22},
-#' \url{https://web.stanford.edu/~hastie/Papers/glmnet.pdf}.\cr
+#' \doi{10.18637/jss.v033.i01}.\cr
 #' Simon, N., Friedman, J., Hastie, T. and Tibshirani, R. (2011)
 #' \emph{Regularization Paths for Cox's Proportional
 #' Hazards Model via Coordinate Descent, Journal of Statistical Software, Vol.
-#' 39(5), 1-13}, \url{https://www.jstatsoft.org/v39/i05/}.\cr Tibshirani,
-#' Robert, Bien, J., Friedman, J., Hastie, T.,Simon, N.,Taylor, J. and
+#' 39(5), 1-13},
+#' \doi{10.18637/jss.v039.i05}.\cr
+#' Tibshirani,Robert, Bien, J., Friedman, J., Hastie, T.,Simon, N.,Taylor, J. and
 #' Tibshirani, Ryan. (2012) \emph{Strong Rules for Discarding Predictors in
 #' Lasso-type Problems, JRSSB, Vol. 74(2), 245-266},
-#' \url{https://statweb.stanford.edu/~tibs/ftp/strong.pdf}.\cr
-#' Hastie, T., Tibshirani, Robert and Tibshirani, Ryan. \emph{Extended
-#' Comparisons of Best Subset Selection, Forward Stepwise Selection, and the
-#' Lasso (2017), Stanford Statistics Technical Report},
+#' \url{https://arxiv.org/abs/1011.2234}.\cr
+#' Hastie, T., Tibshirani, Robert and Tibshirani, Ryan (2020) \emph{Best Subset,
+#' Forward Stepwise or Lasso? Analysis and Recommendations Based on Extensive Comparisons,
+#' Statist. Sc. Vol. 35(4), 579-592},
 #' \url{https://arxiv.org/abs/1707.08692}.\cr
-#' Glmnet webpage with four vignettes, \url{https://glmnet.stanford.edu}.
+#' Glmnet webpage with four vignettes: \url{https://glmnet.stanford.edu}.
 #' @keywords models regression
 #' @examples
 #'
@@ -467,10 +468,10 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
         ix=as.integer(x@p+1)
         jx=as.integer(x@i+1)
 
-        # TODO: currently only changed gaussian family to C++ implementation.
-        # We need gaussian to take xd as the dgCMatrix itself.
-        # Other methods still require xd to be the compressed data vector.
-        if (family == "gaussian") {
+        # TODO: changed everything except cox to C++ implementation.
+        # C++ version takes xd as the dgCMatrix itself.
+        # Fortran requires xd to be the compressed data vector.
+        if (family != "cox") {
             xd <- x
         } else {
             xd <- x@x
@@ -481,9 +482,9 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
       } else {
         xd <- x
       }
-      # TODO: only coerce to vector of double if family is not supported by C++.
-      if (family != "gaussian") {
-          storage.mode(xd) <- "double"
+      # TODO: only coerce if xd is not sparse
+      if(!inherits(xd,"sparseMatrix")) {
+        storage.mode(xd) <- "double"
       }
       if (trace.it) {
         if (relax) cat("Training Fit\n")
@@ -503,11 +504,11 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
 
       fit=switch(family,
                  "gaussian"=elnet(xd,is.sparse,y,weights,offset,type.gaussian,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,pb),
-                 "poisson"=fishnet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit),
-                 "binomial"=lognet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family),
-                 "multinomial"=lognet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family),
+                 "poisson"=fishnet(xd,is.sparse,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,pb),
+                 "binomial"=lognet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family,pb),
+                 "multinomial"=lognet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family,pb),
                  "cox"=coxnet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit),
-                 "mgaussian"=mrelnet(xd,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,vnames,maxit)
+                 "mgaussian"=mrelnet(xd,is.sparse,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,vnames,maxit,pb)
                  )
       if (trace.it) {
         utils::setTxtProgressBar(pb, nlam)

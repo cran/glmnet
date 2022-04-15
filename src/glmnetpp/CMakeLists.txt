@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.7)
 
-project("glmnetpp" VERSION 4.1.3
+project("glmnetpp" VERSION 4.2.0
                  DESCRIPTION "A C++ implementation of elastic net solver.")
 
 option(GLMNETPP_ENABLE_TEST         "Enable unit tests to be built."    ON)
@@ -8,12 +8,12 @@ option(GLMNETPP_ENABLE_BENCHMARK    "Enable benchmarks to be built."    OFF)
 option(GLMNETPP_ENABLE_COVERAGE     "Build glmnetpp with coverage"      OFF)
 option(GLMNETPP_MOCK_LEGACY        "Build glmnetpp with mock versions of the fortran."      OFF)
 
-# Add global flags
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
-endif()
-if (CMAKE_CXX_COMPILER_ID STREQUAL "CLANG")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
+# Define a set of strict build flags
+set(GLMNETPP_STRICT_WARNINGS -g -Wall)
+if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(GLMNETPP_STRICT_WARNINGS
+        ${GLMNETPP_STRICT_WARNINGS}
+        -Wextra -Werror -pedantic)
 endif()
 
 # Stoopid hack on windows
@@ -31,7 +31,7 @@ set(GLMNETPP_INCLUDEDIR "${${PROJECT_NAME}_SOURCE_DIR}/include")
 set(GLMNETPP_SOURCEDIR "${${PROJECT_NAME}_SOURCE_DIR}/src")
 
 # Add this library as shared library.
-add_library(${PROJECT_NAME} SHARED)
+add_library(${PROJECT_NAME} INTERFACE)
 
 target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE
             $<BUILD_INTERFACE:${GLMNETPP_INCLUDEDIR}>

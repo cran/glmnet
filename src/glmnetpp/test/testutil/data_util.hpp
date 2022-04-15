@@ -8,7 +8,7 @@
 
 namespace glmnetpp {
 
-inline Eigen::MatrixXd read_csv(const std::string& filename)
+inline Eigen::MatrixXd read_csv(const std::string& filename, char delim=',')
 {
     std::vector<double> matrixEntries;
 
@@ -22,7 +22,7 @@ inline Eigen::MatrixXd read_csv(const std::string& filename)
     while (std::getline(matrixDataFile, matrixRowString)) 
     {
         std::stringstream matrixRowStringStream(matrixRowString); 
-        while (std::getline(matrixRowStringStream, matrixEntry, ',')) 
+        while (std::getline(matrixRowStringStream, matrixEntry, delim)) 
         {
             matrixEntries.push_back(stod(matrixEntry));
         }
@@ -33,6 +33,16 @@ inline Eigen::MatrixXd read_csv(const std::string& filename)
     // note that matrixEntries.data() is the pointer to the first memory location at which the entries of the vector matrixEntries are stored;
     return Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>(
             matrixEntries.data(), matrixRowNumber, matrixEntries.size() / matrixRowNumber);
+}
+
+// define csv format
+const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "\n");
+
+template <typename Derived>
+void write_csv(const std::string& name, const Eigen::MatrixBase<Derived>& matrix)
+{
+    std::ofstream file(name.c_str());
+    file << std::setprecision(16) << matrix.format(CSVFormat);
 }
 
 // Center and standardize a matrix with 0 mean columns and scaled by var/n each column
@@ -82,8 +92,9 @@ struct DataGen
     auto make_beta(size_t p, double sparsity=0.5) 
     {
         std::bernoulli_distribution bern_sp(sparsity);
+        std::normal_distribution<double> norm(0., 1.);
         Eigen::VectorXd beta = Eigen::VectorXd::NullaryExpr(
-                p, [&](auto) { return bern_sp(gen); });
+                p, [&](auto) { return bern_sp(gen) * norm(gen); });
         return beta;
     }
 

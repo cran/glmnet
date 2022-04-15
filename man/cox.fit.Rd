@@ -98,7 +98,7 @@ debugging).}
 in the model.}
 \item{call}{The call that produced this object.}
 \item{nobs}{Number of observations.}
-\item{warm_fit}{If \code{save.fit=TRUE}, output of FORTRAN routine, used for
+\item{warm_fit}{If \code{save.fit=TRUE}, output of C++ routine, used for
 warm starts. For internal use only.}
 \item{family}{Family used for the model, always "cox".}
 \item{converged}{A logical variable: was the algorithm judged to have

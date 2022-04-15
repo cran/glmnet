@@ -42,13 +42,17 @@ Version 3.0 is a major release with several new features, including:
 Version 4.0 is a major release that allows for any GLM family, besides
 the built-in families.
 
+Version 4.3 is a major release that expands the scope for survival
+modeling, allowing for (start, stop) data, strata, and sparse X inputs.
+It also provides a much-requested method for `survival:survfit`.
+
 ## References
 
 <div id="refs" class="references">
 
 <div id="ref-glmnet">
 
-Friedman, Jerome, Trevor Hastie, and Rob Tibshirani. 2010.
+Friedman, Jerome, Trevor Hastie, and Robert Tibshirani. 2010.
 “Regularization Paths for Generalized Linear Models via Coordinate
 Descent.” *Journal of Statistical Software, Articles* 33 (1): 1–22.
 <https://doi.org/10.18637/jss.v033.i01>.
@@ -65,8 +69,8 @@ Regression.”
 
 <div id="ref-coxnet">
 
-Simon, Noah, Jerome Friedman, Trevor Hastie, and Rob Tibshirani. 2011.
-“Regularization Paths for Cox’s Proportional Hazards Model via
+Simon, Noah, Jerome Friedman, Trevor Hastie, and Robert Tibshirani.
+2011. “Regularization Paths for Cox’s Proportional Hazards Model via
 Coordinate Descent.” *Journal of Statistical Software, Articles* 39 (5):
 1–13. <https://doi.org/10.18637/jss.v039.i05>.
 
@@ -75,7 +79,7 @@ Coordinate Descent.” *Journal of Statistical Software, Articles* 39 (5):
 <div id="ref-strongrules">
 
 Tibshirani, Robert, Jacob Bien, Jerome Friedman, Trevor Hastie, Noah
-Simon, Jonathan Taylor, and Ryan J. Tibshirani. 2012. “Strong Rules for
+Simon, Jonathan Taylor, and Ryan Tibshirani. 2012. “Strong Rules for
 Discarding Predictors in Lasso-Type Problems.” *Journal of the Royal
 Statistical Society: Series B (Statistical Methodology)* 74 (2): 245–66.
 <https://doi.org/10.1111/j.1467-9868.2011.01004.x>.

@@ -8,9 +8,9 @@ template <bool cond>
 struct IfElseFunc
 {
     template <class F1, class F2>
-    static void eval(F1 f1, F2)
+    constexpr inline static auto eval(F1 f1, F2)
     {
-        f1();
+        return f1();
     }
 };
 
@@ -18,9 +18,9 @@ template <>
 struct IfElseFunc<false>
 {
     template <class F1, class F2>
-    static void eval(F1, F2 f2)
+    constexpr inline static auto eval(F1, F2 f2)
     {
-        f2();
+        return f2();
     }
 };
 
@@ -32,9 +32,9 @@ struct IfElseFunc<false>
  * Otherwise, f2 is executed.
  */
 template <bool cond, class F1, class F2>
-inline void if_else(F1 f1, F2 f2)
+constexpr inline auto if_else(F1 f1, F2 f2)
 {
-    details::IfElseFunc<cond>::eval(f1, f2);
+    return details::IfElseFunc<cond>::eval(f1, f2);
 }
 
 } // namespace util

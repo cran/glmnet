@@ -4,16 +4,22 @@
 #include <testutil/mock_pb.hpp>
 #include <testutil/translation/elnet.hpp>
 #include <testutil/translation/spelnet.hpp>
-#include <glmnetpp_bits/internal.hpp>
+#include <testutil/translation/multelnet.hpp>
+#include <testutil/translation/multspelnet.hpp>
+#include <testutil/internal.hpp>
 #include <glmnetpp_bits/elnet_driver/gaussian.hpp>
 #include <glmnetpp_bits/elnet_point/gaussian_cov.hpp>
 #include <glmnetpp_bits/elnet_point/gaussian_naive.hpp>
+#include <glmnetpp_bits/elnet_point/gaussian_multi.hpp>
 #include <glmnetpp_bits/elnet_point/internal/gaussian_cov.hpp>
 #include <glmnetpp_bits/elnet_point/internal/gaussian_naive.hpp>
+#include <glmnetpp_bits/elnet_point/internal/gaussian_multi.hpp>
 #include <glmnetpp_bits/elnet_point/sp_gaussian_cov.hpp>
 #include <glmnetpp_bits/elnet_point/sp_gaussian_naive.hpp>
+#include <glmnetpp_bits/elnet_point/sp_gaussian_multi.hpp>
 #include <glmnetpp_bits/elnet_point/internal/sp_gaussian_cov.hpp>
 #include <glmnetpp_bits/elnet_point/internal/sp_gaussian_naive.hpp>
+#include <glmnetpp_bits/elnet_point/internal/sp_gaussian_multi.hpp>
 
 namespace glmnetpp {
 
@@ -117,7 +123,7 @@ struct GaussianDriverPack : GaussianDriverPackBase
                 a0, ca, ia, nin, rsq, alm, nlp, jerr, mock_setpb, InternalParams());
     }
 
-    void fit_transl()
+    void fit_old()
     {
         transl::elnet<double>(
                 ka, alpha, X, y, w, jd, vp, cl, ne, nx,
@@ -189,16 +195,7 @@ TEST_P(gaussian_driver_fixture, gaussian_driver_test)
             maxit, nx, ne, nlam, alpha, flmin, isd, intr, ka,
             X, y, w, ulam, vp, cl, jd);
     GaussianDriverPack expected(actual);
-    
-    std::thread actual_thr([&]() { actual.fit(); });
-    std::thread expected_thr([&]() { expected.fit_transl(); });
-
-    set_affinity(14, actual_thr.native_handle());
-    set_affinity(15, expected_thr.native_handle());
-
-    actual_thr.join();
-    expected_thr.join();
-
+    run(actual, expected, 0, 1); 
     check_pack(actual, expected);
 }
 
@@ -258,7 +255,7 @@ struct SpGaussianDriverPack : GaussianDriverPackBase
                 a0, ca, ia, nin, rsq, alm, nlp, jerr, mock_setpb, InternalParams());
     }
 
-    void fit_transl()
+    void fit_old()
     {
         transl::spelnet<double>(
                 ka, alpha, X, y, w, jd, vp, cl, ne, nx,
@@ -330,16 +327,7 @@ TEST_P(sp_gaussian_driver_fixture, sp_gaussian_driver_test)
             maxit, nx, ne, nlam, alpha, flmin, isd, intr, ka,
             X, y, w, ulam, vp, cl, jd);
     SpGaussianDriverPack expected(actual);
-    
-    std::thread actual_thr([&]() { actual.fit(); });
-    std::thread expected_thr([&]() { expected.fit_transl(); });
-
-    set_affinity(14, actual_thr.native_handle());
-    set_affinity(15, expected_thr.native_handle());
-
-    actual_thr.join();
-    expected_thr.join();
-
+    run(actual, expected, 0, 1); 
     check_pack(actual, expected);
 }
 
@@ -359,5 +347,322 @@ INSTANTIATE_TEST_SUITE_P(
         testing::Bool()
         )
 );
+
+// =======================================================
+// Multi-response Driver
+// =======================================================
+
+struct GaussianMultiDriverPackBase
+    : GaussianDriverPackBase
+{
+    using base_t = GaussianDriverPackBase;
+
+    const bool jsd;
+
+    // will be modified
+    Eigen::MatrixXd y;
+    Eigen::MatrixXd a0;
+    Eigen::VectorXd ao;
+
+    GaussianMultiDriverPackBase(
+            int _maxit,
+            int _nx,
+            int _ne,
+            int _nlam,
+            bool _isd,
+            bool _jsd,
+            bool _intr,
+            double _alpha,
+            double _flmin,
+            const Eigen::MatrixXd& _y,
+            const Eigen::VectorXd& _w,
+            const Eigen::VectorXd& _ulam,
+            const Eigen::VectorXd& _vp,
+            const Eigen::MatrixXd& _cl,
+            const Eigen::VectorXi& _jd)
+        : base_t(_maxit, _nx, _ne, _nlam, _alpha, _flmin, _isd, _intr, false /* not used */, 
+                _y.col(0) /* not used */, _w, _ulam, _vp, _cl, _jd)
+        , jsd(_jsd)
+        , y(_y)
+        , a0(_y.cols(), _nlam)
+        , ao(_nx * _y.cols() * _nlam)
+    {
+        a0.setZero();
+        ao.setZero();
+    }
+};
+
+struct GaussianMultiDriverPack : GaussianMultiDriverPackBase
+{
+    using base_t = GaussianMultiDriverPackBase;
+    Eigen::MatrixXd X;
+    GaussianMultiDriverPack(
+            int _maxit,
+            int _nx,
+            int _ne,
+            int _nlam,
+            bool _isd,
+            bool _jsd,
+            bool _intr,
+            double _alpha,
+            double _flmin,
+            const Eigen::MatrixXd& _X,
+            const Eigen::MatrixXd& _y,
+            const Eigen::VectorXd& _w,
+            const Eigen::VectorXd& _ulam,
+            const Eigen::VectorXd& _vp,
+            const Eigen::MatrixXd& _cl,
+            const Eigen::VectorXi& _jd)
+        : base_t(_maxit, _nx, _ne, _nlam, _isd, _jsd, _intr, _alpha, _flmin, _y, _w, _ulam, _vp, _cl, _jd)
+        , X(_X)
+    {}
+
+    void fit()
+    {
+        using elnet_driver_t = ElnetDriver<
+            util::glm_type::gaussian>;
+
+        elnet_driver_t elnet_driver;
+        elnet_driver.fit(
+                alpha, X, y, w, jd, vp, cl, ne, nx, 
+                nlam, flmin, ulam, thr, isd, jsd, intr, maxit, lmu,
+                a0, ao, ia, nin, rsq, alm, nlp, jerr, mock_setpb, InternalParams());
+    }
+
+    void fit_old()
+    {
+        transl::multelnet<double>(
+                alpha, X, y, w, jd, vp, cl, ne, nx,
+                nlam, flmin, ulam, thr, isd, jsd, intr, maxit, lmu,
+                a0, ao, ia, nin, rsq, alm, nlp, jerr);
+    }
+};
+
+struct gaussian_multi_driver_fixture_base
+    : base_fixture
+    , testing::WithParamInterface<
+        std::tuple<size_t, size_t, size_t, size_t, size_t, double, double, bool, bool, bool> >
+{
+protected:
+    static constexpr double tol = 1e-15;
+
+    void check_pack(const GaussianMultiDriverPackBase& actual,
+                    const GaussianMultiDriverPackBase& expected)
+    {
+        expect_double_eq_vec(actual.w, expected.w);
+        expect_near_mat(actual.a0, expected.a0, tol);
+        expect_near_vec(actual.ao, expected.ao, tol);
+        expect_eq_vec(actual.ia, expected.ia);
+        expect_eq_vec(actual.nin, expected.nin);
+        expect_near_vec(actual.rsq, expected.rsq, tol);
+        expect_double_eq_vec(actual.alm, expected.alm);
+        EXPECT_EQ(actual.nlp, expected.nlp);
+        EXPECT_EQ(actual.jerr, expected.jerr);
+        EXPECT_EQ(actual.lmu, expected.lmu);
+        expect_near_mat(actual.y, expected.y, tol);
+    }
+};
+
+struct gaussian_multi_driver_fixture : gaussian_multi_driver_fixture_base
+{
+    void SetUp() override
+    {
+        size_t seed, n, p, nr = 3;
+        std::tie(seed, n, p, maxit, nlam, alpha, flmin, isd, jsd, intr) = GetParam();
+        DataGen dgen(seed); // hehe
+        X = dgen.make_X(n, p);
+        y.resize(n, nr);
+        for (size_t i = 0; i < nr; ++i) {
+            auto beta = dgen.make_beta(p);
+            y.col(i) = dgen.make_y(X, beta);
+        }
+        w = dgen.make_w(n);
+        jd = dgen.make_jd(p);
+        vp = dgen.make_vp(p);
+        cl = dgen.make_cl(p);
+        nx = dgen.make_nx(p);
+        ne = dgen.make_ne(p);
+        ulam = dgen.make_ulam(nlam);
+    }
+
+protected:
+    using base_t = gaussian_multi_driver_fixture_base;
+    using base_t::tol;
+    Eigen::MatrixXd X, y, cl;
+    Eigen::VectorXd w, vp, ulam;
+    Eigen::VectorXi jd;
+    size_t maxit, nlam, nx, ne;
+    double alpha, flmin;
+    bool isd, jsd, intr;
+
+    void check_pack(const GaussianMultiDriverPack& actual,
+                    const GaussianMultiDriverPack& expected)
+    {
+        base_t::check_pack(actual, expected);
+        expect_double_eq_mat(actual.X, expected.X);
+    }
+};
+
+TEST_P(gaussian_multi_driver_fixture, gaussian_multi_driver_test)
+{
+    GaussianMultiDriverPack actual(
+            maxit, nx, ne, nlam, isd, jsd, intr, alpha, flmin,
+            X, y, w, ulam, vp, cl, jd);
+    GaussianMultiDriverPack expected(actual);
+    run(actual, expected, 0, 1); 
+    check_pack(actual, expected);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    GaussianMultiDriverSuite, gaussian_multi_driver_fixture,
+    testing::Combine(
+        testing::Values(241, 412, 23968, 31), // seed
+        testing::Values(10, 30, 50),          // n
+        testing::Values(5, 20, 40),           // p
+        testing::Values(1, 50),               // maxit
+        testing::Values(1, 4),                // nlam
+        testing::Values(0.0, 0.5, 1.0),       // alpha
+        testing::Values(0.5, 1.0, 1.5),       // flmin
+        testing::Bool(),
+        testing::Bool(),
+        testing::Bool()
+        )
+);
+
+// =======================================================
+
+struct SpGaussianMultiDriverPack : GaussianMultiDriverPackBase
+{
+    using base_t = GaussianMultiDriverPackBase;
+    const Eigen::SparseMatrix<double> X;
+    SpGaussianMultiDriverPack(
+            int _maxit,
+            int _nx,
+            int _ne,
+            int _nlam,
+            bool _isd,
+            bool _jsd,
+            bool _intr,
+            double _alpha,
+            double _flmin,
+            const Eigen::SparseMatrix<double>& _X,
+            const Eigen::MatrixXd& _y,
+            const Eigen::VectorXd& _w,
+            const Eigen::VectorXd& _ulam,
+            const Eigen::VectorXd& _vp,
+            const Eigen::MatrixXd& _cl,
+            const Eigen::VectorXi& _jd)
+        : base_t(_maxit, _nx, _ne, _nlam, _isd, _jsd, _intr, _alpha, _flmin, _y, _w, _ulam, _vp, _cl, _jd)
+        , X(_X)
+    {}
+
+    void fit()
+    {
+        using elnet_driver_t = ElnetDriver<
+            util::glm_type::gaussian>;
+
+        elnet_driver_t elnet_driver;
+        elnet_driver.fit(
+                alpha, X, y, w, jd, vp, cl, ne, nx, 
+                nlam, flmin, ulam, thr, isd, jsd, intr, maxit, lmu,
+                a0, ao, ia, nin, rsq, alm, nlp, jerr, mock_setpb, InternalParams());
+    }
+
+    void fit_old()
+    {
+        transl::multspelnet<double>(
+                alpha, X, y, w, jd, vp, cl, ne, nx, 
+                nlam, flmin, ulam, thr, isd, jsd, intr, maxit, lmu,
+                a0, ao, ia, nin, rsq, alm, nlp, jerr);
+    }
+};
+
+struct sp_gaussian_multi_driver_fixture : gaussian_multi_driver_fixture_base
+{
+    void SetUp() override
+    {
+        size_t seed, n, p, nr = 3;
+        std::tie(seed, n, p, maxit, nlam, alpha, flmin, isd, jsd, intr) = GetParam();
+        DataGen dgen(seed); // hehe
+        X = dgen.make_X_sparse(n, p);
+        y.resize(n, nr);
+        for (size_t i = 0; i < nr; ++i) {
+            auto beta = dgen.make_beta(p);
+            y.col(i) = dgen.make_y(X, beta);
+        }
+        w = dgen.make_w(n);
+        jd = dgen.make_jd(p);
+        vp = dgen.make_vp(p);
+        cl = dgen.make_cl(p);
+        nx = dgen.make_nx(p);
+        ne = dgen.make_ne(p);
+        ulam = dgen.make_ulam(nlam);
+    }
+
+protected:
+    using base_t = gaussian_multi_driver_fixture_base;
+    using base_t::tol;
+    Eigen::SparseMatrix<double> X;
+    Eigen::MatrixXd y, cl;
+    Eigen::VectorXd w, vp, ulam;
+    Eigen::VectorXi jd;
+    size_t maxit, nlam, nx, ne;
+    double alpha, flmin;
+    bool isd, jsd, intr;
+
+    void check_pack(const SpGaussianMultiDriverPack& actual,
+                    const SpGaussianMultiDriverPack& expected)
+    {
+
+        expect_double_eq_vec(actual.w, expected.w);
+        expect_double_eq_mat(actual.cl, expected.cl);
+        expect_near_mat(actual.a0, expected.a0, tol);
+        expect_near_vec(actual.ao, expected.ao, 1e-15);
+        expect_eq_vec(actual.ia, expected.ia);
+        expect_eq_vec(actual.nin, expected.nin);
+        expect_near_vec(actual.rsq, expected.rsq, 2e-15);
+
+        // This check loosens expect_near_vec.
+        // The absolute difference proportion to the actual value must be within a certain tolerance.
+        EXPECT_EQ(actual.alm.size(), expected.alm.size());
+        for (int i = 0; i < actual.alm.size(); ++i) {
+            EXPECT_NEAR(actual.alm[i], expected.alm[i], 
+                    actual.alm[i] * 1e-15);
+        }
+
+        EXPECT_EQ(actual.nlp, expected.nlp);
+        EXPECT_EQ(actual.jerr, expected.jerr);
+        EXPECT_EQ(actual.lmu, expected.lmu);
+    
+        expect_near_mat(actual.y, expected.y, 4e-15);
+    }
+};
+
+TEST_P(sp_gaussian_multi_driver_fixture, sp_gaussian_multi_driver_test)
+{
+    SpGaussianMultiDriverPack actual(
+            maxit, nx, ne, nlam, isd, jsd, intr, alpha, flmin,
+            X, y, w, ulam, vp, cl, jd);
+    SpGaussianMultiDriverPack expected(actual);
+    run(actual, expected, 0, 1); 
+    check_pack(actual, expected);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    SpGaussianMultiDriverSuite, sp_gaussian_multi_driver_fixture,
+    testing::Combine(
+        testing::Values(241, 412, 3, 31), // seed
+        testing::Values(10, 30, 50),          // n
+        testing::Values(5, 20, 40),           // p
+        testing::Values(1, 50),               // maxit
+        testing::Values(1, 4),                // nlam
+        testing::Values(0.0, 0.5, 1.0),       // alpha
+        testing::Values(0.5, 1.0, 1.5),       // flmin
+        testing::Bool(),
+        testing::Bool(),
+        testing::Bool()
+        )
+);
+
 
 } // namespace glmnetpp

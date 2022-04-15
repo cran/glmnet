@@ -1,7 +1,7 @@
 #pragma once
 #include <Eigen/Core>
 #include <testutil/mock_pb.hpp>
-#include <glmnetpp_bits/internal.hpp>
+#include <testutil/internal.hpp>
 #include <glmnetpp_bits/util/exceptions.hpp>
 
 namespace glmnetpp {

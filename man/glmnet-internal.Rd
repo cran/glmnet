@@ -59,7 +59,7 @@ These are not intended for use by users. \code{lambda.interp} does linear
 interpolation of the lambdas to obtain a prediction at a new point s.
 \code{glmnet_softmax} does the classification for multinomial models.
 \code{nonzeroCoef} determines in an efficient manner which variables are
-nonzero in each fit. \code{jerr} prints out error messages from the fortran.
+nonzero in each fit. \code{jerr} prints out error messages from the C++ routines.
 \code{plotCoef} is called by the \code{plot} method for \code{glmnet}
 objects. \code{check_dots} is used in \code{coef} and \code{predict} with
 argument \code{exact=TRUE}, to make sure user supplies original data used to

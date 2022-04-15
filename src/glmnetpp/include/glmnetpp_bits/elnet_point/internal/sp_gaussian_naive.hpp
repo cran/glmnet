@@ -59,28 +59,39 @@ public:
         , xm_(xm.data(), xm.size())
         , xs_(xs.data(), xs.size())
     {
-        base_t::compute_abs_grad([this](index_t k) { return compute_grad(k); });
+        base_t::construct([this](index_t k) { return compute_abs_grad(k); });
     }
 
-    void update_beta(index_t k, value_t ab, value_t dem) {
-        base_t::update_beta(k, ab, dem, compute_grad(k));
+    template <class PointPackType>
+    GLMNETPP_STRONG_INLINE
+    void update_beta(index_t k, const PointPackType& pack) {
+        base_t::update_beta(k, pack.ab, pack.dem, compute_grad(k));
     }
 
+    GLMNETPP_STRONG_INLINE
     void update_resid(index_t k, value_t beta_diff) {
         auto beta_diff_scaled = beta_diff / xs_(k);
         y_ -= beta_diff_scaled * X_.col(k);
         o_ += beta_diff_scaled * xm_(k);
     }
 
-    bool check_kkt(value_t ab) {
-        return base_t::check_kkt(ab, [this](index_t k) { return compute_grad(k); });
+    template <class PointPackType>
+    GLMNETPP_STRONG_INLINE
+    bool check_kkt(const PointPackType& pack) {
+        return base_t::check_kkt(pack.ab, [this](index_t k) { return compute_abs_grad(k); });
     }
 
 private:
+    GLMNETPP_STRONG_INLINE
     value_t compute_grad(index_t k) const {
         return X_.col(k).cwiseProduct(w_).dot(
                 (y_.array() + o_).matrix()
                 ) / xs_(k);
+    }
+
+    GLMNETPP_STRONG_INLINE
+    value_t compute_abs_grad(index_t k) const {
+        return std::abs(compute_grad(k));
     }
 
     using typename base_t::vec_t;

@@ -7,7 +7,8 @@ namespace util {
 enum class glm_type
 {
     gaussian,
-    binomial
+    binomial,
+    poisson
 };
 
 
@@ -23,7 +24,9 @@ struct Mode<glm_type::gaussian>
     enum class type
     {
         naive,
-        cov
+        cov,
+        multi,
+        wls
     };
 };
 
@@ -33,7 +36,17 @@ struct Mode<glm_type::binomial>
     enum class type
     {
         two_class,
-        multi_class
+        multi_class,
+        multi_class_group
+    };
+};
+
+template <>
+struct Mode<glm_type::poisson>
+{
+    enum class type
+    {
+        naive
     };
 };
 
@@ -48,6 +61,12 @@ enum class control_flow
     continue_,
     break_,
     return_
+};
+
+enum class update_type
+{
+    full,
+    partial
 };
 
 } // namespace util

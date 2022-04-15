@@ -4,9 +4,9 @@
 import argparse
 import matplotlib.pyplot as plt
 import path_names
-import analyze_set_vs_vector_loop as asvvl
-import analyze_lasso_stress_benchmark as alsb
+import analyze_binomial_benchmark as abb
 import analyze_gaussian_benchmark as agb
+import analyze_binomial_two_class_benchmark as btcb
 
 parser = argparse.ArgumentParser(description='Collects data and produces plots of benchmark programs.')
 parser.add_argument('bench_names', nargs='*',
@@ -21,9 +21,9 @@ if len(args.bench_names) == 0 and not args.a:
 
 # Dictionary of bench name to module name
 bench_to_module = {
-    asvvl.TESTNAME : asvvl,
-    alsb.TESTNAME : alsb,
-    agb.TESTNAME : agb
+    abb.TESTNAME : abb,
+    agb.TESTNAME : agb,
+    btcb.TESTNAME : btcb
 }
 
 mods = [bench_to_module[bench_name] for bench_name in args.bench_names]

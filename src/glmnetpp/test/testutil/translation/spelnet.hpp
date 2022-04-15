@@ -1,8 +1,8 @@
 #pragma once
 #include <Eigen/Core>
 #include <vector>
-#include <glmnetpp_bits/chkvars.hpp>
-#include <glmnetpp_bits/standardize.hpp>
+#include <glmnetpp_bits/elnet_driver/chkvars.hpp>
+#include <glmnetpp_bits/elnet_driver/standardize.hpp>
 #include <testutil/translation/spelnet1.hpp>
 #include <testutil/translation/spelnet2.hpp>
 

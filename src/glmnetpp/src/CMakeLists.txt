@@ -23,12 +23,3 @@ if (NOT GLMNETPP_MOCK_LEGACY)
     find_library(RLIB R REQUIRED HINTS ${R_LIB_DIR})
     target_link_libraries(legacy PRIVATE ${RLIB})
 endif()
-
-########################################################################
-# Add source files to project
-########################################################################
-target_sources(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/internal.cpp)
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${GLMNETPP_INCLUDEDIR})
-set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})

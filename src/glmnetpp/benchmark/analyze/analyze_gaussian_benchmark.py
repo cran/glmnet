@@ -7,7 +7,7 @@ from subprocess import check_output
 
 TESTNAME = 'gaussian_benchmark'
 n = 1000
-ps = 2**(np.linspace(1, 14, 14)).astype(int)
+ps = 2**(np.linspace(5, 11, 7)).astype(int)
 
 def plot(df, fig_dir):
     grouped = df.groupby(['ka', 'sp'])

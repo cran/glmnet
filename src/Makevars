@@ -1,2 +1,2 @@
 CXX_STD = CXX14
-PKG_CXXFLAGS=-Iglmnetpp/include -Iglmnetpp/src
+PKG_CXXFLAGS=-Iglmnetpp/include -Iglmnetpp/src -Iglmnetpp/test # TODO

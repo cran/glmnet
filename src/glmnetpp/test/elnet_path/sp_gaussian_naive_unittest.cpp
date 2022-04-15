@@ -1,7 +1,7 @@
 #include <testutil/translation/spelnet2.hpp>
 #include <testutil/mock_pb.hpp>
 #include <elnet_path/gaussian_base.hpp>
-#include <glmnetpp_bits/internal.hpp>
+#include <testutil/internal.hpp>
 #include <glmnetpp_bits/elnet_point/gaussian_naive.hpp>
 #include <glmnetpp_bits/elnet_point/internal/sp_gaussian_naive.hpp>
 #include <glmnetpp_bits/elnet_point/sp_gaussian_naive.hpp>
@@ -68,7 +68,7 @@ struct SpGaussianNaivePack
                 ao, ia, kin, rsqo, almo, nlp, jerr, mock_setpb, InternalParams());
     }
 
-    void fit_transl() override
+    void fit_old() override
     {
         transl::spelnet2<double>(
                 alpha, ju, vp, cl, y, w, ne, nx, X, 

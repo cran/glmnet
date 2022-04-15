@@ -37,7 +37,7 @@ NULL
 #' interpolation of the lambdas to obtain a prediction at a new point s.
 #' \code{glmnet_softmax} does the classification for multinomial models.
 #' \code{nonzeroCoef} determines in an efficient manner which variables are
-#' nonzero in each fit. \code{jerr} prints out error messages from the fortran.
+#' nonzero in each fit. \code{jerr} prints out error messages from the C++ routines.
 #' \code{plotCoef} is called by the \code{plot} method for \code{glmnet}
 #' objects. \code{check_dots} is used in \code{coef} and \code{predict} with
 #' argument \code{exact=TRUE}, to make sure user supplies original data used to
@@ -84,18 +84,22 @@ NULL
 #' Trevor Hastie <hastie@@stanford.edu>
 #' @references Friedman, J., Hastie, T. and Tibshirani, R. (2008)
 #' \emph{Regularization Paths for Generalized Linear Models via Coordinate
-#' Descent}, \url{https://web.stanford.edu/~hastie/Papers/glmnet.pdf}\cr
-#' \emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\cr
-#' \url{https://www.jstatsoft.org/v33/i01/}\cr Simon, N., Friedman, J., Hastie,
-#' T., Tibshirani, R. (2011) \emph{Regularization Paths for Cox's Proportional
+#' Descent (2010), Journal of Statistical Software, Vol. 33(1), 1-22},
+#' \doi{10.18637/jss.v033.i01}.\cr
+#' Simon, N., Friedman, J., Hastie, T. and Tibshirani, R. (2011)
+#' \emph{Regularization Paths for Cox's Proportional
 #' Hazards Model via Coordinate Descent, Journal of Statistical Software, Vol.
-#' 39(5) 1-13}\cr \url{https://www.jstatsoft.org/v39/i05/}\cr Tibshirani,
-#' Robert., Bien, J., Friedman, J.,Hastie, T.,Simon, N.,Taylor, J. and
+#' 39(5), 1-13},
+#' \doi{10.18637/jss.v039.i05}.\cr
+#' Tibshirani,Robert, Bien, J., Friedman, J., Hastie, T.,Simon, N.,Taylor, J. and
 #' Tibshirani, Ryan. (2012) \emph{Strong Rules for Discarding Predictors in
-#' Lasso-type Problems, JRSSB, vol 74},\cr
-#' \url{https://statweb.stanford.edu/~tibs/ftp/strong.pdf}\cr
-#' \emph{Glmnet webpage with four vignettes}
-#' \url{https://glmnet.stanford.edu}
+#' Lasso-type Problems, JRSSB, Vol. 74(2), 245-266},
+#' \url{https://arxiv.org/abs/1011.2234}.\cr
+#' Hastie, T., Tibshirani, Robert and Tibshirani, Ryan (2020) \emph{Best Subset,
+#' Forward Stepwise or Lasso? Analysis and Recommendations Based on Extensive Comparisons,
+#' Statist. Sc. Vol. 35(4), 579-592},
+#' \url{https://arxiv.org/abs/1707.08692}.\cr
+#' Glmnet webpage with four vignettes: \url{https://glmnet.stanford.edu}.
 #' @keywords models regression package
 #' @examples
 #'

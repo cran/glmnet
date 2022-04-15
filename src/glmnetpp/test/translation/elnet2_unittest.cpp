@@ -36,7 +36,7 @@ struct Elnet2Pack: ElnetBasePack
                 ao, ia, kin, rsqo, almo, nlp, jerr);
     }
 
-    void fit_legacy() override
+    void fit_old() override
     {
         int ni = X.cols();
         int no = X.rows();

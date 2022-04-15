@@ -67,11 +67,18 @@ predict(cv.fit, newx = x[1:5, ], s = c(0.001, 0.002), gamma = "gamma.min")
 \references{
 Friedman, J., Hastie, T. and Tibshirani, R. (2008)
 \emph{Regularization Paths for Generalized Linear Models via Coordinate
-Descent, Journal of Statistical Software, Vol. 33, Issue 1, Feb 2010}\cr
-\url{https://www.jstatsoft.org/v33/i01/}
-\url{https://arxiv.org/abs/1707.08692}\cr Hastie, T., Tibshirani, Robert,
-Tibshirani, Ryan (2019) \emph{Extended Comparisons of Best Subset Selection,
-Forward Stepwise Selection, and the Lasso}
+Descent (2010), Journal of Statistical Software, Vol. 33(1), 1-22},
+\doi{10.18637/jss.v033.i01}.\cr
+Simon, N., Friedman, J., Hastie, T. and Tibshirani, R. (2011)
+\emph{Regularization Paths for Cox's Proportional
+Hazards Model via Coordinate Descent, Journal of Statistical Software, Vol.
+39(5), 1-13},
+\doi{10.18637/jss.v039.i05}.\cr
+Hastie, T., Tibshirani, Robert and Tibshirani, Ryan (2020) \emph{Best Subset,
+Forward Stepwise or Lasso? Analysis and Recommendations Based on Extensive Comparisons,
+Statist. Sc. Vol. 35(4), 579-592},
+\url{https://arxiv.org/abs/1707.08692}.\cr
+Glmnet webpage with four vignettes, \url{https://glmnet.stanford.edu}.
 }
 \seealso{
 \code{glmnet}, and \code{print}, and \code{coef} methods, and

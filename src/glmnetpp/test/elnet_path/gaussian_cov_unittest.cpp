@@ -1,7 +1,7 @@
 #include <testutil/translation/elnet1.hpp>
 #include <testutil/mock_pb.hpp>
 #include <elnet_path/gaussian_base.hpp>
-#include <glmnetpp_bits/internal.hpp>
+#include <testutil/internal.hpp>
 #include <glmnetpp_bits/elnet_point/internal/gaussian_cov.hpp>
 #include <glmnetpp_bits/elnet_point/gaussian_cov.hpp>
 #include <glmnetpp_bits/elnet_path/base.hpp>
@@ -57,7 +57,7 @@ struct GaussianCovPack
                 ao, ia, kin, rsqo, almo, nlp, jerr, mock_setpb, InternalParams());
     }
 
-    void fit_transl() override
+    void fit_old() override
     {
         transl::elnet1<double>(
                 alpha, ju, vp, cl, g, ne, nx, X, 
