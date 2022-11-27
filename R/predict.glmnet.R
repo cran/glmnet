@@ -119,7 +119,7 @@ predict.glmnet=function(object,newx,s=NULL,type=c("link","response","coefficient
   if(type=="coefficients")return(nbeta)
   if(type=="nonzero")return(nonzeroCoef(nbeta[-1,,drop=FALSE],bystep=TRUE))
   ###Check on newx
- if(inherits(newx, "sparseMatrix"))newx=as(newx,"dgCMatrix")
+ if(inherits(newx, "sparseMatrix"))newx=as(newx,"dMatrix")
  dx=dim(newx); p = object$dim[1]
  if(is.null(dx))newx=matrix(newx,1,byrow=TRUE)
  if(ncol(newx) != p)stop(paste0("The number of variables in newx must be ",p))

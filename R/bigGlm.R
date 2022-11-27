@@ -49,12 +49,24 @@ bigGlm=function (x,..., path=FALSE){
     arglist = list(...)
     arglist$x = bx
     arglist$exclude=p+1
+    fixbeta <- function(beta,p,nlam=1){
+        beta <- beta[1:p, nlam , drop = FALSE]
+        dn <- dimnames(beta)
+        dn <- list(dn[[1]],NULL)
+        dimnames(beta) <- dn
+        return(beta)
+        }
     if(!path){
         arglist$lambda=0
         fit = do.call("glmnet", arglist)
-        if (is.list(fit$beta))
-            fit$beta = lapply(fit$beta, function(x, p) x[1:p, , drop = FALSE], p)
-        else fit$beta = fit$beta[1:p, , drop = FALSE]
+        if (is.list(fit$beta)){
+            fit$beta = lapply(fit$beta, fixbeta, p=p)
+            dimnames(fit$a0) <- NULL
+            }
+        else {
+                fit$beta = fixbeta(fit$beta, p=p)
+                names(fit$a0) <- NULL
+                }
     }
     else
     {
@@ -65,19 +77,21 @@ bigGlm=function (x,..., path=FALSE){
         nlam=length(fit$lambda)#may have stopped early
         if (is.list(fit$beta)){
             fit$a0=fit$a0[,nlam,drop=FALSE]
-            fit$beta = lapply(fit$beta, function(x, p,nlam) x[1:p,nlam , drop = FALSE], p,nlam)
+            dimnames(fit$a0) <- NULL
+            fit$beta = lapply(fit$beta, fixbeta, p=p, nlam=nlam)
             dfmat=fit$dfmat
             if(!is.null(dfmat))fit$dfmat=dfmat[,nlam,drop=FALSE]
         }
         else {
-                fit$a0=fit$a0[nlam]
-                fit$beta = fit$beta[1:p,nlam , drop = FALSE]
+            fit$a0=fit$a0[nlam]
+            names(fit$a0) <- NULL
+            fit$beta = fixbeta(fit$beta, p=p, nlam=nlam)
             }
         fit$df=p
         fit$lambda=0
-        fit$dim=c(fit$dim[1],1)
         fit$dev.ratio=fit$dev.ratio[nlam]
     }
+    fit$dim=c(p,1)
     fit$call = thiscall
     class(fit) = c("bigGlm", class(fit))
     fit

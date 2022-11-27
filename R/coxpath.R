@@ -523,13 +523,13 @@ cox.fit <- function(x, y, weights, lambda, alpha = 1.0, offset = rep(0, nobs),
     coefold <- rep(0, nvars)   # initial coefs = 0
     eta <- offset
   } else {
-    if ("glmnetfit" %in% class(warm)) {
-      if (class(warm$warm_fit) != "warmfit") stop("Invalid warm start object")
+    if (inherits(warm,"glmnetfit")) {
+      if (!is(warm$warm_fit,"warmfit")) stop("Invalid warm start object")
       fit <- warm
       nulldev <- fit$nulldev
       coefold <- fit$warm_fit$a  # prev value for coefficients
       eta <- get_eta(x, coefold, 0) + offset
-    } else if ("list" %in% class(warm) && "beta" %in% names(warm)) {
+    } else if (inherits(warm,"list") && "beta" %in% names(warm)) {
       fit <- warm
       nulldev <- coxnet.deviance(y = y, offset = offset, weights = weights,
                                  std.weights = FALSE)

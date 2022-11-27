@@ -353,6 +353,8 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
     if(is.null(np)|(np[2]<=1))stop("x should be a matrix with 2 or more columns")
     nobs=as.integer(np[1])
     nvars=as.integer(np[2])
+    ##check for NAs
+    if(any(is.na(x)))stop("x has missing values; consider using makeX() to impute them")
     if(is.null(weights))weights=rep(1,nobs)
     else if(length(weights)!=nobs)stop(paste("number of elements in weights (",length(weights),") not equal to the number of rows of x (",nobs,")",sep=""))
     if(is.function(exclude))exclude <- check.exclude(exclude(x=x,y=y,weights=weights),nvars)
@@ -464,7 +466,8 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
       if(inherits(x,"sparseMatrix")){##Sparse case
         is.sparse=TRUE
         x=as(x,"CsparseMatrix")
-        x=as(x,"dgCMatrix")
+        x=as(x,"dMatrix")
+#        x=as(x,"generalMatrix")
         ix=as.integer(x@p+1)
         jx=as.integer(x@i+1)
 

@@ -13,7 +13,7 @@
 namespace glmnetpp {
 
 template <bool do_glmnetpp>
-struct gaussian_cov_fixture : benchmark::Fixture
+struct gaussian_naive_fixture : benchmark::Fixture
 {
     using internal_t = ElnetPointInternal<
                 util::glm_type::gaussian,
@@ -128,18 +128,18 @@ struct gaussian_cov_fixture : benchmark::Fixture
 
 
 BENCHMARK_TEMPLATE_DEFINE_F(
-        gaussian_cov_fixture,
+        gaussian_naive_fixture,
         glmnetpp,
         true)(benchmark::State& state)
 { run(state); }
 
 BENCHMARK_TEMPLATE_DEFINE_F(
-        gaussian_cov_fixture,
+        gaussian_naive_fixture,
         legacy,
         false)(benchmark::State& state)
 { run(state); }
 
-BENCHMARK_REGISTER_F(gaussian_cov_fixture,
+BENCHMARK_REGISTER_F(gaussian_naive_fixture,
                      glmnetpp)
     ->ArgsProduct({
         //{100, 500, 1000, 2000},
@@ -149,7 +149,7 @@ BENCHMARK_REGISTER_F(gaussian_cov_fixture,
         })
     ;
 
-BENCHMARK_REGISTER_F(gaussian_cov_fixture,
+BENCHMARK_REGISTER_F(gaussian_naive_fixture,
                      legacy)
     ->ArgsProduct({
         //{100, 500, 1000, 2000},

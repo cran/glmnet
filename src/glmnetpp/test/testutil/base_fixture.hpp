@@ -67,6 +67,7 @@ protected:
     { \
         EXPECT_EQ(v1.size(), v2.size()); \
         for (index_t i = 0; i < v1.size(); ++i) { \
+            if (std::isnan(v1[i]) && std::isnan(v2[i])) continue; \
             EXPECT_NEAR(v1[i], v2[i], tol); \
         } \
     }

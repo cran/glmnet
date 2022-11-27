@@ -145,38 +145,6 @@ static R_NativePrimitiveArgType coxnet_t[] = {
   INTSXP,
   INTSXP
 };
-void F77_SUB(spelnet)(
-		      int *ka,
-		      double *parm,
-		      int *no,
-		      int *ni,
-		      double *x,
-		      int *ix,
-		      int *jx,
-		      double *y,
-		      double *w,
-		      int *jd,
-		      double *vp,
-		      double *cl,
-		      int *ne,
-		      int *nx,
-		      int *nlam,
-		      double *flmin,
-		      double *ulam,
-		      double *thr,
-		      int *isd,
-		      int *intr,
-		      int *maxit,
-		      int *lmu,
-		      double *a0,
-		      double *ca,
-		      int *ia,
-		      int *nin,
-		      double *rsq,
-		      double *alm,
-		      int *nlp,
-		      int *jerr
-		      );
 
 static R_NativePrimitiveArgType loglike_t[] = {
   INTSXP,

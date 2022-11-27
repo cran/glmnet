@@ -1,0 +1,14 @@
+name: glmnetpp
+channels:
+  - conda-forge
+dependencies:
+# essentials
+  - python=3.10
+  - numpy
+  - scipy
+
+# C++ toolchain
+  - cxx-compiler 
+  - clang-tools
+  - gfortran
+  - suitesparse

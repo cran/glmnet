@@ -36,3 +36,13 @@
     derived_t& self() { return static_cast<derived_t&>(*this); } \
     const derived_t& self() const { return static_cast<const derived_t&>(*this); }
 #endif
+
+/*
+ * Printing utility.
+ */
+#ifndef PRINT
+#define PRINT(t)                                                         \
+ (std::cerr << std::setprecision(18) << __LINE__ << ": " << #t << '\n' \
+            << t << "\n"                                              \
+            << std::endl)
+#endif

@@ -1,0 +1,50 @@
+cc_library(
+    name = "testutil",
+    srcs = glob([
+        "testutil/**/*.hpp",
+        "testutil/**/*.cpp",
+    ]),
+    hdrs = glob([
+        "testutil/**/*.hpp",
+    ]),
+    includes = ["."],
+    deps = [
+        "//:glmnetpp",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+[cc_test(
+    name = type_,
+    srcs = glob([
+        "{}/**/*.hpp".format(type_),
+        "{}/**/*.cpp".format(type_),
+    ]),
+    defines = ["EIGEN_INITIALIZE_MATRICES_BY_NAN"],
+    deps = [
+        ":testutil",
+        "//src:legacy",
+        "//:glmnetpp",
+        "@com_google_googletest//:gtest_main",
+    ],
+) for type_ in [
+    "elnet_driver",
+    "elnet_path",
+    "elnet_point",
+    "util",
+]]
+
+cc_test(
+    name = "translation",
+    srcs = glob([
+        "translation/**/*.hpp",
+        "translation/elnet_unittest.cpp",
+    ]),
+    defines = ["EIGEN_INITIALIZE_MATRICES_BY_NAN"],
+    deps = [
+        ":testutil",
+        "//src:legacy",
+        "//:glmnetpp",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

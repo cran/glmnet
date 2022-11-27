@@ -1028,10 +1028,10 @@ void chg_itrace_(
 int *itrace
 );
 
-void chg_bnorm_(
-double *prec,
-int *mxit
-);
+/* void chg_bnorm_( */
+/* double *prec, */
+/* int *mxit */
+/* ); */
 
 void chg_epsnr_(
 double *epsnr

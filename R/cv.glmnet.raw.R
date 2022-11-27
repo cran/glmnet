@@ -43,9 +43,9 @@ cv.glmnet.raw <-
       for (i in seq(nfolds)) {
           if (trace.it) cat(sprintf("Fold: %d/%d\n", i, nfolds))
         which = foldid == i
-      if (is.matrix(y))
-        y_sub = y[!which, ]
-      else y_sub = y[!which]
+        if (length(dim(y))>1)
+            y_sub = y[!which, ]
+        else y_sub = y[!which]
       if (is.offset)
         offset_sub = as.matrix(offset)[!which, ]
       else offset_sub = NULL

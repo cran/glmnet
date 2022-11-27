@@ -1006,7 +1006,7 @@ private:
             // Otherwise, is_ is reshaped to size n, which is undefined behavior for the caller.
             is_.head(n) = Eigen::VectorXi::LinSpaced(n, 0, n-1);
             std::sort(is_.data(), is_.data() + n, 
-                    [&](size_t i, size_t j) { return a[i] <= a[j]; });
+                    [&](size_t i, size_t j) { return a[i] < a[j]; });
 
             if (a(is_(0)) == a(is_(n-1))) {
                 out = a(0); 

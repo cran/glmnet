@@ -1,0 +1,28 @@
+cc_library(
+    name = "bug_reports_tools",
+    srcs = glob([
+        "tools/**/*.hpp",
+        "tools/**/*.cpp",
+    ]),
+    deps = [
+        "@bazel_tools//tools/cpp/runfiles",
+        "@eigen",
+    ]
+)
+
+[cc_binary(
+    name = type_,
+    srcs = glob([
+        "**/*.hpp",
+        "{}.cpp".format(type_),
+    ]),
+    defines = ["EIGEN_INITIALIZE_MATRICES_BY_NAN"],
+    data = ["//bug_reports/data:data"],
+    deps = [
+        ":bug_reports_tools",
+        "//test:testutil",
+        "//:glmnetpp",
+    ],
+) for type_ in [
+    "2022_11_07",
+]]

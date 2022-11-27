@@ -1,3 +1,13 @@
+# glmnet 4.1-6
+
+Removed unneeded legacy fortran code, leaving only coxnet. Fixed up
+Matrix as() sequences
+
+# glmnet 4.1-5
+
+Relatively minor changes to bugs in survival functions and bigGlm,
+and some improved failure messages.
+
 # glmnet 4.1-4
 
 Most of the Fortran code has been replaced by C++ by James Yang,

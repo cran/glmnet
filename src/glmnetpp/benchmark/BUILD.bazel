@@ -1,0 +1,21 @@
+[cc_binary(
+    name = type_,
+    srcs = ["{}.cpp".format(type_)],
+    deps = [
+        "//:glmnetpp",
+        "//test:testutil",
+        "//src:legacy",
+        "@com_github_google_benchmark//:benchmark_main",
+    ],
+    copts = [
+        '-std=c++17',
+    ],
+)
+for type_ in [
+    "binomial_benchmark",
+    "binomial_two_class_benchmark",
+    "gaussian_benchmark",    
+    "gaussian_cov_benchmark",    
+    "gaussian_naive_benchmark",    
+    "poisson_benchmark",    
+]]

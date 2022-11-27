@@ -71,7 +71,7 @@ inline auto elc(
         // We assume m has already been reshaped such that its size is at least n.
         m.head(n) = Eigen::VectorXi::LinSpaced(n, 0, n-1);
         std::sort(m.data(), m.data() + n, 
-                [&](size_t i, size_t j) { return a[i] <= a[j]; });
+                [&](int i, int j) { return a[i] < a[j]; });
 
         if (a(m(0)) == a(m(n-1))) {
             out = a(0); 

@@ -1,0 +1,30 @@
+cc_library(
+    name = "legacy",
+    srcs = [
+        "liblegacy.a",
+    ],
+    hdrs = glob([
+        "legacy/**/*.h"
+    ]),
+    data = [":legacy_lib"],
+    includes = ["."],
+    visibility = ["//visibility:public"],
+    linkopts = ["-lR", "-lgfortran"],
+)
+
+genrule(
+    name = "legacy_lib",
+    srcs = glob([
+        "legacy/**/*.c",
+        "legacy/**/*.f",   
+    ]),
+    outs = ["liblegacy.a"],
+    cmd =
+"""
+gcc -c src/legacy/glmnet5dpclean.f
+gcc -c src/legacy/wls.f
+gcc -c src/legacy/pb.c -I $$R_INCLUDE_DIR
+ar cr liblegacy.a glmnet5dpclean.o wls.o pb.o
+cat liblegacy.a > $@
+""",
+)

@@ -2,9 +2,9 @@
 #include <testutil/data_util.hpp>
 #include <testutil/mock_pb.hpp>
 #include <legacy/legacy.h>
-#include <glmnetpp_bits/chkvars.hpp>
-#include <glmnetpp_bits/standardize.hpp>
-#include <glmnetpp_bits/internal.hpp>
+#include <glmnetpp_bits/elnet_driver/chkvars.hpp>
+#include <glmnetpp_bits/elnet_driver/standardize.hpp>
+#include <testutil/internal.hpp>
 #include <glmnetpp_bits/elnet_driver/poisson.hpp>
 #include <glmnetpp_bits/elnet_path.hpp>
 #include <glmnetpp_bits/elnet_point.hpp>

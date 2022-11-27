@@ -1,4 +1,5 @@
 coxnet=function(x,is.sparse,ix,jx,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit){
+  y <- response.coxnet(y)
   if(!is.matrix(y)||!all(match(c("time","status"),dimnames(y)[[2]],0)))stop("Cox model requires a matrix with columns 'time' (>0) and 'status'  (binary) as a response; a 'Surv' object suffices",call.=FALSE)
   ty=as.double(y[,"time"])
   tevent=as.double(y[,"status"])

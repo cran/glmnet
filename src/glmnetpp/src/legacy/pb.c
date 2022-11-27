@@ -23,9 +23,9 @@ void F77_SUB(setpb)(int *val) {
   UNPROTECT(1);
 }
 
-/* Nullify progress bar, not really used */
-void nullifyPB() {
-  pb = NULL;
-}
+/* /\* Nullify progress bar, not really used *\/ */
+/* void nullifyPB() { */
+/*   pb = NULL; */
+/* } */
 
 

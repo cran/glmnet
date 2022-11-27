@@ -1,0 +1,9 @@
+cc_library(
+    name = "glmnetpp",
+    hdrs = glob(["include/**"]),
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@eigen",
+    ],
+)

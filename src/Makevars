@@ -1,2 +1,2 @@
 CXX_STD = CXX14
-PKG_CXXFLAGS=-Iglmnetpp/include -Iglmnetpp/src -Iglmnetpp/test # TODO
+PKG_CXXFLAGS=-Iglmnetpp/include -Iglmnetpp/src -Iglmnetpp/test -DEIGEN_PERMANENTLY_DISABLE_STUPID_WARNINGS

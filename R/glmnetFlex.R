@@ -539,15 +539,15 @@ glmnet.fit <- function(x, y, weights, lambda, alpha = 1.0,
         eta <- family$linkfun(mu)
         intold <- (eta - offset)[1]
     } else {
-        if ("glmnetfit" %in% class(warm)) {
-            if (class(warm$warm_fit) != "warmfit") stop("Invalid warm start object")
+        if (inherits(warm,"glmnetfit")) {
+            if (!is(warm$warm_fit,"warmfit")) stop("Invalid warm start object")
             fit <- warm
             nulldev <- fit$nulldev
             coefold <- fit$warm_fit$a   # prev value for coefficients
             intold <- fit$warm_fit$aint    # prev value for intercept
             eta <- get_eta(x, coefold, intold)
             mu <- linkinv(eta <- eta + offset)
-        } else if ("list" %in% class(warm) && "a0" %in% names(warm) &&
+        } else if (inherits(warm,"list") && "a0" %in% names(warm) &&
                    "beta" %in% names(warm)) {
             nulldev <- get_start(x, y, weights, family, intercept, is.offset,
                                    offset, exclude, vp, alpha)$nulldev
@@ -842,7 +842,7 @@ elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
     # as if no warmstart was provided)
     if (!is.null(warm) && "glmnetfit" %in% class(warm)) {
         warm <- warm$warm_fit
-        if (class(warm) != "warmfit") stop("Invalid warm start object")
+        if (!is(warm,"warmfit")) stop("Invalid warm start object")
 
         a <- warm$a
         aint <- warm$aint
@@ -924,7 +924,7 @@ elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
 
         # check if coefs were provided as warmstart: if so, use them
         if (!is.null(warm)) {
-            if ("list" %in% class(warm) && "a0" %in% names(warm) &&
+            if (inherits(warm,"list") && "a0" %in% names(warm) &&
                 "beta" %in% names(warm)) {
                 a <- as.double(warm$beta)
                 aint <- as.double(warm$a0)
@@ -949,7 +949,7 @@ elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
 
     a.new <- a
     a.new[0] <- a.new[0] # induce a copy
-  
+
     # take out components of x and run C++ subroutine
     if (inherits(x, "sparseMatrix")) {
         xm <- as.double(attr(x, "xm"))
