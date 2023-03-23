@@ -5,8 +5,8 @@
 \title{Display the names of the measures used in CV for different "glmnet" families}
 \usage{
 glmnet.measures(
-  family = c("all", "gaussian", "binomial", "poisson", "multinomial", "cox",
-    "mgaussian", "GLM")
+  family = c("all", "gaussian", "binomial", "poisson", "multinomial", "cox", "mgaussian",
+    "GLM")
 )
 }
 \arguments{

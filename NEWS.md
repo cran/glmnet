@@ -1,3 +1,8 @@
+# glmnet 4.1-7
+
+Added DOI for JSS 2023 paper and corrected some typos in documentation
+(`nfold` -> `nfolds`) and vignette.
+
 # glmnet 4.1-6
 
 Removed unneeded legacy fortran code, leaving only coxnet. Fixed up

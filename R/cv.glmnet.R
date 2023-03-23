@@ -51,8 +51,8 @@
 #' @param nfolds number of folds - default is 10. Although \code{nfolds} can be
 #' as large as the sample size (leave-one-out CV), it is not recommended for
 #' large datasets. Smallest value allowable is \code{nfolds=3}
-#' @param foldid an optional vector of values between 1 and \code{nfold}
-#' identifying what fold each observation is in. If supplied, \code{nfold} can
+#' @param foldid an optional vector of values between 1 and \code{nfolds}
+#' identifying what fold each observation is in. If supplied, \code{nfolds} can
 #' be missing.
 #' @param alignment This is an experimental argument, designed to fix the
 #' problems users were having with CV, with possible values \code{"lambda"}
@@ -69,7 +69,7 @@
 #' this refers to computing \code{nfolds} separate statistics, and then using
 #' their mean and estimated standard error to describe the CV curve. If
 #' \code{grouped=FALSE}, an error matrix is built up at the observation level
-#' from the predictions from the \code{nfold} fits, and then summarized (does
+#' from the predictions from the \code{nfolds} fits, and then summarized (does
 #' not apply to \code{type.measure="auc"}). For the \code{"cox"} family,
 #' \code{grouped=TRUE} obtains the CV partial likelihood for the Kth fold by
 #' \emph{subtraction}; by subtracting the log partial likelihood evaluated on

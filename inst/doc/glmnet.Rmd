@@ -238,7 +238,7 @@ Users can make predictions from the fitted `glmnet` object. In addition to the a
 
 * "link" returns the fitted values (i.e. $\hat\beta_0 + x_i^T\hat\beta$)
 
-* "response" gives the same output "link" for "gaussian" family.
+* "response" gives the same output as "link" for "gaussian" family.
 
 * "coefficients" returns the model codfficients.
 

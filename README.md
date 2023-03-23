@@ -42,7 +42,7 @@ Version 3.0 is a major release with several new features, including:
 Version 4.0 is a major release that allows for any GLM family, besides
 the built-in families.
 
-Version 4.3 is a major release that expands the scope for survival
+Version 4.1 is a major release that expands the scope for survival
 modeling, allowing for (start, stop) data, strata, and sparse X inputs.
 It also provides a much-requested method for `survival:survfit`.
 
@@ -83,6 +83,15 @@ Simon, Jonathan Taylor, and Ryan Tibshirani. 2012. “Strong Rules for
 Discarding Predictors in Lasso-Type Problems.” *Journal of the Royal
 Statistical Society: Series B (Statistical Methodology)* 74 (2): 245–66.
 <https://doi.org/10.1111/j.1467-9868.2011.01004.x>.
+
+</div>
+
+<div id="ref-glm">
+
+Kenneth Tay, J, Narasimhan, Balasubramanian, Hastie,
+Trevor. 2023. “Elastic Net Regularization Paths for All Generalized
+Linear Models.” *Journal of Statistical Software, Articles* 106 (1):
+1–31. <https://doi.org/10.18637/jss.v106.i01>.
 
 </div>
 
