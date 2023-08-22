@@ -1,4 +1,4 @@
-1e606a26995e6db51121f316aa5ee311 *DESCRIPTION
+67a7278022ea49a84ffd3b7e3a58fd41 *DESCRIPTION
 b3a2e443b697130de588b50a907b6d5a *NAMESPACE
 b3db43e49e7faffe7ed5c376a451e887 *NEWS.md
 b7e403cbac1975dfabbd5b1e6ec68cfc *R/Cindex.R
@@ -20,7 +20,7 @@ f288cf974491d93b56e5c4d6d204d658 *R/coef.glmnet.R
 a42ad691868ee94b3eae743299af81bc *R/coef.relaxed.R
 ab05dba77ad585b2ac3a465c26fc2b00 *R/coefnorm.R
 ee4cc296f6a922b28ba89fe64fa5ce56 *R/confusion.glmnet.R
-b7db022f09a79b60e233bc933cc961ce *R/coxgrad.R
+0b5afc5cfb075810d2bf5f79d5b0f50b *R/coxgrad.R
 b5ce6894a3e9d337b3c4ebbab87ca622 *R/coxnet.R
 836fa1cdc1092e7a00f781fff99c89a7 *R/coxnet.deviance.R
 b2d91e31dcc18510577125a301ab8221 *R/coxpath.R
@@ -49,7 +49,7 @@ b0325f5e584fbe646aedb73d02f6b86d *R/getOptcv.relaxed.R
 dd14d7acb21ae8f1bb87a54ea763950b *R/getcoef.R
 c1a8bceef71c915555f8bffc7298137e *R/getcoef.multinomial.R
 bf3d2c58679f94ef0596ae3eb63de59f *R/glmnet-package.R
-882d5232a2cfb14e9b7305defead4d78 *R/glmnet.R
+d366f059e97237992b15d3e1df07c6f6 *R/glmnet.R
 e3af5ef4ce582ce08d2824f63930638a *R/glmnet.control.R
 741a587449cd2f3613c2e52f25bc0280 *R/glmnet.measures.R
 a1d90fd743701499c9971480076bd625 *R/glmnetFlex.R
@@ -112,16 +112,16 @@ cac6b8e217715098a5ee94e4066c1a4b *data/PoissonExample.rda
 15e1e14c9f1c36426fefaa028aed0caa *inst/CITATION
 a93a7d8728d7660982e08bba82f720dc *inst/doc/Coxnet.R
 0bb3a929eff4b5695d75d5c08ae8360c *inst/doc/Coxnet.Rmd
-903d11d1e6ef68b6b870038721e58538 *inst/doc/Coxnet.pdf
+e6df8902bdb313ef8752059fcb4f6977 *inst/doc/Coxnet.pdf
 9ae5eaa92f330dbf58b156e1b5871dda *inst/doc/glmnet.R
-05148361d5244058ea0a3401142c7cde *inst/doc/glmnet.Rmd
-7f3dc8d4164838145c891f6075e8dd4f *inst/doc/glmnet.pdf
+d6e6b8d3df663f925a43db28cf922fb6 *inst/doc/glmnet.Rmd
+7765605962be44586e22e219c62aa567 *inst/doc/glmnet.pdf
 85579e41e7c36b006e98a47bb0ca7f6f *inst/doc/glmnetFamily.R
 cab72afa072399ca5ae1906987ef89f4 *inst/doc/glmnetFamily.Rmd
-b548ce97a2e5fe6de5d48a00afe69ae4 *inst/doc/glmnetFamily.pdf
+3c897a0d7b21881a30b28f62f65db8ac *inst/doc/glmnetFamily.pdf
 f3b0466d566df6079e63fe164a809f82 *inst/doc/relax.R
 e1dc532562ac69525a0b9c3c095be562 *inst/doc/relax.Rmd
-49215b13a4068a42bcde810e08892a47 *inst/doc/relax.pdf
+f3d2e6e802260ad36573c63a40aeef1d *inst/doc/relax.pdf
 64c471277309951b4697ffdd1ee15fb8 *inst/mortran/README.Rmd
 105f4c45761aea898c3ecb428b4f2d88 *inst/mortran/coxnet5dpclean.m
 52e95162e7dc0e62ec329602b05cd001 *inst/testscripts/save_results.R
@@ -152,7 +152,7 @@ e6388e65131a54875a8f44c9e536e17e *man/cox.path.Rd
 1e9b7d5537b29ef0a4c097e26e0fb2a7 *man/get_start.Rd
 b52f7e8516900daa988d250db6b8507b *man/glmnet-internal.Rd
 8103c488fd4f3cc88214781f3d8b60f2 *man/glmnet-package.Rd
-78c7aff6a2a1eb2afbe27527504ccc4b *man/glmnet.Rd
+711b09bcc4d6c26f9980beb79474e6df *man/glmnet.Rd
 5cc46f5cf2cc5389a89709d6ae129d0c *man/glmnet.control.Rd
 044d3028ad7c3ed6d4c27e0b6ef9b025 *man/glmnet.fit.Rd
 5100041a8bdf7a926cc199587f99d2e5 *man/glmnet.measures.Rd
@@ -394,6 +394,6 @@ b047cb04f0ce8cdd6646c63b15aaa28d *src/glmnetpp/test/util/type_traits_unittest.cp
 3969a7d30dda77ddac9a8dcea40f8f58 *vignettes/assets/glmnet_refs.bib
 6b485f932628ec1755201811c3e05f49 *vignettes/assets/vignette_binomial.png
 3f2e5f9cf200b832dd68492f66f63f9e *vignettes/assets/vignette_gaussian.png
-05148361d5244058ea0a3401142c7cde *vignettes/glmnet.Rmd
+d6e6b8d3df663f925a43db28cf922fb6 *vignettes/glmnet.Rmd
 cab72afa072399ca5ae1906987ef89f4 *vignettes/glmnetFamily.Rmd
 e1dc532562ac69525a0b9c3c095be562 *vignettes/relax.Rmd

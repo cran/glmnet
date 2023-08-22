@@ -129,7 +129,9 @@ coefficient. This is a number that multiplies \code{lambda} to allow
 differential shrinkage. Can be 0 for some variables, which implies no
 shrinkage, and that variable is always included in the model. Default is 1
 for all variables (and implicitly infinity for variables listed in
-\code{exclude}). Note: the penalty factors are internally rescaled to sum to
+\code{exclude}). Also, any \code{penalty.factor} that is set to \code{inf} is
+converted to an \code{exclude}, and then internally reset to 1.
+Note: the penalty factors are internally rescaled to sum to
 nvars, and the lambda sequence will reflect this change.}
 
 \item{lower.limits}{Vector of lower limits for each coefficient; default

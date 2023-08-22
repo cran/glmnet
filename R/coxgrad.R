@@ -195,6 +195,10 @@ coxgrad3 <- function(eta, y, w, std.weights = TRUE, diag.hessian = FALSE) {
         } else {
             ss_match <- match(start_o, stop_o)
         }
+    ## set weights to zero for any observation with start time greater than largest death time
+    last_death <- max(stop_time[d==1])
+    w[start_time >= last_death] <- 0
+    ##
 
         # keep a set of values which are ordered by start time
         w_exp_eta_start <- (w * exp(eta))[start_o]
