@@ -11,15 +11,14 @@ elnet.fit(
   lambda,
   alpha = 1,
   intercept = TRUE,
-  thresh = 1e-07,
-  maxit = 1e+05,
   penalty.factor = rep(1, nvars),
   exclude = c(),
   lower.limits = -Inf,
   upper.limits = Inf,
   warm = NULL,
   from.glmnet.fit = FALSE,
-  save.fit = FALSE
+  save.fit = FALSE,
+  control = glmnet.control()
 )
 }
 \arguments{
@@ -42,15 +41,6 @@ The penalty is defined as \deqn{(1-\alpha)/2||\beta||_2^2+\alpha||\beta||_1.}
 \code{alpha=1} is the lasso penalty, and \code{alpha=0} the ridge penalty.}
 
 \item{intercept}{Should intercept be fitted (default=TRUE) or set to zero (FALSE)?}
-
-\item{thresh}{Convergence threshold for coordinate descent. Each inner
-coordinate-descent loop continues until the maximum change in the objective
-after any coefficient update is less than thresh times the null deviance.
-Default value is \code{1e-7}.}
-
-\item{maxit}{Maximum number of passes over the data; default is \code{10^5}.
-(If a warm start object is provided, the number of passes the warm start object
-performed is included.)}
 
 \item{penalty.factor}{Separate penalty factors can be applied to each
 coefficient. This is a number that multiplies \code{lambda} to allow differential
@@ -78,6 +68,12 @@ For internal use only.}
 Default is FALSE.This has implications for computation of the penalty factors.}
 
 \item{save.fit}{Return the warm start object? Default is FALSE.}
+
+\item{control}{A fully resolved 17-key control list of the form returned by
+\code{\link{glmnet.control}()}. Default is \code{glmnet.control()} -- current
+session state. This function does not resolve or validate the list; keys
+(\code{thresh}, \code{maxit}, \code{big}, etc.) are read directly. See
+\code{?glmnet.path} for the same contract.}
 }
 \value{
 An object with class "glmnetfit" and "glmnet". The list returned has

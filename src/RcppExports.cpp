@@ -11,6 +11,46 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// compute_cox_quantities_exp
+List compute_cox_quantities_exp(Eigen::VectorXd start, Eigen::VectorXd stop, Eigen::VectorXi status, Eigen::VectorXi strata, bool efron, Eigen::MatrixXd eta, Eigen::VectorXd weights);
+RcppExport SEXP _glmnet_compute_cox_quantities_exp(SEXP startSEXP, SEXP stopSEXP, SEXP statusSEXP, SEXP strataSEXP, SEXP efronSEXP, SEXP etaSEXP, SEXP weightsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type start(startSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type stop(stopSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXi >::type status(statusSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXi >::type strata(strataSEXP);
+    Rcpp::traits::input_parameter< bool >::type efron(efronSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type weights(weightsSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_cox_quantities_exp(start, stop, status, strata, efron, eta, weights));
+    return rcpp_result_gen;
+END_RCPP
+}
+// compute_cox_lambda_max_exp
+List compute_cox_lambda_max_exp(Eigen::MatrixXd x, Eigen::VectorXd start, Eigen::VectorXd stop, Eigen::VectorXi status, Eigen::VectorXi strata, bool efron, Eigen::VectorXd offset, Eigen::VectorXd weights, Eigen::VectorXd xm, Eigen::VectorXd xs, Eigen::VectorXd vp, Eigen::VectorXi exclude, double alpha);
+RcppExport SEXP _glmnet_compute_cox_lambda_max_exp(SEXP xSEXP, SEXP startSEXP, SEXP stopSEXP, SEXP statusSEXP, SEXP strataSEXP, SEXP efronSEXP, SEXP offsetSEXP, SEXP weightsSEXP, SEXP xmSEXP, SEXP xsSEXP, SEXP vpSEXP, SEXP excludeSEXP, SEXP alphaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type start(startSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type stop(stopSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXi >::type status(statusSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXi >::type strata(strataSEXP);
+    Rcpp::traits::input_parameter< bool >::type efron(efronSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type offset(offsetSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type weights(weightsSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type xm(xmSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type xs(xsSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type vp(vpSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXi >::type exclude(excludeSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_cox_lambda_max_exp(x, start, stop, status, strata, efron, offset, weights, xm, xs, vp, exclude, alpha));
+    return rcpp_result_gen;
+END_RCPP
+}
 // elnet_exp
 List elnet_exp(int ka, double parm, Eigen::MatrixXd x, Eigen::VectorXd y, Eigen::VectorXd w, const Eigen::Map<Eigen::VectorXi> jd, const Eigen::Map<Eigen::VectorXd> vp, Eigen::MatrixXd cl, int ne, int nx, int nlam, double flmin, const Eigen::Map<Eigen::VectorXd> ulam, double thr, int isd, int intr, int maxit, SEXP pb, int lmu, Eigen::Map<Eigen::VectorXd> a0, Eigen::Map<Eigen::MatrixXd> ca, Eigen::Map<Eigen::VectorXi> ia, Eigen::Map<Eigen::VectorXi> nin, Eigen::Map<Eigen::VectorXd> rsq, Eigen::Map<Eigen::VectorXd> alm, int nlp, int jerr);
 RcppExport SEXP _glmnet_elnet_exp(SEXP kaSEXP, SEXP parmSEXP, SEXP xSEXP, SEXP ySEXP, SEXP wSEXP, SEXP jdSEXP, SEXP vpSEXP, SEXP clSEXP, SEXP neSEXP, SEXP nxSEXP, SEXP nlamSEXP, SEXP flminSEXP, SEXP ulamSEXP, SEXP thrSEXP, SEXP isdSEXP, SEXP intrSEXP, SEXP maxitSEXP, SEXP pbSEXP, SEXP lmuSEXP, SEXP a0SEXP, SEXP caSEXP, SEXP iaSEXP, SEXP ninSEXP, SEXP rsqSEXP, SEXP almSEXP, SEXP nlpSEXP, SEXP jerrSEXP) {
@@ -274,6 +314,47 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// coxnet_exp
+List coxnet_exp(double parm, Eigen::MatrixXd x, Eigen::VectorXd start, Eigen::VectorXd stop, Eigen::VectorXi status, Eigen::VectorXi strata, bool efron, Eigen::VectorXd g, const Eigen::Map<Eigen::VectorXd> w, const Eigen::Map<Eigen::VectorXi> jd, const Eigen::Map<Eigen::VectorXd> vp, Eigen::MatrixXd cl, int ne, int nx, int nlam, double flmin, const Eigen::Map<Eigen::VectorXd> ulam, double thr, int isd, int maxit, SEXP pb, int lmu, Eigen::Map<Eigen::VectorXd> a0, Eigen::Map<Eigen::MatrixXd> ca, Eigen::Map<Eigen::VectorXi> ia, Eigen::Map<Eigen::VectorXi> nin, double nulldev, Eigen::Map<Eigen::VectorXd> dev, Eigen::Map<Eigen::VectorXd> alm, int nlp, int jerr);
+RcppExport SEXP _glmnet_coxnet_exp(SEXP parmSEXP, SEXP xSEXP, SEXP startSEXP, SEXP stopSEXP, SEXP statusSEXP, SEXP strataSEXP, SEXP efronSEXP, SEXP gSEXP, SEXP wSEXP, SEXP jdSEXP, SEXP vpSEXP, SEXP clSEXP, SEXP neSEXP, SEXP nxSEXP, SEXP nlamSEXP, SEXP flminSEXP, SEXP ulamSEXP, SEXP thrSEXP, SEXP isdSEXP, SEXP maxitSEXP, SEXP pbSEXP, SEXP lmuSEXP, SEXP a0SEXP, SEXP caSEXP, SEXP iaSEXP, SEXP ninSEXP, SEXP nulldevSEXP, SEXP devSEXP, SEXP almSEXP, SEXP nlpSEXP, SEXP jerrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type parm(parmSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type start(startSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type stop(stopSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXi >::type status(statusSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXi >::type strata(strataSEXP);
+    Rcpp::traits::input_parameter< bool >::type efron(efronSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type g(gSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type w(wSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXi> >::type jd(jdSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type vp(vpSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type cl(clSEXP);
+    Rcpp::traits::input_parameter< int >::type ne(neSEXP);
+    Rcpp::traits::input_parameter< int >::type nx(nxSEXP);
+    Rcpp::traits::input_parameter< int >::type nlam(nlamSEXP);
+    Rcpp::traits::input_parameter< double >::type flmin(flminSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type ulam(ulamSEXP);
+    Rcpp::traits::input_parameter< double >::type thr(thrSEXP);
+    Rcpp::traits::input_parameter< int >::type isd(isdSEXP);
+    Rcpp::traits::input_parameter< int >::type maxit(maxitSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type pb(pbSEXP);
+    Rcpp::traits::input_parameter< int >::type lmu(lmuSEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type a0(a0SEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type ca(caSEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXi> >::type ia(iaSEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXi> >::type nin(ninSEXP);
+    Rcpp::traits::input_parameter< double >::type nulldev(nulldevSEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type dev(devSEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type alm(almSEXP);
+    Rcpp::traits::input_parameter< int >::type nlp(nlpSEXP);
+    Rcpp::traits::input_parameter< int >::type jerr(jerrSEXP);
+    rcpp_result_gen = Rcpp::wrap(coxnet_exp(parm, x, start, stop, status, strata, efron, g, w, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, maxit, pb, lmu, a0, ca, ia, nin, nulldev, dev, alm, nlp, jerr));
+    return rcpp_result_gen;
+END_RCPP
+}
 // multspelnet_exp
 List multspelnet_exp(double parm, const Eigen::Map<Eigen::SparseMatrix<double> > x, Eigen::MatrixXd y, Eigen::VectorXd w, const Eigen::Map<Eigen::VectorXi> jd, const Eigen::Map<Eigen::VectorXd> vp, const Eigen::Map<Eigen::MatrixXd> cl, int ne, int nx, int nlam, double flmin, const Eigen::Map<Eigen::VectorXd> ulam, double thr, int isd, int jsd, int intr, int maxit, SEXP pb, int lmu, Eigen::Map<Eigen::MatrixXd> a0, Eigen::Map<Eigen::VectorXd> ca, Eigen::Map<Eigen::VectorXi> ia, Eigen::Map<Eigen::VectorXi> nin, Eigen::Map<Eigen::VectorXd> rsq, Eigen::Map<Eigen::VectorXd> alm, int nlp, int jerr);
 RcppExport SEXP _glmnet_multspelnet_exp(SEXP parmSEXP, SEXP xSEXP, SEXP ySEXP, SEXP wSEXP, SEXP jdSEXP, SEXP vpSEXP, SEXP clSEXP, SEXP neSEXP, SEXP nxSEXP, SEXP nlamSEXP, SEXP flminSEXP, SEXP ulamSEXP, SEXP thrSEXP, SEXP isdSEXP, SEXP jsdSEXP, SEXP intrSEXP, SEXP maxitSEXP, SEXP pbSEXP, SEXP lmuSEXP, SEXP a0SEXP, SEXP caSEXP, SEXP iaSEXP, SEXP ninSEXP, SEXP rsqSEXP, SEXP almSEXP, SEXP nlpSEXP, SEXP jerrSEXP) {
@@ -309,6 +390,67 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type jerr(jerrSEXP);
     rcpp_result_gen = Rcpp::wrap(multspelnet_exp(parm, x, y, w, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, jsd, intr, maxit, pb, lmu, a0, ca, ia, nin, rsq, alm, nlp, jerr));
     return rcpp_result_gen;
+END_RCPP
+}
+// spcoxnet_exp
+List spcoxnet_exp(double parm, const Eigen::Map<Eigen::SparseMatrix<double>> x, Eigen::VectorXd start, Eigen::VectorXd stop, Eigen::VectorXi status, Eigen::VectorXi strata, bool efron, Eigen::VectorXd g, const Eigen::Map<Eigen::VectorXd> w, const Eigen::Map<Eigen::VectorXi> jd, const Eigen::Map<Eigen::VectorXd> vp, Eigen::MatrixXd cl, int ne, int nx, int nlam, double flmin, const Eigen::Map<Eigen::VectorXd> ulam, double thr, int isd, int maxit, SEXP pb, int lmu, Eigen::Map<Eigen::VectorXd> a0, Eigen::Map<Eigen::MatrixXd> ca, Eigen::Map<Eigen::VectorXi> ia, Eigen::Map<Eigen::VectorXi> nin, double nulldev, Eigen::Map<Eigen::VectorXd> dev, Eigen::Map<Eigen::VectorXd> alm, int nlp, int jerr);
+RcppExport SEXP _glmnet_spcoxnet_exp(SEXP parmSEXP, SEXP xSEXP, SEXP startSEXP, SEXP stopSEXP, SEXP statusSEXP, SEXP strataSEXP, SEXP efronSEXP, SEXP gSEXP, SEXP wSEXP, SEXP jdSEXP, SEXP vpSEXP, SEXP clSEXP, SEXP neSEXP, SEXP nxSEXP, SEXP nlamSEXP, SEXP flminSEXP, SEXP ulamSEXP, SEXP thrSEXP, SEXP isdSEXP, SEXP maxitSEXP, SEXP pbSEXP, SEXP lmuSEXP, SEXP a0SEXP, SEXP caSEXP, SEXP iaSEXP, SEXP ninSEXP, SEXP nulldevSEXP, SEXP devSEXP, SEXP almSEXP, SEXP nlpSEXP, SEXP jerrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type parm(parmSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::SparseMatrix<double>> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type start(startSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type stop(stopSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXi >::type status(statusSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXi >::type strata(strataSEXP);
+    Rcpp::traits::input_parameter< bool >::type efron(efronSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type g(gSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type w(wSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXi> >::type jd(jdSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type vp(vpSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type cl(clSEXP);
+    Rcpp::traits::input_parameter< int >::type ne(neSEXP);
+    Rcpp::traits::input_parameter< int >::type nx(nxSEXP);
+    Rcpp::traits::input_parameter< int >::type nlam(nlamSEXP);
+    Rcpp::traits::input_parameter< double >::type flmin(flminSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type ulam(ulamSEXP);
+    Rcpp::traits::input_parameter< double >::type thr(thrSEXP);
+    Rcpp::traits::input_parameter< int >::type isd(isdSEXP);
+    Rcpp::traits::input_parameter< int >::type maxit(maxitSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type pb(pbSEXP);
+    Rcpp::traits::input_parameter< int >::type lmu(lmuSEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type a0(a0SEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type ca(caSEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXi> >::type ia(iaSEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXi> >::type nin(ninSEXP);
+    Rcpp::traits::input_parameter< double >::type nulldev(nulldevSEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type dev(devSEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type alm(almSEXP);
+    Rcpp::traits::input_parameter< int >::type nlp(nlpSEXP);
+    Rcpp::traits::input_parameter< int >::type jerr(jerrSEXP);
+    rcpp_result_gen = Rcpp::wrap(spcoxnet_exp(parm, x, start, stop, status, strata, efron, g, w, jd, vp, cl, ne, nx, nlam, flmin, ulam, thr, isd, maxit, pb, lmu, a0, ca, ia, nin, nulldev, dev, alm, nlp, jerr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// glmnet_control_get
+List glmnet_control_get();
+RcppExport SEXP _glmnet_glmnet_control_get() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(glmnet_control_get());
+    return rcpp_result_gen;
+END_RCPP
+}
+// glmnet_control_set
+void glmnet_control_set(List updates);
+RcppExport SEXP _glmnet_glmnet_control_set(SEXP updatesSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type updates(updatesSEXP);
+    glmnet_control_set(updates);
+    return R_NilValue;
 END_RCPP
 }
 // get_int_parms

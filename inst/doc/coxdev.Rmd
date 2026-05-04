@@ -1,0 +1,483 @@
+---
+title: "Some notes on the score and Hessian of weighted Cox's proportional hazards with ties"
+author: 
+  - Jonathan Taylor
+  - Trevor Hastie
+  - Balasubramanian Narasimhan
+  - Kenneth Tay
+date: "April 13, 2026"
+output:
+    html_document:
+    fig_caption: yes
+    toc: yes
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{Computations for Cox Regression}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r include=FALSE}
+# the code in this chunk enables us to truncate the print output for each
+# chunk using the `out.lines` option
+# save the built-in output hook
+hook_output <- knitr::knit_hooks$get("output")
+
+# set a new output hook to truncate text output
+knitr::knit_hooks$set(output = function(x, options) {
+  if (!is.null(n <- options$out.lines)) {
+    x <- xfun::split_lines(x)
+    if (length(x) > n) {
+      # truncate the output
+      x <- c(head(x, n), "....\n")
+    }
+    x <- paste(x, collapse = "\n")
+  }
+  hook_output(x, options)
+})
+```
+
+## Abstract
+
+We develop the score and Hessian for Cox's partial likelihood with weights as well as ties (including both "Breslow" and "Efron" tie-breaking).
+
+---
+
+There are two terms in Cox's partial log-likelihood
+$$
+\sum_{i=1}^n d_i w_i \left[ \eta_i - \log \left(\sum_{j:j \geq i} w_j e^{\eta_j} \right) \right].
+$$
+
+We'll focus on the second, as the first is simple to deal with, even with ties.
+
+# The easy case: no ties
+
+We'll first compute things when there are no ties in the data. Individuals may have tied start time. However, for any event time $t_i$ where a failure occurs ($d_i=1$), we assume there are no other individuals who have the same event time nor are there any start times equal to $t_i$. This makes ordering the $t_i$'s unambiguous and the distinction between a start time equalling $t_i$ or not irrelevant.
+
+**We'll assume that we've sorted things by event time. That is, $j > i \implies t_j > t_i$. As we have no ties in this section, we can recover "disk order" by reversing the sort. More generally, with ties we'll assume that $j > i \implies t_j \geq t_i$ and that tied event and start times will be sorted in an arbitrary but fixed order. Therefore, we can unambiguously map between this fixed order and "disk order".**
+
+## Right censored
+
+Ignoring the linear term, and sign, we need to differentiate (by $\eta_k$)
+$$
+\sum_{i = 1}^n d_i w_i \log \left(\sum_{j \geq i} w_j e^{\eta_j}\right)
+$$
+Below, $d_i=\text{status}_i$ so it will always be binary even in the presence of ties. Ties will be dealt with shortly.
+
+$$
+\begin{aligned}
+   \frac{\partial}{\partial \eta_k} \sum_{i = 1}^n d_i w_i \log \left(\sum_{j \geq i} w_j e^{\eta_j}\right) 
+   &= \sum_{i=1}^n d_i w_i \frac{ \sum_{j \geq i} w_j \delta_{jk} e^{\eta_k}} 
+   {\sum_{l \geq i} w_l e^{\eta_l}} \\
+   &= \sum_{i=1}^n d_i w_i \frac{ 1_{\{k \geq i\}} w_k e^{\eta_k}} 
+   {\sum_{l \geq i} w_l e^{\eta_l}} \\
+   &= w_k e^{\eta_k} \sum_{i=1}^k d_i w_i \frac{ 1} 
+   {\sum_{l \geq i} w_l e^{\eta_l}} \\
+\end{aligned}
+$$
+
+Second derivative:
+$$
+\begin{aligned}
+   \frac{\partial^2}{\partial \eta_k^2} \sum_{i = 1}^n d_i w_i \log \left(\sum_{j \geq i} w_j e^{\eta_j}\right) 
+&= \frac{\partial}{\partial w_k} \left[w_k e^{\eta_k} \sum_{i=1}^k d_i w_i \frac{ 1} 
+   {\sum_{l \geq i} w_l e^{\eta_l}} \right] \\
+   &= w_k e^{\eta_k} \left[\sum_{i=1}^k d_i w_i \frac{ 1} 
+   {\sum_{l \geq i} w_l e^{\eta_l}} - \sum_{i=1}^k d_i w_i \frac{ \sum_{l \geq i} w_l \delta_{lk} e^{\eta_l}} 
+   {(\sum_{l \geq i} w_l e^{\eta_l})^2} \right] \\
+    &= w_k e^{\eta_k} \left[\sum_{i=1}^k d_i w_i \frac{ 1} 
+   {\sum_{l \geq i} w_l e^{\eta_l}} - \sum_{i=1}^k d_i w_i \frac{ 1_{\{k \geq i\}} w_k e^{\eta_k}} 
+   {(\sum_{l \geq i} w_l e^{\eta_l})^2} \right] \\
+      &= w_k e^{\eta_k} \left[\sum_{i=1}^k d_i w_i \frac{ 1} 
+   {\sum_{l \geq i} w_l e^{\eta_l}} - \sum_{i=1}^k d_i w_i \frac{  w_k e^{\eta_k}} 
+   {(\sum_{l \geq i} w_l e^{\eta_l})^2} \right] \\
+\end{aligned}
+$$
+
+## Start / stop
+
+Let the start times be $(s_m)_{1 \leq m \leq n}$.
+
+We now make the basic observation:
+$$
+\begin{aligned}
+    \frac{\partial}{\partial \eta_k} \left(\sum_{j:j \geq i} w_j e^{\eta_j} - \sum_{m:s_m \geq t_i} w_m e^{\eta_m} \right) &= w_k e^{\eta_k}\left[ \left(\sum_{j:j \geq i} \delta_{jk} - 
+    \sum_{m: s_m \geq t_i} \delta_{mk} \right) \right] \\
+    &= w_k e^{\eta_k} \left[ 1_{\{k \geq i\}} - 1_{\{s_k \geq t_i\}} \right]
+\end{aligned}
+$$
+
+We need to differentiate (by $\eta_k$)
+$$
+\sum_{i = 1}^n d_i w_i \log \left(\sum_{j \geq i} w_j e^{\eta_j} - \sum_{m:s_m \geq t_i} w_m e^{\eta_m} \right)
+$$
+
+Proceeding
+$$
+\begin{aligned}
+   \frac{\partial}{\partial \eta_k} \sum_{i = 1}^n d_i w_i \log \left(\sum_{j \geq i} w_j e^{\eta_j}- \sum_{m:s_m \geq t_i} w_m e^{\eta_m} \right) 
+   &= w_k e^{\eta_k} \sum_{i=1}^n  d_i w_i \frac{1_{\{k \geq i\}} - 1_{\{s_k \geq t_i\}} } 
+   {\sum_{j \geq i} w_j e^{\eta_j}- \sum_{m:s_m \geq t_i} w_m e^{\eta_m} } \\
+   &= w_k e^{\eta_k}\biggl[ \sum_{i=1}^k  \frac{ d_i w_i} 
+   {\sum_{l \geq i} w_l e^{\eta_l}- \sum_{m:s_m \geq t_i} w_m e^{\eta_m} }   \\
+   & \qquad \quad - \sum_{i:t_i \leq s_k} \frac{ d_i w_i} 
+   {\sum_{l \geq i} w_l e^{\eta_l}- \sum_{m:s_m \geq t_i} w_m e^{\eta_m} }\biggr] \\
+\end{aligned}
+$$
+
+This can be computed by computing the cumsum of the sequence
+$$
+\left( \frac{ d_i w_i} 
+   {\sum_{l \geq i} w_l e^{\eta_l}- \sum_{m:s_m \geq t_i} w_m e^{\eta_m} } \right)_{1 \leq i \leq n}.
+$$
+
+**Note that this depends only on the risk sums at failure times! Hence, we only need produce an algorithm that correctly computes the risk sums at failure times! We will return to this below with ties.**
+
+## Difference of cumsums
+
+Let
+$$
+E_i(\xi) = \sum_{j \geq i: w_j > 0} \xi_j = \sum_{j: t_j \geq t_i, w_j > 0} \xi_j
+$$
+and
+$$
+S_i(\xi) = \sum_{j: s_j \geq t_i, w_j > 0} \xi.
+$$
+The quantity $S_i$ can be expressed in terms of the cumsum of the $w_j e^{\eta_j}$ ordered in start time order and then finding the index of $t_i$ within the start times $(s_i)_{1 \leq i \leq n}$.
+
+The difference
+$$
+\sum_{j: j \geq i} w_j e^{\eta_j} - \sum_{m:s_m \geq t_i} w_m e^{\eta_m}
+$$
+can be expressed as the risk sum
+$$
+R_i(we^{\eta}) = E_i(we^{\eta}) - S_i(we^{\eta}).
+$$
+
+The objective can then be expressed as
+$$
+\sum_{i=1}^n d_i w_i \log(R_i(we^{\eta}))
+$$
+with gradient
+$$
+w_k e^{\eta_k}
+\sum_{i=1}^n 
+\frac{d_i w_i [1_{\{k \geq i\}} - 1_{\{s_k \geq t_i\}}]}{E_i(we^{\eta})-S_i(we^{\eta})} = w_k e^{\eta_k}
+\sum_{i=1}^n 
+\frac{d_i w_i [1_{\{k \geq i\}} - 1_{\{s_k \geq t_i\}}]}{R_i(we^{\eta})}
+$$
+
+This can be written as a difference of cumsums of the sequence
+$$
+\left(\frac{d_i w_i}{R_i(we^{\eta})}\right)_{1 \leq i \leq n}
+$$
+The cumsums will be ordered with respect to event / stop time, we will need to find the index of the start time $s_k$ within the event / stop times $(t_i)_{1 \leq i \leq n}$.
+
+## Second derivative
+
+The diagonal of the Hessian is then
+$$
+w_k e^{\eta_k}
+\sum_{i=1}^n 
+\frac{d_i w_i [1_{\{k \geq i\}} - 1_{\{s_k \geq t_i\}}]}{E_i(we^{\eta})-S_i(we^{\eta})}
+- w_k^2 e^{2 \eta_k} \sum_{i=1}^n \frac{d_i w_i [1_{\{k \geq i\}} - 1_{\{s_k \geq t_i\}}]}{(E_i(we^{\eta})-S_i(we^{\eta}))^2}
+$$
+(Used $1_{\{k \geq i\}}-1_{\{s_k \geq t_i\}} \in \{0,1\}$ and $1^2=1, 0^2=0$ so $(1_{\{k \geq i\}}-1_{\{s_k \geq t_i\}})^2=1_{\{k \geq i\}}-1_{\{s_k \geq t_i\}}$.)
+This can again be expressed in terms of cumsums. The sequence above as well as the sequence
+$$
+\left(\frac{d_i w_i}{(E_i(we^{\eta})-S_i(we^{\eta}))^2}\right)_{1 \leq i \leq n}
+$$
+
+Again, we will need to cumsum this sequence with respect to event / stop order.
+
+# Probabilistic interpretation
+
+In terms of computing derivatives, it is perhaps helpful to instead think of differentiating
+$$
+\sum_{i=1}^n d_i w_i \log(R_i(we^{\eta})/R_i(w))
+\overset{def}{=} \sum_{i=1}^n d_i w_i \Lambda_i(\eta).
+$$
+The map $\eta \to \log(R_i(we^{\eta})/R_i(w))$ is the cumulant generating function of an exponential family built on top of a base measure taking values in the risk set. The law of this base random variable, $V_i$ changes with time, in that it depends on the risk set at $t_i$. The random variable has density proportional to $w_j$ on $\{j:t_j \geq t_i, s_j < t_i\}.$ Let's call its law $P_i$ and the corresponding law under $\eta$ $P_{i,\eta}$.
+
+This CGF interpretation gives clean interpretation to the $k$-th coordinate of the gradient as
+$$
+\begin{aligned}
+    \sum_{i=1}^n d_i w_i E_{i,\eta}[1_{\{k\}}(V_i)] = 
+\sum_{i=1}^n d_i w_i \frac{w_k e^{\eta_k} 1_{\{k \in \text{supp}(P_i)\}}}{E_i[e^\eta]} = \sum_{i=1}^n d_i w_i \pi_{i,\eta}[k]
+\end{aligned}
+$$
+
+The second derivative has $(r,c)$ entry
+$$
+\sum_{i=1}^n d_i w_i\left( \pi_{i,\eta}[r] \delta_{rc} - 
+\pi_{i,\eta}[r] \pi_{i,\eta}[c] \right).
+$$
+
+**This also tells us about saturated log-likelihood by considering multinomials of successive risk sets.**
+
+# Ties and zero weights
+
+**As mentioned previously, we'll assume that we've picked an arbitrary sort of event times by event time. That is, $j \geq i \implies t_j \geq t_i$. We can recover "disk order" by inverting this particular sort. So series indexed by $i$ below should be interpreted as indexed by a fixed but arbitrary sort of our event times. Also note that any summation over cases $j$ will be restricted to the sum over entries $w_j > 0$.**
+
+For ties, the issue of determining "which" of a set events occurred "first" must be disambiguated in some sense. Once a hypothetical ordering of the events were given, then the risk sums for each failure at some time be computed.
+
+This is usually not done exactly. The Breslow and Efron methods "approximate" this computation of risk sums in a certain sense. The two methods proceed essentially as above, i.e. computing a risk sum for each individual and then compute the log of the risk sum.
+
+Any reasonable approximation based on computing a risk sum for each individual (with ties) should have the property that it is exchangable with respect to a reordering of the failures at a given observed failure time.
+
+The linear term clearly has no issue, it is the sum of log risk sums that needs to be addressed. For this, we rewrite the log-likelihood as
+$$
+\sum_{i=1, w_i > 0}^n d_i \left[w_i  \eta_i - \bar{w}_i \log \left( \bar{R}_i(we^{\eta}) \right) \right].
+$$
+
+As above, we recall that we restricted $d_i \in \{0,1\}$. Again, we note that we only need to correctly compute the risk sums $\bar{R}_i$ for the individuals who failed $d_i=1$.
+
+At this point, there are several orderings of the individuals by event time. The Efron and Breslow, expressed as sums over individuals, can be viewed as picking an arbitrary such order and proposing $\bar{w}$ and $\bar{R}$ that are invariant to this choice of ordering.
+
+Specifically, we group individuals into clusters in such a way that for any individual $i$ who failed ($d_i=1$) at time $t_i$, their cluster is all other individuals who failed at that same time. Given such a clustering $C$, set
+$$
+\bar{w}_i = \begin{cases} \frac{\sum_{j:C_j=C_i, w_j>0} w_j}{\sum_{j:C_j=C_i, w_j>0} 1} = \frac{\sum_{j:C_j=C_i, w_j>0} w_j}{K_j} & w_i > 0 \\
+    0  & \text{otherwise.}
+    \end{cases}
+$$
+with
+$$
+K_j = \# \{j:C_j=C_i, w_j>0\}.
+$$
+
+We have again applied our principle of summing only over $\{j:w_j>0\}$ in computing the average weight for the cluster.
+
+**Again, by the form of the likelihood it only matters that $\bar{w}_i$ is corrected "correctly" for individuals who fail $(d_i=1)$.**
+
+We will choose a clustering that assigns all individuals to an individual cluster *unless* $d_i=1$. If it is an individual that failed, we find all other individuals who failed at that time and assign them to the same cluster. In this way, for each $i$, there is a $\mathtt{first}(i)$ which is the first index in our arbitrary ordering which is in the same cluster as $i$ and a $\mathtt{last}(i)$. The size of each cluster is $\mathtt{last}(i) + 1 - \mathtt{first}(i)$. This will be 1 unless $t_i$ is a failure $(d_i=1)$ and there is more than 1 failure at this $t_i$.
+
+From this $\mathtt{first}$ and $\mathtt{last}$ we can compute a "centering" weight $\sigma$ to be used for the Efron or Breslow correction. It is easier to describe in words than in formulae: for a set of indices which is a cluster of size $K$ (so a set of $K$ failures at some particular $t$) the corresponding entries of $\sigma$ are $\{0,1/K,2/K,\dots,(K-1)/K\}.$ Here, $K$ is one of the entries of the equation above. When the cluster of tied event times contains points of weight 0, then these should have $\sigma_i=0$. That is, suppose we observe a cluster of size 6 with corresponding weight $w=[1/2,0,0,3/4,0,2]$ then the corresponding $\sigma=[0,0,0,1/3,0,2/3]$. This is the $\sigma$ we would get if we dropped those entries with 0 weight from the `(start, stop, event)` arrays to begin with. This is accomplished by a particular lexical sort which takes all points with equal event times and places those failures with $w_i>0$ in the beginning of that segment and into a unique cluster.
+
+We can now define our risk sums
+$$
+\begin{aligned}
+\Delta_i(\xi) &= \sum_{j:C_j=C_i, w_j>0} \xi_j  \\
+\bar{R}_i(\xi) &= \sum_{j: t_j \geq t_{i}, w_j>0} \xi_j - 
+\sum_{m: s_m \geq t_i, w_m>0} \xi_m
+- \delta \cdot \sigma_i \cdot \Delta_i(\xi)
+\end{aligned}
+$$
+It is clear from the above that $\bar{R}$ is linear, i.e. $\bar{R}_i(\xi)=\bar{r}_i'\xi$ for some vector $\bar{r}_i$.
+
+Following through our choice of clustering, we'll see that $R_i(we^{\eta})=\bar{R}_i(we^{\eta})$ unless $d_i=1$. It should also be clear that computing the cumulative sum of $\bar{R}_i(we^{\eta})$ over $i$ doesn't depend on our initial ordering based on the $t_i$'s. Similarly computing the cumsum of $\zeta_i \bar{R}_i(we^{\eta})$ with $\zeta_i$ constant within clusters (such as the vector $\bar{w}$) will also not depend on our initial ordering. Finally, it should be clear that for such $\zeta$ the corresponding $\Delta_i$ can be expressed in terms of the cumsums of $(w_j \zeta_j)_{1 \leq j \leq n}$.
+
+The Breslow correction uses $\delta=0$. The Efron correction uses $\delta=1$.
+
+## Probabilistic interpretation
+
+In terms of differentiating with respect to $\eta$ we could again consider differentiating
+$$
+\sum_{i=1}^n d_i \bar{w}_i
+\log(\bar{R}_i(we^{\eta})/\bar{R}_i(w)).
+$$
+
+This again yields a probabilistic interpretation as in the case of no ties. In this case, the base measure is handled slightly differently as to when there are no ties. Breslow's method fixes the risk set and weights to be the same for all $i$ in the current cluster of failures. (Recall we have some valid, but arbitrary ordering by event time.) This is clearly exchangeable. Efron's method on the other hand changes the weights as $i$ cycles through the cluster of event times, downweighting all in the cluster multiplicatively by $1/K$ as $i$ cycles through the cluster of event times.
+
+## First derivative
+
+Proceeding as previously we want to differentiate
+$$
+\sum_{i=1}^n d_i \bar{w}_i \log \left( \bar{R}_i(we^{\eta})  / \bar{R}_i(w) \right).
+$$
+
+Similarly to when there are no ties, we see this is
+$$
+w_k e^{\eta_k}\sum_{i=1}^n \frac{d_i \bar{w}_i [1_{\{t_k \geq t_i\}} - 1_{\{s_k \geq t_i\}} - \delta \cdot \sigma_i \cdot( 1_{\{i \leq \mathtt{last}(k)\}} - 1_{\{i \leq \mathtt{first}(k)-1\}}) ]}{\bar{R}_i(we^{\eta})} = \sum_{i=1}^n d_i \bar{w}_i
+\pi_{i,\eta}[k].
+$$
+
+## Second derivative
+
+For the $k$-th entry of the diagonal there will be the first term above and we will subtract a second term
+$$
+w^2_k e^{2\eta_k}\sum_{i=1}^n \frac{d_i \bar{w}_i [1_{\{t_k \geq t_i\}} - 1_{\{s_k \geq t_i\}} - \delta \cdot \sigma_i\cdot( 1_{\{i \leq \mathtt{last}(k)\}} - 1_{\{i \leq \mathtt{first}(k)-1\}})]^2}{\bar{R}_i(we^{\eta})^2}.
+$$
+
+We can expand this, and we'll see that this can be expressed in terms of differences of cumsums of the sequences
+$$
+\left(\frac{d_i \bar{w}_i}{\bar{R}_i(we^{\eta})^2}, \frac{d_i \bar{w}_i \sigma_i}{\bar{R}_i(we^{\eta})^2}, \frac{d_i \bar{w}_i \sigma^2_i}{\bar{R}_i(we^{\eta})^2}\right)_{1 \leq i \leq n}.
+$$
+
+# A lemma or two
+
+To ensure we get the right results, we'll use a few lemmas.
+
+**Lemma 1** (Forward cumsum representation).
+*Given a sequence $(Z_i)_{1 \leq i \leq n}$ let $E(Z)_i, S(Z)_i$ denote reversed cumsums of $Z$ (padded with a 0 as the $n+1$-st element) with respect to arbitrary, but otherwise valid, ordering of the $t_i$'s and $s_i$'s. Let $\mathtt{eventmap}(i)$ be a sequence such that, whenever $d_i=1$ we have $\mathtt{event}(i) = \#\{j:s_j < t_i\}.$ Then,*
+$$
+d_i \cdot \left( \sum_{j: t_j \geq t_i} Z_j - \sum_{m: s_m \geq t_i} Z_m \right) = d_i  \cdot (E(Z)_{\mathtt{first}(i)} - S(Z)_{\mathtt{eventmap}(i)}).
+$$
+*In particular, this implies for $i$ such that $d_i=1$*
+$$
+\bar{r}_i'Z = E(Z)_{\mathtt{first}(i)} - S(Z)_{\mathtt{eventmap}(i)} - \delta \cdot \sigma_i  \cdot (E_{\mathtt{first}(i)}(Z) - E_{\mathtt{last}(i)+1}(Z)).
+$$
+
+**Proof:** If $d_i=1$, then $E_{\mathtt{first}(i)}$ sums all entries of $Z$ for which $t_j \geq t_i$. Similarly, under our assumptions $S(Z)_{\mathtt{event}(i)}$ will be the sum over start times greater than or equal to $t_i$.
+
+**Note:** When we don't have start times $\mathtt{eventmap}(i)=n$ (0-based indexing) and $S(Z)_{\mathtt{eventmap}(i)} \equiv 0.$
+
+**Note:** This says our risk sum calculation is correct for the failure times. This seems false without the $d_i$, i.e. we only have the correct sum at failure times. But that's all we need thankfully.
+
+**Note:** Recall that to get this expression into the "disk order", we invert by our fixed sort of event times.
+
+**Lemma 2** (Adjoint cumsum representation).
+*Given a sequence $(Z_i)_{1 \leq i \leq n}$ let $\bar{E}(d \cdot Z)_i$ denote the cumsums of $d \cdot Z$ ordered with respect to a valid, but otherwise arbitrary order, (with a 0 padded in as the first element). Then,*
+$$
+\begin{aligned}
+    \sum_{i=1}^n d_i Z_i (1_{\{t_k \geq t_i\}} - 1_{\{s_k \geq t_i\}}) &=
+\bar{E}(d \cdot Z)_{\mathtt{last}(k)+1} - \bar{E}(d \cdot Z)_{\mathtt{startmap}(k)} \\
+&= 
+\bar{E}(d \cdot Z)_{\mathtt{last}(k)+1} - \bar{E}(d \cdot Z)_{\mathtt{firststart}(k)}
+\end{aligned}
+$$
+*Above, $\mathtt{startmap}(k) = \# \{j: t_j \leq s_k\}$. Further $\mathtt{startmap}(i) = \mathtt{first}(\mathtt{startmap}(k)) \leq \mathtt{first}(k).$*
+
+**Note:** With no start times, $\mathtt{startmap} \equiv 0$ (0-based indexing) and $\bar{E}(Z)_{\mathtt{startmap}(i)} \equiv 0$.
+
+**Note:** The elementwise multiplication by $d$ is also crucial here.
+
+## Derivatives revisited
+
+In the light of the lemmata above, we can rewrite this first derivative now as
+$$
+w_k e^{\eta_k}\sum_{i=1}^n \frac{d_i \bar{w}_i [1_{\{i \leq \mathtt{last}(k)\}} - 1_{\{i < \mathtt{startmap}(k)\}} - \delta \cdot \sigma_i \cdot( 1_{\{i \leq \mathtt{last}(k)\}} - 1_{\{i \leq \mathtt{first}(k)-1\}}) ]}{\bar{R}_i(we^{\eta})}
+$$
+
+Similarly, that term in the second derivative takes the form
+$$
+w_k^2 e^{2 \eta_k}\sum_{i=1}^n \frac{d_i \bar{w}_i [1_{\{i \leq \mathtt{last}(k)\}} - 1_{\{i < \mathtt{startmap}(k)\}} - \delta \cdot \sigma_i \cdot( 1_{\{i \leq \mathtt{last}(k)\}} - 1_{\{i \leq \mathtt{first}(k)-1\}}) ]^2}{\bar{R}_i(we^{\eta})^2}
+$$
+
+The last conclusion of Lemma 2 allows us now to resolve products of all the indicators above. The only that requires any thought is the product
+$$
+1_{\{i < \mathtt{startmap}(k)-1\}} 1_{\{i \leq \mathtt{first}(k)-1\}} = 1_{\{i < \mathtt{startmap}(k)-1\}}.
+$$
+
+# Full Hessian
+
+Suppose we want to multiply the Hessian by a vector $(\xi_i)_{1 \leq i \leq n}$. Let's use $(r,c)$ for the $r$-th row and $c$-th column of the Hessian.
+
+## Non-diagonal term
+
+We'll have a term like
+$$
+-w_r w_c e^{ \eta_r + \eta_c} \sum_{i=1}^n \frac{d_i \bar{w}_i }{\bar{R}_i(we^{\eta})^2} \bar{r}_i'e_r \bar{r}_i'e_c.
+$$
+
+We are free to rewrite this as:
+$$
+-w_r w_c e^{ \eta_r + \eta_c} \sum_{i=1}^n \frac{d_i \bar{w}_i }{\bar{R}_i(we^{\eta})^2} [1_{\{t_r \geq t_i\}} - 1_{\{s_r \geq t_i\}} - \delta \cdot \sigma_i \cdot (1_{\{i \leq \mathtt{last}(r)\}} - 1_{\{i \leq \mathtt{first}(r)-1\}})] \bar{r}_i'e_c.
+$$
+We'll write it this way as it will allow us to get rid of the two sums conveniently.
+
+Multiplying this on the right by $\xi$ yields (with $e_j$ the elementary basis vectors):
+$$
+-w_r e^{\eta_r}  \sum_{i=1}^n   \frac{d_i \bar{w}_i }{\bar{R}_i(we^{\eta})^2} [1_{\{t_r \geq t_i\}} - 1_{\{s_r \geq t_i\}} - \delta \cdot \sigma_i \cdot (1_{\{i \leq \mathtt{last}(r)\}} - 1_{\{i \leq \mathtt{first}(r)-1\}})] \left(\sum_{c=1}^n \bar{r}_i'e_c w_c e^{\eta_c} \xi_c\right)
+$$
+
+The sum over $c$ is simply computing
+$$
+\bar{r}_i'(\xi w e^{\eta}) = \bar{R}_i(\xi w^{\eta})
+$$
+Lemma 1 tells us how to do this correctly for the $i$ with $d_i=1$. This is done by calling the function `_sum_over_risk_set` in the code, applied to an argument $\xi w e^{\eta}$.
+
+We now have to compute the following sum over $i$
+$$
+-  w_r e^{\eta_r} \sum_{i=1}^n \frac{d_i \bar{w}_i \bar{R}_i(\xi w e^{\eta})}{\bar{R}_i(w e^{\eta})^2} [1_{\{t_r \geq t_i\}} - 1_{\{s_r \geq t_i\}} - \delta \cdot \sigma_i \cdot (1_{\{i \leq \mathtt{last}(r)\}} - 1_{\{i \leq \mathtt{first}(r)-1\}})] .
+$$
+
+Up to the scaling by $-w_r e^{\eta_r}$ computation can be handled by Lemma 2 applied to the sequences
+$$
+\frac{\bar{w}_i \bar{R}_i(\xi w e^{\eta})}{\bar{R}_i(\xi w e^{\eta})^2}, \frac{\bar{w}_i \sigma_i \bar{R}_i(\xi w e^{\eta})}{\bar{R}_i(\xi w e^{\eta})^2}.
+$$
+This is handled by the function `_sum_over_events` in the code.
+
+## Diagonal term
+
+The diagonal term will have $(r,c)$ entry
+$$
+\delta_{rc} w_r e^{\eta_r} \sum_{i=1}^n \frac{d_i \bar{w}_i [1_{\{t_r \geq t_i\}} - 1_{\{s_r \geq t_i\}} - \delta \cdot \sigma_i \cdot (1_{\{i \leq \mathtt{last}(r)\}} - 1_{\{i \leq \mathtt{first}(r)-1\}})]}{\bar{R}_i(we^{\eta})}.
+$$
+
+Summing over $c$ in a multiplication by $\xi$ on the right yields
+$$
+\begin{aligned}
+&\sum_{c=1}^n \xi_c \delta_{rc} w_r e^{\eta_r} \sum_{i=1}^n \frac{d_i \bar{w}_i [1_{\{t_r \geq t_i\}} - 1_{\{s_r \geq t_i\}} - \delta \cdot \sigma_i \cdot (1_{\{i \leq \mathtt{last}(r)\}} - 1_{\{i \leq \mathtt{first}(r)-1\}})]}{\bar{R}_i(we^{\eta})} \\
+&= \xi_r w_r e^{\eta_r} \sum_{i=1}^n \frac{d_i \bar{w}_i [1_{\{t_r \geq t_i\}} - 1_{\{s_r \geq t_i\}} - \delta \cdot \sigma_i \cdot (1_{\{i \leq \mathtt{last}(r)\}} - 1_{\{i \leq \mathtt{first}(r)-1\}})]}{\bar{R}_i(we^{\eta})}. 
+\end{aligned}
+$$
+We again apply Lemma 2 to the sequences
+$$
+\frac{\bar{w}_i}{\bar{R}_i(we^{\eta})}, \frac{\bar{w}_i \sigma_i}{\bar{R}_i(we^{\eta})}.
+$$
+
+## Probabilistic interpretation
+
+The Hessian has $(r,c)$ entry
+$$
+\sum_{i=1}^n d_i \bar{w}_i \left( \delta_{rc} \cdot \pi_{i,\eta}[r] -
+\pi_{i,\eta}[r]\pi_{i,\eta}[c] \right).
+$$
+
+Multiplying on the right by $\xi$ yields
+$$
+\sum_{i=1}^n d_i \bar{w}_i \left( \xi_r \pi_{i,\eta}[r] -
+\pi_{i,\eta}[r] E_{i,\eta}[\xi] \right) = 
+\sum_{i=1}^n d_i \bar{w}_i  (\xi_r - E_{i,\eta}[\xi]) \pi_{i,\eta}[r] 
+$$
+
+
+# Appendix: Proofs of Lemmas
+
+## Proof of Lemma 1 (Forward cumsum representation)
+
+Consider the evaluation of the risk sum for an individual $i$ that experiences an event ($d_i = 1$). The sum can be decomposed into two parts based on the definition of the risk set at time $t_i$, which includes all individuals $j$ such that $s_j < t_i \leq t_j$:
+$$
+\sum_{j: s_j < t_i \leq t_j} Z_j = \sum_{j: t_j \geq t_i} Z_j - \sum_{m: s_m \geq t_i, t_m \geq t_i} Z_m.
+$$
+Because the start time $s_m$ is always strictly less than the event time $t_m$ ($s_m < t_m$), the condition $s_m \geq t_i$ naturally implies $t_m \geq t_i$. Thus, the second sum simplifies:
+$$
+\sum_{j: s_j < t_i \leq t_j} Z_j = \sum_{j: t_j \geq t_i} Z_j - \sum_{m: s_m \geq t_i} Z_m.
+$$
+
+Let us assume 0-based indexing for the sequences. The sequence $Z$ is sorted in ascending order of event times $t$. The index $\mathtt{first}(i)$ represents the first occurrence of the event time $t_i$ in this sorted sequence. Therefore, summing $Z_j$ for all $j$ where $t_j \geq t_i$ is equivalent to summing the sequence from index $\mathtt{first}(i)$ to the end ($n-1$). By definition, the reversed cumsum $E(Z)_{\mathtt{first}(i)}$ computes exactly this quantity.
+
+Similarly, let $S(Z)$ be the reversed cumsum of $Z$ sorted by start times $s$. The quantity $\mathtt{eventmap}(i) = \#\{j : s_j < t_i\}$ gives the exact number of start times strictly less than $t_i$. In a 0-based indexed array sorted by start times, the indices $0, 1, \dots, \mathtt{eventmap}(i)-1$ correspond to $s_m < t_i$, and the indices from $\mathtt{eventmap}(i)$ onwards correspond to $s_m \geq t_i$. Thus, the reversed cumsum $S(Z)_{\mathtt{eventmap}(i)}$ computes the sum of $Z_m$ for $s_m \geq t_i$.
+
+Multiplying by $d_i$ (which trivially yields $0$ on both sides if $d_i=0$) establishes the first equality:
+$$
+d_i \cdot \left( \sum_{j: t_j \geq t_i} Z_j - \sum_{m: s_m \geq t_i} Z_m \right) = d_i  \cdot \left( E(Z)_{\mathtt{first}(i)} - S(Z)_{\mathtt{eventmap}(i)} \right).
+$$
+
+For the second part of the Lemma, recall the definition of $\bar{R}_i(\xi)$:
+$$
+\bar{R}_i(Z) = \sum_{j: t_j \geq t_i} Z_j - \sum_{m: s_m \geq t_i} Z_m - \delta \cdot \sigma_i \cdot \Delta_i(Z)
+$$
+where $\Delta_i(Z) = \sum_{j: C_j=C_i} Z_j$ is the sum over the cluster of tied event times at $t_i$. The cluster spans indices from $\mathtt{first}(i)$ to $\mathtt{last}(i)$. In terms of the reversed cumsum $E(Z)$, the sum over this finite slice is simply $E(Z)_{\mathtt{first}(i)} - E(Z)_{\mathtt{last}(i)+1}$. Substituting this difference into the expression for $\bar{R}_i(Z)$ yields:
+$$
+\bar{r}_i'Z = E(Z)_{\mathtt{first}(i)} - S(Z)_{\mathtt{eventmap}(i)} - \delta \cdot \sigma_i  \cdot \left( E(Z)_{\mathtt{first}(i)} - E(Z)_{\mathtt{last}(i)+1} \right),
+$$
+which concludes the proof. $\square$
+
+## Proof of Lemma 2 (Adjoint cumsum representation)
+
+We want to evaluate the sum $\sum_{i=1}^n d_i Z_i (1_{\{t_k \geq t_i\}} - 1_{\{s_k \geq t_i\}})$. The indicator $(1_{\{t_k \geq t_i\}} - 1_{\{s_k \geq t_i\}})$ equals $1$ if and only if $s_k < t_i \leq t_k$, and is $0$ otherwise. Thus, the sum effectively accumulates $d_i Z_i$ over the interval $(s_k, t_k]$.
+
+Assuming 0-based indexing for the arrays sorted by event time $t$, let us identify the bounds of this interval in terms of the sequence indices. The upper bound is defined by $t_i \leq t_k$. In the sorted array, the elements satisfying this condition occupy indices $0$ through $\mathtt{last}(k)$. The total number of such elements is $\mathtt{last}(k) + 1$. The lower bound is defined by $s_k < t_i$, which means we exclude elements where $t_i \leq s_k$. The number of elements with $t_i \leq s_k$ is precisely given by $\mathtt{startmap}(k) = \#\{j : t_j \leq s_k\}$. Thus, the excluded indices are $0$ through $\mathtt{startmap}(k) - 1$.
+
+Consequently, the interval $s_k < t_i \leq t_k$ corresponds exactly to the index range $i \in \{\mathtt{startmap}(k), \dots, \mathtt{last}(k)\}$.
+
+Let $\bar{E}(d \cdot Z)$ denote the forward cumsum sequence of $d \cdot Z$, padded with a $0$ at the 0-th index. That is, $\bar{E}(d \cdot Z)_m = \sum_{i=0}^{m-1} d_i Z_i$. Using this forward cumsum, the sum over our target index range can be computed as the difference between the sum up to $\mathtt{last}(k)$ and the sum up to $\mathtt{startmap}(k)-1$:
+$$
+\sum_{i=\mathtt{startmap}(k)}^{\mathtt{last}(k)} d_i Z_i = \bar{E}(d \cdot Z)_{\mathtt{last}(k)+1} - \bar{E}(d \cdot Z)_{\mathtt{startmap}(k)}.
+$$
+This establishes the first equality.
+
+The second equality, $\mathtt{startmap}(k) = \mathtt{first}(\mathtt{startmap}(k))$, holds because all individuals $j$ that share the exact same event time $t_j = s_k$ must either entirely fall within or outside the threshold boundary. Hence, the index count maps cleanly to the $\mathtt{first}$ function of that start boundary, ensuring numerical stability in implementations with ties. $\square$
+
+

@@ -123,30 +123,35 @@ Second, the option `grouped = TRUE` (default) obtains the CV partial likelihood 
 
 ### Handling of ties
 
-`glmnet` handles ties in survival time with the Breslow approximation. This is different from `survival` package's `coxph` function, whose default tie-handling method is the Efron approximation.
+`glmnet` supports both the Breslow and Efron approximations for handling ties in survival times. The `cox.ties` argument selects between them.
+
+In the current release (v5.0) the default is `cox.ties = "breslow"`, which matches the pre-v5.0 behavior of `glmnet`. **In v5.1 this default will change to `cox.ties = "efron"` to match the default of `survival::coxph`.** Calls to `glmnet()` with `family = "cox"` that do not set `cox.ties` explicitly will emit a transition warning until the switch occurs. To silence the warning, pass `cox.ties` explicitly:
+
+- `cox.ties = "breslow"` locks in the v5.0 default.
+- `cox.ties = "efron"` previews the v5.1 default.
+
 ```{r}
 # create x matrix
 set.seed(1)
 nobs <- 100; nvars <- 15
 x <- matrix(rnorm(nobs * nvars), nrow = nobs)
 
-# create response
+# create response with many ties
 ty <- rep(rexp(nobs / 5), each = 5)
 tcens <- rbinom(n = nobs, prob = 0.3, size = 1)
 y <- Surv(ty, tcens)
 
-# coefficients from these two models will not line up because
-# of different tie handling methods
-glmnet_fit <- glmnet(x, y, family = "cox", lambda = 0)
+# Efron: set cox.ties = "efron" in glmnet (matches coxph's default)
+glmnet_fit <- glmnet(x, y, family = "cox", lambda = 0, cox.ties = "efron")
 coxph_fit <- coxph(y ~ x)
 plot(coef(glmnet_fit), coef(coxph_fit))
 abline(0, 1)
 ```
 
-`glmnet` is not able to perform the Efron approximation at the moment. `survival`'s `coxph` can perform the Breslow approximation by specifying `ties = "breslow"`:
+The Breslow approximation (current `glmnet` default):
 ```{r}
-# coefficients from these two models will line up
-glmnet_fit <- glmnet(x, y, family = "cox", lambda = 0)
+# Breslow: set cox.ties = "breslow" in glmnet, ties = "breslow" in coxph
+glmnet_fit <- glmnet(x, y, family = "cox", lambda = 0, cox.ties = "breslow")
 coxph_fit <- coxph(y ~ x, ties = "breslow")
 plot(coef(glmnet_fit), coef(coxph_fit))
 abline(0, 1)

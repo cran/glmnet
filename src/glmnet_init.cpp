@@ -44,52 +44,6 @@ SEXP _glmnet_chg_epsnr(SEXP argSEXP);
 SEXP _glmnet_chg_mxitnr(SEXP irgSEXP);
 SEXP _glmnet_wls_exp(SEXP alm0SEXP, SEXP almcSEXP, SEXP alphaSEXP, SEXP mSEXP, SEXP noSEXP, SEXP niSEXP, SEXP xSEXP, SEXP rSEXP, SEXP xvSEXP, SEXP vSEXP, SEXP intrSEXP, SEXP juSEXP, SEXP vpSEXP, SEXP clSEXP, SEXP nxSEXP, SEXP thrSEXP, SEXP maxitSEXP, SEXP aSEXP, SEXP aintSEXP, SEXP gSEXP, SEXP iaSEXP, SEXP iySEXP, SEXP izSEXP, SEXP mmSEXP, SEXP ninoSEXP, SEXP rsqcSEXP, SEXP nlpSEXP, SEXP jerrSEXP);
 SEXP _glmnet_spwls_exp(SEXP alm0SEXP, SEXP almcSEXP, SEXP alphaSEXP, SEXP mSEXP, SEXP noSEXP, SEXP niSEXP, SEXP xSEXP, SEXP xmSEXP, SEXP xsSEXP, SEXP rSEXP, SEXP xvSEXP, SEXP vSEXP, SEXP intrSEXP, SEXP juSEXP, SEXP vpSEXP, SEXP clSEXP, SEXP nxSEXP, SEXP thrSEXP, SEXP maxitSEXP, SEXP aSEXP, SEXP aintSEXP, SEXP gSEXP, SEXP iaSEXP, SEXP iySEXP, SEXP izSEXP, SEXP mmSEXP, SEXP ninoSEXP, SEXP rsqcSEXP, SEXP nlpSEXP, SEXP jerrSEXP);
-SEXP storePB(SEXP);
-
-void F77_SUB(coxnet)(
-		     double *parm,
-		     int *no,
-		     int *ni,
-		     double *x,
-		     double *y,
-		     double *d,
-		     double *o,
-		     double *w,
-		     int *jd,
-		     double *vp,
-		     double *cl,
-		     int *ne,
-		     int *nx,
-		     int *nlam,
-		     double *flmin,
-		     double *ulam,
-		     double *thr,
-		     int *maxit,
-		     int *isd,
-		     int *lmu,
-		     double *ca,
-		     int *ia,
-		     int *nin,
-		     double *dev0,
-		     double *fdev,
-		     double *alm,
-		     int *nlp,
-		     int *jerrc
-		     );
-
-void F77_SUB(loglike)(
-		      int *no,
-		      int *ni,
-		      double *x,
-		      double *y,
-		      double *d,
-		      double *g,
-		      double *w,
-		      int *nlam,
-		      double *a,
-		      double *flog,
-		      int *jerr
-		      );
 } // end extern "C"
 
 static const R_CallMethodDef CallEntries[] = {
@@ -117,65 +71,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_glmnet_chg_mxitnr", (DL_FUNC) &_glmnet_chg_mxitnr, 1},
     {"_glmnet_wls_exp", (DL_FUNC) &_glmnet_wls_exp, 28},
     {"_glmnet_spwls_exp", (DL_FUNC) &_glmnet_spwls_exp, 30},
-    {"storePB", (DL_FUNC) &storePB, 1},
     {NULL, NULL, 0}
 };
 
-#define FDEF(name)  {#name, (DL_FUNC) &F77_SUB(name), sizeof(name ## _t)/sizeof(name ## _t[0]), name ##_t}
-
-static R_NativePrimitiveArgType coxnet_t[] = {
-  REALSXP,
-  INTSXP,
-  INTSXP,
-  REALSXP,
-  REALSXP,
-  REALSXP,
-  REALSXP,
-  REALSXP,
-  INTSXP,
-  REALSXP,
-  REALSXP,
-  INTSXP,
-  INTSXP,
-  INTSXP,
-  REALSXP,
-  REALSXP,
-  REALSXP,
-  INTSXP,
-  INTSXP,
-  INTSXP,
-  REALSXP,
-  INTSXP,
-  INTSXP,
-  REALSXP,
-  REALSXP,
-  REALSXP,
-  INTSXP,
-  INTSXP
-};
-
-static R_NativePrimitiveArgType loglike_t[] = {
-  INTSXP,
-  INTSXP,
-  REALSXP,
-  REALSXP,
-  REALSXP,
-  REALSXP,
-  REALSXP,
-  INTSXP,
-  REALSXP,
-  REALSXP,
-  INTSXP
-};
-
-static R_FortranMethodDef fMethods[] = {
-  FDEF(coxnet) ,
-  FDEF(loglike) ,
-  {NULL, NULL, 0}
-};
-
 void R_init_glmnet(DllInfo *dll){
-  R_registerRoutines(dll, NULL, CallEntries, fMethods, NULL);
+  R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
 }
 

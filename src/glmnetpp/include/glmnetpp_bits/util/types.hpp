@@ -8,7 +8,8 @@ enum class glm_type
 {
     gaussian,
     binomial,
-    poisson
+    poisson,
+    cox
 };
 
 
@@ -43,6 +44,15 @@ struct Mode<glm_type::binomial>
 
 template <>
 struct Mode<glm_type::poisson>
+{
+    enum class type
+    {
+        naive
+    };
+};
+
+template <>
+struct Mode<glm_type::cox>
 {
     enum class type
     {

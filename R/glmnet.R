@@ -139,13 +139,37 @@
 #' y standardization with \code{family="gaussian"}.
 #' @param intercept Should intercept(s) be fitted (default=TRUE) or set to zero
 #' (FALSE)
-#' @param thresh Convergence threshold for coordinate descent. Each inner
-#' coordinate-descent loop continues until the maximum change in the objective
-#' after any coefficient update is less than \code{thresh} times the null
-#' deviance. Defaults value is \code{1E-7}.
-#' @param dfmax Limit the maximum number of variables in the model. Useful for
-#' very large \code{nvars}, if a partial path is desired.
-#' @param pmax Limit the maximum number of variables ever to be nonzero
+#' @param control A named list of algorithm control parameters,
+#' providing per-call overrides of session defaults set by
+#' \code{\link{glmnet.control}()}. The following keys are accepted:
+#'
+#' \itemize{
+#'   \item \emph{Both execution paths}: \code{thresh}, \code{maxit},
+#'     \code{dfmax}, \code{pmax}, \code{trace.it}, \code{fdev},
+#'     \code{devmax}, \code{mnlam}, \code{eps}, \code{big},
+#'     \code{itrace}.
+#'   \item \emph{Core-engine path only} (ignored when \code{family} is
+#'     a \code{family()} object): \code{pmin}, \code{exmx} (logistic-
+#'     family kernels); \code{prec}, \code{mxit} (bounds-subsolver).
+#'   \item \emph{GLM-family (R-IRLS) path only} (ignored when
+#'     \code{family} is a character string): \code{epsnr},
+#'     \code{mxitnr}.
+#' }
+#'
+#' Unknown keys trigger an error. Overrides are per-call and do not
+#' mutate session state (the C++-global parameters are restored to
+#' their pre-call values on exit, including on error). See
+#' \code{\link{glmnet.control}} for each parameter's role, scope, and
+#' factory default.
+#' @param thresh \strong{Deprecated}. Use \code{control = list(thresh = ...)}
+#' or \code{\link{glmnet.control}(thresh = ...)} instead. Convergence
+#' threshold for coordinate descent. Factory default is \code{1E-7}.
+#' @param dfmax \strong{Deprecated}. Use \code{control = list(dfmax = ...)}
+#' or \code{\link{glmnet.control}(dfmax = ...)} instead. Limit the maximum
+#' number of variables in the model.
+#' @param pmax \strong{Deprecated}. Use \code{control = list(pmax = ...)}
+#' or \code{\link{glmnet.control}(pmax = ...)} instead. Limit the maximum
+#' number of variables ever to be nonzero.
 #' @param exclude Indices of variables to be excluded from the model. Default
 #' is none. Equivalent to an infinite penalty factor for the variables excluded (next item).
 #' Users can supply instead an \code{exclude} function that generates the list of indices.
@@ -169,8 +193,9 @@
 #' \code{nvars}
 #' @param upper.limits Vector of upper limits for each coefficient; default
 #' \code{Inf}. See \code{lower.limits}
-#' @param maxit Maximum number of passes over the data for all lambda values;
-#' default is 10^5.
+#' @param maxit \strong{Deprecated}. Use \code{control = list(maxit = ...)}
+#' or \code{\link{glmnet.control}(maxit = ...)} instead. Maximum number of
+#' passes over the data for all lambda values; factory default is 10^5.
 #' @param type.gaussian Two algorithm types are supported for (only)
 #' \code{family="gaussian"}. The default when \code{nvar<500} is
 #' \code{type.gaussian="covariance"}, and saves all inner-products ever
@@ -191,8 +216,17 @@
 #' for more information. This argument is new, and users may experience convergence issues
 #' with small datasets, especially with non-gaussian families. Limiting the
 #' value of 'maxp' can alleviate these issues in some cases.
-#' @param trace.it If \code{trace.it=1}, then a progress bar is displayed;
-#' useful for big models that take a long time to fit.
+#' @param trace.it \strong{Deprecated}. Use \code{control = list(trace.it = ...)}
+#' or \code{\link{glmnet.control}(trace.it = ...)} instead. If
+#' \code{trace.it=1}, then a progress bar is displayed.
+#' @param cox.ties Character; the method for handling ties in Cox models.
+#'   One of \code{"breslow"} (the current default) or \code{"efron"}.
+#'   Applies when \code{family="cox"}. \strong{The default will change to
+#'   \code{"efron"} in glmnet 5.1} to match \code{survival::coxph}; until
+#'   then, calls that do not set \code{cox.ties} explicitly emit a
+#'   transition warning. Pass \code{cox.ties = "breslow"} to lock in the
+#'   v5.0 default, or \code{cox.ties = "efron"} to preview the v5.1
+#'   behavior.
 #' @param ... Additional argument used in \code{relax.glmnet}. These include
 #' some of the original arguments to 'glmnet', and each must be named if used.
 #' @return An object with S3 class \code{"glmnet","*" }, where \code{"*"} is
@@ -347,9 +381,12 @@
 #' system.time(fit2n <- glmnet(x, y))
 #'
 #' @export glmnet
-glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox","mgaussian"),weights=NULL,offset=NULL,alpha=1.0,nlambda=100,lambda.min.ratio=ifelse(nobs<nvars,1e-2,1e-4),lambda=NULL,standardize=TRUE,intercept=TRUE,thresh=1e-7,dfmax=nvars+1,pmax=min(dfmax*2+20,nvars),exclude=NULL,penalty.factor=rep(1,nvars),lower.limits=-Inf,upper.limits=Inf,maxit=100000,type.gaussian=ifelse(nvars<500,"covariance","naive"),type.logistic=c("Newton","modified.Newton"),standardize.response=FALSE,type.multinomial=c("ungrouped","grouped"),relax=FALSE,trace.it=0,...){
+glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox","mgaussian"),weights=NULL,offset=NULL,alpha=1.0,nlambda=100,lambda.min.ratio=ifelse(nobs<nvars,1e-2,1e-4),lambda=NULL,standardize=TRUE,intercept=TRUE,thresh=1e-7,dfmax=NULL,pmax=NULL,exclude=NULL,penalty.factor=rep(1,nvars),lower.limits=-Inf,upper.limits=Inf,maxit=100000,type.gaussian=ifelse(nvars<500,"covariance","naive"),type.logistic=c("Newton","modified.Newton"),standardize.response=FALSE,type.multinomial=c("ungrouped","grouped"),relax=FALSE,trace.it=0,cox.ties=c("breslow","efron"),control=list(),...){
 
     this.call=match.call()
+    ## Capture whether user supplied cox.ties, for the v5.0->v5.1
+    ## transition warning (issued below when family == "cox").
+    cox.ties.user <- !missing(cox.ties)
 ### Need to do this first so defaults in call can be satisfied
     np=dim(x)
     ##check dims
@@ -358,6 +395,31 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
     nvars=as.integer(np[2])
     ##check for NAs
     if(any(is.na(x)))stop("x has missing values; consider using makeX() to impute them")
+
+    ## --- Resolve algorithm control parameters ---
+    ## .resolve_control() returns the resolved 17-key list plus a single
+    ## niladic restore thunk (or NULL when no overrides were applied).
+    rc <- .resolve_control(
+        control    = control,
+        nvars      = nvars,
+        deprecated = list(
+            thresh   = if (!missing(thresh))   thresh,
+            maxit    = if (!missing(maxit))    maxit,
+            dfmax    = if (!missing(dfmax))    dfmax,
+            pmax     = if (!missing(pmax))     pmax,
+            trace.it = if (!missing(trace.it)) trace.it
+        )
+    )
+    resolved_control <- rc$control
+    if (!is.null(rc$restore)) on.exit(rc$restore(), add = TRUE)
+
+    ## Extract scalars for the character-family dispatch branch below.
+    thresh   <- resolved_control$thresh
+    maxit    <- resolved_control$maxit
+    dfmax    <- resolved_control$dfmax
+    pmax     <- resolved_control$pmax
+    trace.it <- resolved_control$trace.it
+
     if(is.null(weights))weights=rep(1,nobs)
     else if(length(weights)!=nobs)stop(paste("number of elements in weights (",length(weights),") not equal to the number of rows of x (",nobs,")",sep=""))
     if(is.function(exclude))exclude <- check.exclude(exclude(x=x,y=y,weights=weights),nvars)
@@ -369,18 +431,29 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
         ## new.call=this.call
         ## new.call[[1]]=as.name("glmnet.path")
         ## fit=eval(new.call, parent.frame())
-        fit=glmnet.path(x,y,weights,lambda,nlambda,lambda.min.ratio,alpha,offset,family,
-                        standardize,intercept,thresh=thresh,maxit,penalty.factor,exclude,lower.limits,
-                        upper.limits,trace.it=trace.it)
+        fit=glmnet.path(x,y,weights=weights,lambda=lambda,nlambda=nlambda,
+                        lambda.min.ratio=lambda.min.ratio,alpha=alpha,offset=offset,
+                        family=family,standardize=standardize,intercept=intercept,
+                        penalty.factor=penalty.factor,exclude=exclude,
+                        lower.limits=lower.limits,upper.limits=upper.limits,
+                        control=resolved_control)
         fit$call=this.call
     } else {
       family=match.arg(family)
-      if (family == "cox" && use.cox.path(x, y)) {
-      # we should call the new cox.path()
-      fit <- cox.path(x,y,weights,offset,alpha,nlambda,lambda.min.ratio,
-                      lambda,standardize,thresh,exclude,penalty.factor,
-                      lower.limits,upper.limits,maxit,trace.it,...)
-      fit$call <- this.call
+      cox.ties=match.arg(cox.ties)
+      if (family == "cox" && !cox.ties.user) {
+          warning(
+              "Starting in glmnet 5.1, the default Cox tie-handling ",
+              "method will change from 'breslow' to 'efron' (matching ",
+              "survival::coxph). To silence this message and lock in the ",
+              "v5.0 default, pass cox.ties = 'breslow' explicitly. To ",
+              "preview the v5.1 behavior, pass cox.ties = 'efron'.",
+              call. = FALSE
+          )
+      }
+      efron=(cox.ties == "efron")
+      if (FALSE) {
+      # Legacy cox.path() routing removed — all Cox models now use C++ coxnet
     } else {
       ### Must have been a call to old glmnet
       ### Prepare all the generic arguments, then hand off to family functions
@@ -414,19 +487,17 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
         jd=as.integer(c(length(jd),jd))
       }else jd=as.integer(0)
       vp=as.double(penalty.factor)
-      internal.parms=glmnet.control()
-      if(internal.parms$itrace)trace.it=1
-      else{
-        if(trace.it){
+      ## trace.it already resolved by control-param block above;
+      ## sync C++ itrace state for progress bar
+      if(trace.it && !resolved_control$itrace){
           glmnet.control(itrace=1)
-          on.exit(glmnet.control(itrace=0))
-        }
+          on.exit(glmnet.control(itrace=0), add = TRUE)
       }
       ###check on limits
       if(any(lower.limits>0)){stop("Lower limits should be non-positive")}
       if(any(upper.limits<0)){stop("Upper limits should be non-negative")}
-      lower.limits[lower.limits==-Inf]=-internal.parms$big
-      upper.limits[upper.limits==Inf]=internal.parms$big
+      lower.limits[lower.limits==-Inf]=-resolved_control$big
+      upper.limits[upper.limits==Inf]=resolved_control$big
       if(length(lower.limits)<nvars){
         if(length(lower.limits)==1)lower.limits=rep(lower.limits,nvars)else stop("Require length 1 or nvars lower.limits")
       }
@@ -439,10 +510,10 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
       if(any(cl==0)){
         ###Bounds of zero can mess with the lambda sequence and fdev; ie nothing happens and if fdev is not
         ###zero, the path can stop
-        fdev=glmnet.control()$fdev
+        fdev=resolved_control$fdev
         if(fdev!=0) {
           glmnet.control(fdev=0)
-          on.exit(glmnet.control(fdev=fdev))
+          on.exit(glmnet.control(fdev=fdev), add = TRUE)
         }
       }
       storage.mode(cl)="double"
@@ -450,7 +521,7 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
 
       isd=as.integer(standardize)
       intr=as.integer(intercept)
-      if(!missing(intercept)&&family=="cox")warning("Cox model has no intercept")
+      if(!missing(intercept)&&family == "cox")warning("Cox model has no intercept")
       jsd=as.integer(standardize.response)
       thresh=as.double(thresh)
       if(is.null(lambda)){
@@ -500,7 +571,7 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
                  "poisson"=fishnet(x,is.sparse,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,pb),
                  "binomial"=lognet(x,is.sparse,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family,pb),
                  "multinomial"=lognet(x,is.sparse,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,intr,vnames,maxit,kopt,family,pb),
-                 "cox"=coxnet(x,is.sparse,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit),
+                 "cox"=coxnet(x,is.sparse,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,vnames,maxit,pb,efron),
                  "mgaussian"=mrelnet(x,is.sparse,y,weights,offset,alpha,nobs,nvars,jd,vp,cl,ne,nx,nlam,flmin,ulam,thresh,isd,jsd,intr,vnames,maxit,pb)
                  )
       if (trace.it) {

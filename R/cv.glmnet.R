@@ -96,6 +96,9 @@
 #' @param trace.it If \code{trace.it=1}, then progress bars are displayed;
 #' useful for big models that take a long time to fit. Limited tracing if
 #' \code{parallel=TRUE}
+#' @param control A named list of algorithm control parameters,
+#' providing per-call overrides of session defaults set by
+#' \code{\link{glmnet.control}()}. See `glmnet` for details.
 #' @param \dots Other arguments that can be passed to glmnet, for example \code{alpha}, \code{nlambda}, etc. See `glmnet` for details.
 #' @return an object of class \code{"cv.glmnet"} is returned, which is a list
 #' with the ingredients of the cross-validation fit.  If the object was created
@@ -220,7 +223,7 @@
 #' @export cv.glmnet
 cv.glmnet <-
   function (x, y, weights=NULL, offset = NULL, lambda = NULL, type.measure = c("default","mse",
-                                                           "deviance", "class", "auc", "mae","C"), nfolds = 10, foldid=NULL,  alignment=c("lambda","fraction"),grouped = TRUE, keep = FALSE, parallel = FALSE, gamma=c(0,.25,.5,.75,1),relax=FALSE,trace.it=0, ...)
+                                                           "deviance", "class", "auc", "mae","C"), nfolds = 10, foldid=NULL,  alignment=c("lambda","fraction"),grouped = TRUE, keep = FALSE, parallel = FALSE, gamma=c(0,.25,.5,.75,1),relax=FALSE,trace.it=0, control=list(), ...)
 {
     type.measure = match.arg(type.measure)
     alignment=match.arg(alignment)
@@ -230,6 +233,8 @@ cv.glmnet <-
       warning("fraction of path alignment not available if lambda given as argument; switched to alignment=`lambda`")
       alignment="lambda"
   }
+  ## (No up-front control-key validation: glmnet_control_set() in the
+  ## inner glmnet() calls silently ignores unknown names by design.)
    N = nrow(x)
  if (is.null(weights))
     weights = rep(1, N)
@@ -245,7 +250,7 @@ cv.glmnet <-
     else{
         if(trace.it){
             glmnet.control(itrace=1)
-            on.exit(glmnet.control(itrace=0))
+            on.exit(glmnet.control(itrace=0), add = TRUE)
             }
         }
    if (is.null(foldid))
@@ -256,9 +261,11 @@ cv.glmnet <-
 ### Now we switch depending on relax
     if(relax)
         cv.relaxed.raw(x,y,weights,offset,lambda,type.measure,nfolds,foldid,
-                       alignment,grouped,keep,parallel,trace.it,glmnet.call,cv.call,gamma,...)
+                       alignment,grouped,keep,parallel,trace.it,glmnet.call,cv.call,gamma,
+                       control=control,...)
     else
         cv.glmnet.raw(x,y,weights,offset,lambda,type.measure,nfolds,foldid,
-                       alignment,grouped,keep,parallel,trace.it,glmnet.call,cv.call,...)
+                      alignment,grouped,keep,parallel,trace.it,glmnet.call,cv.call,
+                      control=control,...)
  }
 

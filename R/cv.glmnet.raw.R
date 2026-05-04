@@ -4,9 +4,14 @@ cv.glmnet.raw <-
 {
 
 
-  if (trace.it) cat("Training\n")
+  ## Set trace state via session control (avoids polluting match.call)
+  if (trace.it) {
+      glmnet.control(itrace = 1)
+      on.exit(glmnet.control(itrace = 0), add = TRUE)
+      cat("Training\n")
+  }
   glmnet.object = glmnet(x, y, weights = weights, offset = offset,
-    lambda = lambda, trace.it=trace.it,...)
+    lambda = lambda, ...)
   glmnet.object$call = glmnet.call
   subclass=class(glmnet.object)[[1]]
   type.measure=cvtype(type.measure,subclass)
@@ -51,7 +56,7 @@ cv.glmnet.raw <-
       else offset_sub = NULL
       outlist[[i]] = glmnet(x[!which, , drop = FALSE],
                y_sub, lambda = lambda, offset = offset_sub,
-               weights = weights[!which],trace.it=trace.it, ...)
+               weights = weights[!which], ...)
     }
   }
   lambda = glmnet.object$lambda

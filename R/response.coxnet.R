@@ -36,7 +36,7 @@ response.coxnet <- function(y) {
       colnames(y) <- c("start","stop","status")
       return(y)
     } else {
-      stop("cox.path() only supports 'Surv' objects of type 'right' or 'counting'")
+      stop("Cox models only support 'Surv' objects of type 'right' or 'counting'")
     }
   }
 

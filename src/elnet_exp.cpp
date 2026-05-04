@@ -1,6 +1,8 @@
 #include <cstddef>
 #include <RcppEigen.h>
 #include <glmnetpp>
+#include <glmnetpp_bits/elnet_driver/cox.hpp>
+#include <glmnetpp_bits/util/cox_adapter.hpp>
 #include <R.h>
 #include <Rinternals.h>
 #include "driver.h"
@@ -397,6 +399,69 @@ List multelnet_exp(
             Named("jerr")=jerr);
 }
 
+// Cox proportional hazards for dense X.
+// [[Rcpp::export]]
+List coxnet_exp(
+    double parm,
+    Eigen::MatrixXd x,          // design matrix
+    Eigen::VectorXd start,      // start times (or zeros for right-censored)
+    Eigen::VectorXd stop,       // stop/event times
+    Eigen::VectorXi status,     // event indicator (1=event, 0=censored)
+    Eigen::VectorXi strata,     // strata labels (all 1s for non-stratified)
+    bool efron,                 // true for Efron, false for Breslow
+    Eigen::VectorXd g,          // offset / linear predictor
+    const Eigen::Map<Eigen::VectorXd> w,  // weights
+    const Eigen::Map<Eigen::VectorXi> jd,
+    const Eigen::Map<Eigen::VectorXd> vp,
+    Eigen::MatrixXd cl,
+    int ne,
+    int nx,
+    int nlam,
+    double flmin,
+    const Eigen::Map<Eigen::VectorXd> ulam,
+    double thr,
+    int isd,
+    int maxit,
+    SEXP pb,
+    int lmu,
+    Eigen::Map<Eigen::VectorXd> a0,      // not used for Cox but kept for interface
+    Eigen::Map<Eigen::MatrixXd> ca,
+    Eigen::Map<Eigen::VectorXi> ia,
+    Eigen::Map<Eigen::VectorXi> nin,
+    double nulldev,
+    Eigen::Map<Eigen::VectorXd> dev,
+    Eigen::Map<Eigen::VectorXd> alm,
+    int nlp,
+    int jerr
+    )
+{
+    using elnet_driver_t = ElnetDriver<util::glm_type::cox>;
+
+    // Create survival data structure with strata
+    CoxSurvivalData<double, int> surv(start, stop, status, strata, efron);
+
+    elnet_driver_t driver;
+    auto f = [&]() {
+        driver.fit(
+                parm, x, surv, g, w, jd, vp, cl, ne, nx, nlam, flmin,
+                ulam, thr, isd == 1, maxit,
+                lmu, a0, ca, ia, nin, nulldev, dev, alm, nlp, jerr,
+                [&](int v) {setpb_cpp(pb, v);}, ::InternalParams());
+    };
+    run(f, jerr);
+    return List::create(
+            Named("a0")=a0,
+            Named("nin")=nin,
+            Named("alm")=alm,
+            Named("ca")=ca,
+            Named("ia")=ia,
+            Named("lmu")=lmu,
+            Named("nulldev")=nulldev,
+            Named("dev")=dev,
+            Named("nlp")=nlp,
+            Named("jerr")=jerr);
+}
+
 // Multi-response Gaussian for sparse X.
 // [[Rcpp::export]]
 List multspelnet_exp(
@@ -447,6 +512,69 @@ List multspelnet_exp(
             Named("ia")=ia,
             Named("lmu")=lmu,
             Named("rsq")=rsq,
+            Named("nlp")=nlp,
+            Named("jerr")=jerr);
+}
+
+// Cox proportional hazards for sparse X.
+// [[Rcpp::export]]
+List spcoxnet_exp(
+    double parm,
+    const Eigen::Map<Eigen::SparseMatrix<double>> x,  // sparse design matrix
+    Eigen::VectorXd start,      // start times (or zeros for right-censored)
+    Eigen::VectorXd stop,       // stop/event times
+    Eigen::VectorXi status,     // event indicator (1=event, 0=censored)
+    Eigen::VectorXi strata,     // strata labels (all 1s for non-stratified)
+    bool efron,                 // true for Efron, false for Breslow
+    Eigen::VectorXd g,          // offset / linear predictor
+    const Eigen::Map<Eigen::VectorXd> w,  // weights
+    const Eigen::Map<Eigen::VectorXi> jd,
+    const Eigen::Map<Eigen::VectorXd> vp,
+    Eigen::MatrixXd cl,
+    int ne,
+    int nx,
+    int nlam,
+    double flmin,
+    const Eigen::Map<Eigen::VectorXd> ulam,
+    double thr,
+    int isd,
+    int maxit,
+    SEXP pb,
+    int lmu,
+    Eigen::Map<Eigen::VectorXd> a0,      // not used for Cox but kept for interface
+    Eigen::Map<Eigen::MatrixXd> ca,
+    Eigen::Map<Eigen::VectorXi> ia,
+    Eigen::Map<Eigen::VectorXi> nin,
+    double nulldev,
+    Eigen::Map<Eigen::VectorXd> dev,
+    Eigen::Map<Eigen::VectorXd> alm,
+    int nlp,
+    int jerr
+    )
+{
+    using elnet_driver_t = ElnetDriver<util::glm_type::cox>;
+
+    // Create survival data structure with strata
+    CoxSurvivalData<double, int> surv(start, stop, status, strata, efron);
+
+    elnet_driver_t driver;
+    auto f = [&]() {
+        driver.fit(
+                parm, x, surv, g, w, jd, vp, cl, ne, nx, nlam, flmin,
+                ulam, thr, isd == 1, maxit,
+                lmu, a0, ca, ia, nin, nulldev, dev, alm, nlp, jerr,
+                [&](int v) {setpb_cpp(pb, v);}, ::InternalParams());
+    };
+    run(f, jerr);
+    return List::create(
+            Named("a0")=a0,
+            Named("nin")=nin,
+            Named("alm")=alm,
+            Named("ca")=ca,
+            Named("ia")=ia,
+            Named("lmu")=lmu,
+            Named("nulldev")=nulldev,
+            Named("dev")=dev,
             Named("nlp")=nlp,
             Named("jerr")=jerr);
 }

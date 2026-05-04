@@ -14,4 +14,13 @@ struct InternalParams
     static int bnorm_mxit;
     static double epsnr;
     static int mxitnr;
+
+    // Formerly stored in the R-level .glmnet_internal env. Centralised
+    // here so glmnet.control() reads/writes all 17 algorithm-control
+    // parameters through one C++ aggregator. NA_INTEGER on dfmax/pmax
+    // means "not overridden -- caller resolves data-dependent default".
+    static double thresh;
+    static int    maxit;
+    static int    dfmax;
+    static int    pmax;
 };

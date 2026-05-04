@@ -18,8 +18,8 @@ glmnet(
   standardize = TRUE,
   intercept = TRUE,
   thresh = 1e-07,
-  dfmax = nvars + 1,
-  pmax = min(dfmax * 2 + 20, nvars),
+  dfmax = NULL,
+  pmax = NULL,
   exclude = NULL,
   penalty.factor = rep(1, nvars),
   lower.limits = -Inf,
@@ -31,6 +31,8 @@ glmnet(
   type.multinomial = c("ungrouped", "grouped"),
   relax = FALSE,
   trace.it = 0,
+  cox.ties = c("breslow", "efron"),
+  control = list(),
   ...
 )
 
@@ -105,15 +107,17 @@ y standardization with \code{family="gaussian"}.}
 \item{intercept}{Should intercept(s) be fitted (default=TRUE) or set to zero
 (FALSE)}
 
-\item{thresh}{Convergence threshold for coordinate descent. Each inner
-coordinate-descent loop continues until the maximum change in the objective
-after any coefficient update is less than \code{thresh} times the null
-deviance. Defaults value is \code{1E-7}.}
+\item{thresh}{\strong{Deprecated}. Use \code{control = list(thresh = ...)}
+or \code{\link{glmnet.control}(thresh = ...)} instead. Convergence
+threshold for coordinate descent. Factory default is \code{1E-7}.}
 
-\item{dfmax}{Limit the maximum number of variables in the model. Useful for
-very large \code{nvars}, if a partial path is desired.}
+\item{dfmax}{\strong{Deprecated}. Use \code{control = list(dfmax = ...)}
+or \code{\link{glmnet.control}(dfmax = ...)} instead. Limit the maximum
+number of variables in the model.}
 
-\item{pmax}{Limit the maximum number of variables ever to be nonzero}
+\item{pmax}{\strong{Deprecated}. Use \code{control = list(pmax = ...)}
+or \code{\link{glmnet.control}(pmax = ...)} instead. Limit the maximum
+number of variables ever to be nonzero.}
 
 \item{exclude}{Indices of variables to be excluded from the model. Default
 is none. Equivalent to an infinite penalty factor for the variables excluded (next item).
@@ -142,8 +146,9 @@ single value (which will then be replicated), else a vector of length
 \item{upper.limits}{Vector of upper limits for each coefficient; default
 \code{Inf}. See \code{lower.limits}}
 
-\item{maxit}{Maximum number of passes over the data for all lambda values;
-default is 10^5.}
+\item{maxit}{\strong{Deprecated}. Use \code{control = list(maxit = ...)}
+or \code{\link{glmnet.control}(maxit = ...)} instead. Maximum number of
+passes over the data for all lambda values; factory default is 10^5.}
 
 \item{type.gaussian}{Two algorithm types are supported for (only)
 \code{family="gaussian"}. The default when \code{nvar<500} is
@@ -170,8 +175,41 @@ for more information. This argument is new, and users may experience convergence
 with small datasets, especially with non-gaussian families. Limiting the
 value of 'maxp' can alleviate these issues in some cases.}
 
-\item{trace.it}{If \code{trace.it=1}, then a progress bar is displayed;
-useful for big models that take a long time to fit.}
+\item{trace.it}{\strong{Deprecated}. Use \code{control = list(trace.it = ...)}
+or \code{\link{glmnet.control}(trace.it = ...)} instead. If
+\code{trace.it=1}, then a progress bar is displayed.}
+
+\item{cox.ties}{Character; the method for handling ties in Cox models.
+One of \code{"breslow"} (the current default) or \code{"efron"}.
+Applies when \code{family="cox"}. \strong{The default will change to
+\code{"efron"} in glmnet 5.1} to match \code{survival::coxph}; until
+then, calls that do not set \code{cox.ties} explicitly emit a
+transition warning. Pass \code{cox.ties = "breslow"} to lock in the
+v5.0 default, or \code{cox.ties = "efron"} to preview the v5.1
+behavior.}
+
+\item{control}{A named list of algorithm control parameters,
+providing per-call overrides of session defaults set by
+\code{\link{glmnet.control}()}. The following keys are accepted:
+
+\itemize{
+\item \emph{Both execution paths}: \code{thresh}, \code{maxit},
+\code{dfmax}, \code{pmax}, \code{trace.it}, \code{fdev},
+\code{devmax}, \code{mnlam}, \code{eps}, \code{big},
+\code{itrace}.
+\item \emph{Core-engine path only} (ignored when \code{family} is
+a \code{family()} object): \code{pmin}, \code{exmx} (logistic-
+family kernels); \code{prec}, \code{mxit} (bounds-subsolver).
+\item \emph{GLM-family (R-IRLS) path only} (ignored when
+\code{family} is a character string): \code{epsnr},
+\code{mxitnr}.
+}
+
+Unknown keys trigger an error. Overrides are per-call and do not
+mutate session state (the C++-global parameters are restored to
+their pre-call values on exit, including on error). See
+\code{\link{glmnet.control}} for each parameter's role, scope, and
+factory default.}
 
 \item{...}{Additional argument used in \code{relax.glmnet}. These include
 some of the original arguments to 'glmnet', and each must be named if used.}

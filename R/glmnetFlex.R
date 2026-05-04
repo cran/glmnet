@@ -43,11 +43,6 @@
 #' original scale. Default is \code{standardize=TRUE}. If variables are in the
 #' same units already, you might not wish to standardize.
 #' @param intercept Should intercept be fitted (default=TRUE) or set to zero (FALSE)?
-#' @param thresh Convergence threshold for coordinate descent. Each inner
-#' coordinate-descent loop continues until the maximum change in the objective
-#' after any coefficient update is less than thresh times the null deviance.
-#' Default value is \code{1e-10}.
-#' @param maxit Maximum number of passes over the data; default is \code{10^5}.
 #' @param penalty.factor Separate penalty factors can be applied to each
 #' coefficient. This is a number that multiplies \code{lambda} to allow differential
 #' shrinkage. Can be 0 for some variables, which implies no shrinkage, and that
@@ -61,10 +56,16 @@
 #' value (which will then be replicated), else a vector of length \code{nvars}.
 #' @param upper.limits Vector of upper limits for each coefficient; default
 #' \code{Inf}. See \code{lower.limits}.
-#' @param trace.it Controls how much information is printed to screen. Default is
-#' \code{trace.it=0} (no information printed). If \code{trace.it=1}, a progress
-#' bar is displayed. If \code{trace.it=2}, some information about the fitting
-#' procedure is printed to the console as the model is being fitted.
+#' @param control A fully resolved 17-key control list of the form returned by
+#' \code{\link{glmnet.control}()}. Default is \code{glmnet.control()} -- i.e.,
+#' the current session state. This function does not resolve, validate, or
+#' layer the list; it reads keys (\code{thresh}, \code{maxit}, \code{trace.it},
+#' \code{fdev}, \code{eps}, \code{epsnr}, \code{mxitnr}, etc.) from it directly.
+#' When called from \code{\link{glmnet}()}, the argument is populated by
+#' \code{.resolve_control()} and already reflects any per-call overrides; see
+#' \code{\link{glmnet.control}} for the parameter taxonomy. When calling this
+#' function directly (e.g., from test code), either pass nothing (use session
+#' state) or build a full list via \code{modifyList(glmnet.control(), ...)}.
 #'
 #' @return An object with class "glmnetfit" and "glmnet".
 #' \item{a0}{Intercept sequence of length \code{length(lambda)}.}
@@ -102,9 +103,19 @@
 glmnet.path <- function(x, y, weights=NULL, lambda = NULL, nlambda = 100,
                         lambda.min.ratio = ifelse(nobs<nvars, 0.01, 0.0001),
                         alpha = 1.0, offset = NULL, family = gaussian(),
-                        standardize = TRUE, intercept = TRUE, thresh = 1e-10, maxit = 100000,
+                        standardize = TRUE, intercept = TRUE,
                         penalty.factor = rep(1.0, nvars), exclude = integer(0), lower.limits = -Inf,
-                        upper.limits = Inf, trace.it = 0) {
+                        upper.limits = Inf, control = glmnet.control()) {
+    ## `control` is a fully resolved 17-key list. When called from glmnet()
+    ## it was built by .resolve_control() and carries any per-call overrides
+    ## already applied to C++ globals. When called directly (e.g. from tests)
+    ## the signature default evaluates to the current session state. Either
+    ## way, we trust the caller: no resolution, no validation, no modifyList.
+    ## Extract scalars for readability -- these mirror what glmnet()'s
+    ## character-family dispatch branch uses locally.
+    thresh   <- control$thresh
+    maxit    <- control$maxit
+    trace.it <- control$trace.it
 
     ### Check on family argument
     if(is.function(family))family=family()
@@ -184,7 +195,6 @@ glmnet.path <- function(x, y, weights=NULL, lambda = NULL, nlambda = 100,
 
 
     ### check on limits
-    control <- glmnet.control()
     if (thresh >= control$epsnr)
         warning("thresh should be smaller than glmnet.control()$epsnr",
                 call. = FALSE)
@@ -205,7 +215,7 @@ glmnet.path <- function(x, y, weights=NULL, lambda = NULL, nlambda = 100,
     if (any(lower.limits == 0) || any(upper.limits == 0)) {
         ###Bounds of zero can mess with the lambda sequence and fdev;
         ###ie nothing happens and if fdev is not zero, the path can stop
-        fdev <- glmnet.control()$fdev
+        fdev <- control$fdev
         if(fdev!= 0) {
             glmnet.control(fdev = 0)
             on.exit(glmnet.control(fdev = fdev))
@@ -275,11 +285,11 @@ glmnet.path <- function(x, y, weights=NULL, lambda = NULL, nlambda = 100,
 
         if (trace.it == 2) cat("Fitting lambda index", k, ":", ulam[k], fill = TRUE)
         fit <- glmnet.fit(x, y, weights / sum(weights), cur_lambda, alpha = alpha, offset = offset,
-                          family = family, intercept = intercept, thresh = thresh,
-                          maxit = maxit, penalty.factor = vp, exclude = exclude,
+                          family = family, intercept = intercept,
+                          penalty.factor = vp, exclude = exclude,
                           lower.limits = lower.limits, upper.limits = upper.limits,
                           warm = fit, from.glmnet.path = TRUE, save.fit = TRUE,
-                          trace.it = trace.it)
+                          control = control)
         if (trace.it == 1) utils::setTxtProgressBar(pb, k)
         # if error code non-zero, a non-fatal error must have occurred
         # print warning, ignore this lambda value and return result
@@ -391,13 +401,6 @@ glmnet.path <- function(x, y, weights=NULL, lambda = NULL, nlambda = 100,
 #' is \code{gaussian()}. (See \code{\link[stats:family]{family}} for details on
 #' family functions.)
 #' @param intercept Should intercept be fitted (default=TRUE) or set to zero (FALSE)?
-#' @param thresh Convergence threshold for coordinate descent. Each inner
-#' coordinate-descent loop continues until the maximum change in the objective
-#' after any coefficient update is less than thresh times the null deviance.
-#' Default value is \code{1e-10}.
-#' @param maxit Maximum number of passes over the data; default is \code{10^5}.
-#' (If a warm start object is provided, the number of passes the warm start object
-#' performed is included.)
 #' @param penalty.factor Separate penalty factors can be applied to each
 #' coefficient. This is a number that multiplies \code{lambda} to allow differential
 #' shrinkage. Can be 0 for some variables, which implies no shrinkage, and that
@@ -418,11 +421,12 @@ glmnet.path <- function(x, y, weights=NULL, lambda = NULL, nlambda = 100,
 #' @param from.glmnet.path Was \code{glmnet.fit()} called from \code{glmnet.path()}?
 #' Default is FALSE.This has implications for computation of the penalty factors.
 #' @param save.fit Return the warm start object? Default is FALSE.
-#' @param trace.it Controls how much information is printed to screen. If
-#' \code{trace.it=2}, some information about the fitting procedure is printed to
-#' the console as the model is being fitted. Default is \code{trace.it=0}
-#' (no information printed). (\code{trace.it=1} not used for compatibility with
-#' \code{glmnet.path}.)
+#' @param control A fully resolved 17-key control list of the form returned by
+#' \code{\link{glmnet.control}()}. Default is \code{glmnet.control()} -- current
+#' session state. This function does not resolve or validate the list; keys
+#' (\code{thresh}, \code{maxit}, \code{trace.it}, \code{epsnr}, \code{mxitnr},
+#' \code{big}, etc.) are read directly. See \code{?glmnet.path} for the same
+#' contract.
 #'
 #' @return An object with class "glmnetfit" and "glmnet". The list
 #' returned contains more keys than that of a "glmnet" object.
@@ -457,12 +461,16 @@ glmnet.path <- function(x, y, weights=NULL, lambda = NULL, nlambda = 100,
 #'
 glmnet.fit <- function(x, y, weights, lambda, alpha = 1.0,
                        offset = rep(0, nobs), family = gaussian(),
-                       intercept = TRUE, thresh = 1e-10, maxit = 100000,
+                       intercept = TRUE,
                        penalty.factor = rep(1.0, nvars), exclude = c(), lower.limits = -Inf,
                        upper.limits = Inf, warm = NULL, from.glmnet.path = FALSE,
-                       save.fit = FALSE, trace.it = 0) {
+                       save.fit = FALSE, control = glmnet.control()) {
+    ## `control` is a fully resolved 17-key list; see glmnet.path() for the
+    ## contract. Extract scalars for readability.
+    thresh   <- control$thresh
+    maxit    <- control$maxit
+    trace.it <- control$trace.it
     this.call <- match.call()
-    control <- glmnet.control()
 
     ### Prepare all the generic arguments
     nobs <- nrow(x)
@@ -595,10 +603,11 @@ glmnet.fit <- function(x, y, weights, lambda, alpha = 1.0,
 
         # do WLS with warmstart from previous iteration
         fit <- elnet.fit(x, z, w, lambda, alpha, intercept,
-                         thresh = thresh, maxit = maxit, penalty.factor = vp,
+                         penalty.factor = vp,
                          exclude = exclude, lower.limits = lower.limits,
                          upper.limits = upper.limits, warm = fit,
-                         from.glmnet.fit = TRUE, save.fit = TRUE)
+                         from.glmnet.fit = TRUE, save.fit = TRUE,
+                         control = control)
         if (fit$jerr != 0) return(list(jerr = fit$jerr))
 
         # update coefficients, eta, mu and obj_val
@@ -770,13 +779,6 @@ glmnet.fit <- function(x, y, weights, lambda, alpha = 1.0,
 #' The penalty is defined as \deqn{(1-\alpha)/2||\beta||_2^2+\alpha||\beta||_1.}
 #' \code{alpha=1} is the lasso penalty, and \code{alpha=0} the ridge penalty.
 #' @param intercept Should intercept be fitted (default=TRUE) or set to zero (FALSE)?
-#' @param thresh Convergence threshold for coordinate descent. Each inner
-#' coordinate-descent loop continues until the maximum change in the objective
-#' after any coefficient update is less than thresh times the null deviance.
-#' Default value is \code{1e-7}.
-#' @param maxit Maximum number of passes over the data; default is \code{10^5}.
-#' (If a warm start object is provided, the number of passes the warm start object
-#' performed is included.)
 #' @param penalty.factor Separate penalty factors can be applied to each
 #' coefficient. This is a number that multiplies \code{lambda} to allow differential
 #' shrinkage. Can be 0 for some variables, which implies no shrinkage, and that
@@ -797,6 +799,11 @@ glmnet.fit <- function(x, y, weights, lambda, alpha = 1.0,
 #' @param from.glmnet.fit Was \code{elnet.fit()} called from \code{glmnet.fit()}?
 #' Default is FALSE.This has implications for computation of the penalty factors.
 #' @param save.fit Return the warm start object? Default is FALSE.
+#' @param control A fully resolved 17-key control list of the form returned by
+#' \code{\link{glmnet.control}()}. Default is \code{glmnet.control()} -- current
+#' session state. This function does not resolve or validate the list; keys
+#' (\code{thresh}, \code{maxit}, \code{big}, etc.) are read directly. See
+#' \code{?glmnet.path} for the same contract.
 #'
 #' @return An object with class "glmnetfit" and "glmnet". The list returned has
 #' the same keys as that of a \code{glmnet} object, except that it might have an
@@ -825,12 +832,15 @@ glmnet.fit <- function(x, y, weights, lambda, alpha = 1.0,
 #' warm starts. For internal use only.}
 #'
 elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
-                      thresh = 1e-7, maxit = 100000,
                       penalty.factor = rep(1.0, nvars), exclude = c(),
                       lower.limits = -Inf, upper.limits = Inf, warm = NULL,
-                      from.glmnet.fit = FALSE, save.fit = FALSE) {
+                      from.glmnet.fit = FALSE, save.fit = FALSE,
+                      control = glmnet.control()) {
+    ## `control` is a fully resolved 17-key list; see glmnet.path() for the
+    ## contract. Extract scalars for readability.
+    thresh <- control$thresh
+    maxit  <- control$maxit
     this.call <- match.call()
-    internal.parms <- glmnet.control()
 
     # compute null deviance
     ybar <- weighted.mean(y, weights)
@@ -894,8 +904,8 @@ elnet.fit <- function(x, y, weights, lambda, alpha = 1.0, intercept = TRUE,
         ju <- as.integer(ju)
 
         # compute cl from lower.limits and upper.limits
-        lower.limits[lower.limits == -Inf] <- -internal.parms$big
-        upper.limits[upper.limits == Inf] <- internal.parms$big
+        lower.limits[lower.limits == -Inf] <- -control$big
+        upper.limits[upper.limits == Inf] <- control$big
         if (length(lower.limits) < nvars)
             lower.limits = rep(lower.limits, nvars) else
                 lower.limits = lower.limits[seq(nvars)]

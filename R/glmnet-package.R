@@ -14,7 +14,7 @@
 #' @import methods
 #' @import Matrix
 #' @import foreach
-#' @importFrom utils packageDescription
+#' @importFrom utils packageDescription modifyList
 #' @importFrom graphics abline axis matplot points segments text par plot
 #' @importFrom stats  approx  coef  median  predict  rmultinom  runif  weighted.mean family rnorm gaussian binomial glm glm.fit
 #' @importFrom survival concordance Surv is.Surv
@@ -46,7 +46,7 @@ NULL
 #' @name glmnet-internal
 #' @aliases auc assess.coxnet auc.mat cvtype cvstats
 #' cvcompute getcoef getcoef.multinomial fix.lam error.bars
-#' getmin elnet mrelnet lognet fishnet coefnorm coxnet cv.lognet cv.elnet
+#' getmin elnet mrelnet lognet fishnet coefnorm cv.lognet cv.elnet
 #' cv.multnet cv.mrelnet cv.coxnet cv.fishnet cv.glmnet.raw cv.relaxed.raw
 #' blend.relaxed checkgamma.relax buildPredmat buildPredmat.mrelnetlist
 #' buildPredmat.multnetlist buildPredmat.lognetlist buildPredmat.array

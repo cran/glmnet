@@ -1,0 +1,17 @@
+#!/bin/sh
+## Clean up build artifacts from R package development
+
+## Compiled objects in src/
+rm -f src/*.o src/*.so src/*.dll
+
+## Compiled objects in submodule paths
+rm -f src/glmnetpp/coxdev/cpp/src/*.o
+
+## R CMD build tarballs
+rm -f glmnet_*.tar.gz
+
+## R CMD check output
+rm -rf glmnet.Rcheck
+
+## devtools/roxygen cache
+rm -rf Meta

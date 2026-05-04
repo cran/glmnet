@@ -2,7 +2,7 @@
 % Please edit documentation in R/glmnet.control.R
 \name{glmnet.control}
 \alias{glmnet.control}
-\title{internal glmnet parameters}
+\title{Internal glmnet algorithm parameters}
 \usage{
 glmnet.control(
   fdev = 1e-05,
@@ -17,73 +17,188 @@ glmnet.control(
   itrace = 0,
   epsnr = 1e-06,
   mxitnr = 25,
+  thresh = 1e-07,
+  maxit = 1e+05,
+  dfmax = NULL,
+  pmax = NULL,
+  trace.it = 0,
   factory = FALSE
 )
 }
 \arguments{
-\item{fdev}{minimum fractional change in deviance for stopping path; factory
-default = 1.0e-5}
+\item{fdev}{Path-termination parameter: minimum fractional change
+in deviance between consecutive lambdas for the path to continue.
+Scope: both paths. Factory default \code{1.0e-5}.}
 
-\item{devmax}{maximum fraction of explained deviance for stopping path;
-factory default = 0.999}
+\item{devmax}{Path-termination parameter: maximum fraction of null
+deviance the path is allowed to explain before stopping. Scope:
+both paths. Factory default \code{0.999}.}
 
-\item{eps}{minimum value of lambda.min.ratio (see glmnet); factory default=
-1.0e-6}
+\item{eps}{Path-termination parameter: floor on
+\code{lambda.min.ratio} (smallest allowed \eqn{\lambda_{\min} /
+  \lambda_{\max}}). Scope: both paths. Factory default
+\code{1.0e-6}.}
 
-\item{big}{large floating point number; factory default = 9.9e35. Inf in
-definition of upper.limit is set to big}
+\item{big}{Numerical guard: finite substitute for \code{Inf} in
+\code{lower.limits} / \code{upper.limits}. Scope: both paths.
+Factory default \code{9.9e35}.}
 
-\item{mnlam}{minimum number of path points (lambda values) allowed; factory
-default = 5}
+\item{mnlam}{Path-termination parameter: minimum number of lambda
+values to compute before early stopping is allowed. Scope: both
+paths. Factory default \code{5}.}
 
-\item{pmin}{minimum probability for any class. factory default = 1.0e-9.
-Note that this implies a pmax of 1-pmin.}
+\item{pmin}{Numerical guard: floor on predicted probability in
+logistic-family kernels (prevents \code{log(0)}). Implies a max
+of \code{1 - pmin}. Scope: engine only (logistic-family kernels).
+Factory default \code{1.0e-9}.}
 
-\item{exmx}{maximum allowed exponent. factory default = 250.0}
+\item{exmx}{Numerical guard: cap on \code{exp()} arguments in
+logistic-family kernels (prevents overflow). Scope: engine only
+(logistic-family kernels). Factory default \code{250}.}
 
-\item{prec}{convergence threshold for multi response bounds adjustment
-solution. factory default = 1.0e-10}
+\item{prec}{Bounds-subsolver convergence tolerance. Used by the
+engine's \code{bnorm()} subroutine when a coefficient has a
+finite \code{lower} or \code{upper} bound. Scope: engine only
+(bounds-constrained fits). Factory default \code{1.0e-10}.}
 
-\item{mxit}{maximum iterations for multiresponse bounds adjustment solution.
-factory default = 100}
+\item{mxit}{Bounds-subsolver iteration budget. Paired with
+\code{prec}. Scope: engine only (bounds-constrained fits).
+Factory default \code{100}.}
 
-\item{itrace}{If 1 then progress bar is displayed when running \code{glmnet}
-and \code{cv.glmnet}. factory default = 0}
+\item{itrace}{Progress-bar flag. \code{1} enables the progress bar
+in \code{glmnet()} and \code{cv.glmnet()}. Scope: both paths.
+Aliased with \code{trace.it} (setting one sets the other).
+Factory default \code{0}.}
 
-\item{epsnr}{convergence threshold for \code{glmnet.fit}. factory default =
-1.0e-6}
+\item{epsnr}{Newton-Raphson convergence tolerance for the R-level
+IRLS loop in \code{glmnet.fit()}. \strong{Scope: R-IRLS path
+only} --- the core-engine kernels do not read this parameter.
+Factory default \code{1.0e-6}.}
 
-\item{mxitnr}{maximum iterations for the IRLS loop in \code{glmnet.fit}. factory
-default = 25}
+\item{mxitnr}{Newton-Raphson iteration budget for the R-level IRLS
+loop in \code{glmnet.fit()}. \strong{Scope: R-IRLS path only}.
+Factory default \code{25}.}
 
-\item{factory}{If \code{TRUE}, reset all the parameters to the factory
-default; default is \code{FALSE}}
+\item{thresh}{Inner coordinate-descent convergence threshold. Each
+inner CD loop continues until the maximum change in the objective
+after any coefficient update is less than \code{thresh} times the
+null deviance. Scope: both paths. Factory default \code{1e-7}.
+Can also be set per-call via \code{control = list(thresh = ...)}
+in \code{glmnet()}.}
+
+\item{maxit}{Inner coordinate-descent iteration budget: maximum
+total passes over the data across all lambda values. Scope: both
+paths. Factory default \code{100000}. Can also be set per-call
+via \code{control = list(maxit = ...)}.}
+
+\item{dfmax}{Coefficient-count cap: limit the maximum number of
+variables in the model at any lambda. Scope: both paths. Factory
+default \code{NULL}, which resolves at call time to \code{nvars +
+  1} (i.e., unconstrained). Can also be set per-call via
+\code{control = list(dfmax = ...)}.}
+
+\item{pmax}{Coefficient-count cap: limit the maximum number of
+variables ever to be nonzero anywhere on the path. Scope: both
+paths. Factory default \code{NULL}, which resolves at call time
+to \code{min(dfmax * 2 + 20, nvars)}. Can also be set per-call
+via \code{control = list(pmax = ...)}.}
+
+\item{trace.it}{Progress-bar flag (alias of \code{itrace}). Scope:
+both paths. Factory default \code{0}.}
+
+\item{factory}{If \code{TRUE}, reset all parameters to their
+factory defaults. Default is \code{FALSE}.}
 }
 \value{
-A list with named elements as in the argument list
+A list with named elements as in the argument list.
 }
 \description{
-View and/or change the factory default parameters in glmnet
+View and/or change the factory default parameters that control
+glmnet's numerical algorithms.
 }
 \details{
-If called with no arguments, \code{glmnet.control()} returns a list with the
-current settings of these parameters. Any arguments included in the call
-sets those parameters to the new values, and then silently returns. The
-values set are persistent for the duration of the R session.
+If called with no arguments, \code{glmnet.control()} returns a list
+with the current settings of these parameters. Any arguments
+included in the call set those parameters to the new values, and
+then silently return the updated settings. Values set via
+\code{glmnet.control()} persist for the duration of the R session.
+All parameters listed here can also be supplied per-call via the
+\code{control = list(...)} argument of \code{\link{glmnet}()}, which
+does \emph{not} mutate the session state; see that function's
+documentation for the precedence rules.
 }
+\section{Parameter taxonomy}{
+
+glmnet has two execution paths, and not every control parameter is
+consumed by both:
+
+\itemize{
+\item \strong{Core-engine path} --- \code{family} passed as a
+character string (\code{"gaussian"}, \code{"binomial"},
+\code{"poisson"}, \code{"multinomial"}, \code{"mgaussian"},
+\code{"cox"}) routes to purpose-built C++ glmnetpp kernels.
+\item \strong{GLM-family (R-IRLS) path} --- \code{family} passed
+as a \code{family()} object (or \code{glmnet.path()} /
+\code{glmnet.fit()} called directly) runs an IRLS loop
+implemented in R that uses the C++ \code{wls} kernel as its
+inner solver.
+}
+
+The table below shows the role and the scope of each parameter.
+"Scope: engine" means the parameter is only meaningful on the
+core-engine path; "Scope: R-IRLS" means only on the GLM-family path;
+"Scope: both" means consulted by both.
+
+\tabular{llll}{
+\strong{Parameter} \tab \strong{Role} \tab \strong{Scope} \tab \strong{Notes} \cr
+\code{fdev}   \tab path termination         \tab both    \tab C++ name \code{sml}; min fractional deviance change \cr
+\code{devmax} \tab path termination         \tab both    \tab C++ name \code{rsqmax}; max explained-deviance ratio \cr
+\code{mnlam}  \tab path termination         \tab both    \tab min lambda count before early stop \cr
+\code{eps}    \tab path termination         \tab both    \tab lambda.min.ratio floor \cr
+\code{thresh} \tab CD tolerance             \tab both    \tab inner coordinate-descent convergence \cr
+\code{maxit}  \tab CD budget                \tab both    \tab max CD passes across all lambdas \cr
+\code{dfmax}  \tab coefficient-count cap    \tab both    \tab default resolves to \code{nvars + 1} at call time \cr
+\code{pmax}   \tab coefficient-count cap    \tab both    \tab default resolves to \code{min(dfmax*2+20, nvars)} at call time \cr
+\code{big}    \tab numerical guard          \tab both    \tab \code{Inf} substitute for bounds limits \cr
+\code{itrace} \tab progress                 \tab both    \tab aliased with \code{trace.it} \cr
+\code{trace.it} \tab progress               \tab both    \tab aliased with \code{itrace} \cr
+\code{pmin}   \tab probability floor        \tab engine  \tab logistic-family kernels only (\code{lognet}, \code{multnet}) \cr
+\code{exmx}   \tab exp() cap                \tab engine  \tab logistic-family kernels only \cr
+\code{prec}   \tab bounds-subsolver tolerance \tab engine  \tab active when a coefficient has finite \code{lower} / \code{upper} \cr
+\code{mxit}   \tab bounds-subsolver budget  \tab engine  \tab paired with \code{prec} via C++ \code{chg_bnorm()} \cr
+\code{epsnr}  \tab Newton-Raphson tolerance \tab R-IRLS  \tab \emph{inert on the core-engine path}; only \code{glmnet.fit()} reads it \cr
+\code{mxitnr} \tab Newton-Raphson budget    \tab R-IRLS  \tab \emph{inert on the core-engine path}; only \code{glmnet.fit()} reads it \cr
+}
+
+The naming zoo (three tolerances, three iteration budgets) reflects
+the fact that glmnet contains three nested loops:
+\itemize{
+\item \strong{Outer path}: iterate over lambda values. Early
+termination governed by \code{fdev}, \code{devmax}, \code{mnlam},
+\code{eps}.
+\item \strong{Middle Newton/IRLS loop} (only on the R-IRLS path):
+convergence by \code{epsnr}, budget by \code{mxitnr}.
+\item \strong{Inner coordinate descent}: convergence by
+\code{thresh}, budget by \code{maxit}.
+\item \strong{Bounds subsolver} (only for coefficients with finite
+lower/upper): convergence by \code{prec}, budget by \code{mxit}.
+}
+}
+
 \examples{
 
-glmnet.control(fdev = 0)  #continue along path even though not much changes
+glmnet.control(fdev = 0)  # continue along path even though not much changes
+glmnet.control(thresh = 1e-8)  # tighten CD convergence for session
 glmnet.control()  # view current settings
 glmnet.control(factory = TRUE)  # reset all the parameters to their default
 
 }
 \seealso{
-\code{glmnet}
+\code{\link{glmnet}}
 }
 \author{
-Jerome Friedman, Kenneth Tay, Trevor Hastie\cr Maintainer: Trevor Hastie
-\email{hastie@stanford.edu}
+Jerome Friedman, Kenneth Tay, Trevor Hastie\cr
+Maintainer: Trevor Hastie \email{hastie@stanford.edu}
 }
 \keyword{models}
 \keyword{regression}

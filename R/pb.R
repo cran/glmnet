@@ -1,6 +1,4 @@
-## Create and store the pb
+## Create progress bar (storePB removed — no longer needed without Fortran)
 createPB  <- function(...) {
-    pb  <- utils::txtProgressBar(...)
-    .Call("storePB", pb, PACKAGE = "glmnet")
-    pb
+    utils::txtProgressBar(...)
 }

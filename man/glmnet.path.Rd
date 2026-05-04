@@ -16,13 +16,11 @@ glmnet.path(
   family = gaussian(),
   standardize = TRUE,
   intercept = TRUE,
-  thresh = 1e-10,
-  maxit = 1e+05,
   penalty.factor = rep(1, nvars),
   exclude = integer(0),
   lower.limits = -Inf,
   upper.limits = Inf,
-  trace.it = 0
+  control = glmnet.control()
 )
 }
 \arguments{
@@ -70,13 +68,6 @@ same units already, you might not wish to standardize.}
 
 \item{intercept}{Should intercept be fitted (default=TRUE) or set to zero (FALSE)?}
 
-\item{thresh}{Convergence threshold for coordinate descent. Each inner
-coordinate-descent loop continues until the maximum change in the objective
-after any coefficient update is less than thresh times the null deviance.
-Default value is \code{1e-10}.}
-
-\item{maxit}{Maximum number of passes over the data; default is \code{10^5}.}
-
 \item{penalty.factor}{Separate penalty factors can be applied to each
 coefficient. This is a number that multiplies \code{lambda} to allow differential
 shrinkage. Can be 0 for some variables, which implies no shrinkage, and that
@@ -94,10 +85,16 @@ value (which will then be replicated), else a vector of length \code{nvars}.}
 \item{upper.limits}{Vector of upper limits for each coefficient; default
 \code{Inf}. See \code{lower.limits}.}
 
-\item{trace.it}{Controls how much information is printed to screen. Default is
-\code{trace.it=0} (no information printed). If \code{trace.it=1}, a progress
-bar is displayed. If \code{trace.it=2}, some information about the fitting
-procedure is printed to the console as the model is being fitted.}
+\item{control}{A fully resolved 17-key control list of the form returned by
+\code{\link{glmnet.control}()}. Default is \code{glmnet.control()} -- i.e.,
+the current session state. This function does not resolve, validate, or
+layer the list; it reads keys (\code{thresh}, \code{maxit}, \code{trace.it},
+\code{fdev}, \code{eps}, \code{epsnr}, \code{mxitnr}, etc.) from it directly.
+When called from \code{\link{glmnet}()}, the argument is populated by
+\code{.resolve_control()} and already reflects any per-call overrides; see
+\code{\link{glmnet.control}} for the parameter taxonomy. When calling this
+function directly (e.g., from test code), either pass nothing (use session
+state) or build a full list via \code{modifyList(glmnet.control(), ...)}.}
 }
 \value{
 An object with class "glmnetfit" and "glmnet".

@@ -11,7 +11,8 @@ coxnet.deviance(
   offset = NULL,
   weights = NULL,
   std.weights = TRUE,
-  beta = NULL
+  beta = NULL,
+  cox.ties = c("breslow", "efron")
 )
 }
 \arguments{
@@ -32,6 +33,11 @@ to sum to 1.}
 
 \item{beta}{Optional coefficient vector/matrix, to be supplied if
 \code{pred = NULL}.}
+
+\item{cox.ties}{Character; the method for handling ties. One of
+\code{"breslow"} (the current default) or \code{"efron"}. The default
+will change to \code{"efron"} in glmnet 5.1 to match
+\code{survival::coxph}.}
 }
 \value{
 A vector of deviances, one for each column of predictions.
@@ -43,7 +49,7 @@ Compute the deviance (-2 log partial likelihood) for Cox model.
 Computes the deviance for a single set of predictions, or for a matrix
 of predictions. The user can either supply the predictions
 directly through the \code{pred} option, or by supplying the \code{x} matrix
-and \code{beta} coefficients. Uses the Breslow approach to ties.
+and \code{beta} coefficients.
 
 The function first checks if \code{pred} is passed: if so, it is used as
 the predictions. If \code{pred} is not passed but \code{x} and \code{beta}
@@ -51,9 +57,8 @@ are passed, then these values are used to compute the predictions. If
 neither \code{x} nor \code{beta} are passed, then the predictions are all
 taken to be 0.
 
-\code{coxnet.deviance()} is a wrapper: it calls the appropriate internal
-routine based on whether the response is right-censored data or
-(start, stop] survival data.
+Uses the C++ coxdev library for computation, supporting both Breslow
+and Efron methods for ties, as well as stratified and (start, stop] data.
 }
 \examples{
 set.seed(1)

@@ -54,7 +54,7 @@ relax.glmnet=function(fit,x,..., maxp = n-3, path=FALSE, check.args=TRUE){
         glmnet.control(itrace = 0) ## disable glmnet reporting
         cat("Relaxed Fits\n")
         pb  <- utils::txtProgressBar(min = 0, max = length(sundex), initial = 0, style = 3)
-        on.exit(glmnet.control(itrace = internal.parms$itrace))
+        on.exit(glmnet.control(itrace = internal.parms$itrace), add = TRUE)
         on.exit(close(pb), add = TRUE)
     }
     for(i in seq(along=sundex)){

@@ -4,7 +4,14 @@
 \alias{coxgrad}
 \title{Compute gradient for Cox model}
 \usage{
-coxgrad(eta, y, w, std.weights = TRUE, diag.hessian = FALSE)
+coxgrad(
+  eta,
+  y,
+  w,
+  std.weights = TRUE,
+  diag.hessian = FALSE,
+  cox.ties = c("breslow", "efron")
+)
 }
 \arguments{
 \item{eta}{Fit vector (usually from glmnet at a particular lambda).}
@@ -19,6 +26,11 @@ to sum to 1.}
 
 \item{diag.hessian}{If \code{TRUE}, compute the diagonal of the Hessian
 of the log partial likelihood as well. Default is \code{FALSE}.}
+
+\item{cox.ties}{Character; the method for handling ties. One of
+\code{"breslow"} (the current default) or \code{"efron"}. The default
+will change to \code{"efron"} in glmnet 5.1 to match
+\code{survival::coxph}.}
 }
 \value{
 A single gradient vector the same length as \code{eta}. If
@@ -33,11 +45,10 @@ model.
 Compute a gradient vector at the fitted vector for the log partial likelihood.
 This is like a residual vector, and useful for manual screening of
 predictors for \code{glmnet} in applications where \code{p} is very large
-(as in GWAS). Uses the Breslow approach to ties.
+(as in GWAS).
 
-This function is essentially a wrapper: it checks whether the response
-provided is right-censored or (start, stop] survival data, and calls the
-appropriate internal routine.
+Uses the C++ coxdev library for computation, supporting both Breslow
+and Efron methods for ties, as well as stratified and (start, stop] data.
 }
 \examples{
 set.seed(1)

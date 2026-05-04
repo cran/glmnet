@@ -1,0 +1,467 @@
+---
+title: "A History of glmnet"
+author:
+  - Trevor Hastie
+  - Balasubramanian Narasimhan
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+bibliography: assets/glmnet_refs.bib
+link-citations: true
+output:
+  pdf_document:
+    fig_caption: yes
+    toc: yes
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{A History of glmnet}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,
+                      fig.align = "center")
+```
+
+## 1. Introduction
+
+`glmnet` is an R package for fitting the lasso and elastic-net
+regularization paths of generalized linear models and related
+regression problems. It has been on CRAN since 2008. Over the
+intervening years it has grown from a single coordinate-descent
+Fortran kernel for Gaussian, binomial, multinomial, Poisson, and Cox
+responses into a layered system in which *any* GLM family can be
+fitted, in which large-scale genomic problems are tractable, and in
+which every numerical kernel is now written in modern C++. The
+package reached its current shape in identifiable steps, each
+due to contributions from several people.
+
+This vignette is a history of those steps and an acknowledgement of
+the contributions. While some historical information is in `NEWS.md`,
+it misses the details. We hope that this document goes beyond a
+listing of enhancements and bug fixes to explain why the package has
+its current structure, and attributes contributions accurately with
+references to published work where appropriate.
+
+## 2. Origins: coordinate descent and the first release (2008--2010)
+
+The statistical backbone of `glmnet` is older than the package. The
+lasso was introduced in @lasso and the elastic-net penalty, which
+combines $\ell_1$ and $\ell_2$ regularization and smooths the variable
+selection behavior of the lasso in the presence of correlated
+features, was introduced in @elasticnet. The *algorithmic* insight,
+worked out in @pathwise, that cyclical coordinate descent is
+extraordinarily effective when combined with warm starts along a
+decreasing sequence of regularization parameters $\lambda_1 >
+\lambda_2 > \cdots > \lambda_K$ was implemented in its CRAN debut
+(version 1.1-1). The path is computed once; each $\lambda_k$ solution
+starts from the previous, and both the set of active variables and the
+number of inner passes stay small.
+
+Coordinate descent has a long history, and our team was not the first
+to use it in conjunction with the lasso. Tibshirani's Ph.D student
+Wenjiang Fu at U. Toronto invented a version of coordinate descent
+called the *shooting algorithm* in 1997.  Ingrid Daubechies used
+coordinate descent for $\ell_1$ image deblurring in a talk at Stanford
+in 2002. In her Ph.D. thesis with Jacquie Meulman at U. Leiden in
+2006, Anita van der Kooij used coordinate descent in fitting elastic
+net problems. Others have used it is well. The *pathwise* use of
+coordinate descent in `glmnet` leads to great efficiency, and allows
+for a fairly seamless transition to different loss functions.
+
+The canonical reference for the package itself is
+@glmnet, published in the *Journal of Statistical Software* the year
+after the initial release. That paper covers Gaussian, two-class
+logistic, multinomial, and Poisson regression. The Cox
+proportional-hazards model for right-censored survival data was
+added in version 1.2 (2010) by Noah Simon, then a PhD student at
+Stanford, and documented in @coxnet. At that point the available
+families were exactly those exposed through the `family` argument
+today: `"gaussian"`, `"binomial"`, `"multinomial"`, `"poisson"`,
+`"mgaussian"`, and `"cox"`. Each one had its own Fortran subroutine,
+and the dispatch in `glmnet.R` was a chain of `if/else` branches
+keyed on the family string:
+
+![Family dispatch in `glmnet` before v4.0. User-facing R in blue,
+internal R in orange, Fortran subroutines in
+grey.](assets/figures/dispatch_v3.png){width=88%}
+
+A word on the implementation language is warranted, because it
+explains most of what came later. The Fortran sources were not written
+by hand in Fortran but generated from *Mortran*, a macro language
+layered over Fortran 77. In the spirit of open source, the full
+Mortran sources live in `inst/mortran/` and were maintained by Jerome
+Friedman for over a decade. The combination was extremely fast but it
+was difficult to extend and hard for newcomers to read. Every new
+feature that touched the inner loop had to be expressed in Mortran or
+directly in Fortran, regenerated to Fortran, and then debugged under
+the limitations of that toolchain. Furthermore, Fortran was dropping
+in popularity and C/C++ was being used more and more for writing fast
+code to interface with R. So too with `glmnet`.
+
+## 3. Filling out the matrix (2010--2018)
+
+The years between the first JSS paper and the 2019 v3.0 release were
+spent in steady, broadening of what the package could accept as input
+and what it could do with it. We summarize the milestones
+thematically; the version numbers come from `NEWS.md` and CRAN
+archive.
+```{r timeline, fig.width=7, fig.height=3.8, out.width="\\textwidth", fig.cap="glmnet release milestones. Top row runs left-to-right; the path folds down at the right and the bottom row runs right-to-left, ending at v5.0. Evenly spaced for legibility rather than to reflect calendar time."}
+par(mar = c(0.4, 0.4, 0.4, 0.4))
+milestones <- data.frame(
+  ver = c("Initial release (2008)", "1.2 (2010)", "1.6 (2011)",
+          "2.0-1 (2015)", "3.0 (2019)",
+          "4.0 (2020)", "4.1 (2021)", "4.1-3 (2021)", "5.0 (2026)"),
+  lbl = c("coordinate descent;\nFortran kernel\n(Friedman, Hastie,\nTibshirani)",
+          "coxnet\n(Simon)",
+          "strong rules screen\n(Tibshirani et al.)",
+          "CV rewrite\n(Hastie)",
+          "relax; assess;\nbigGlm\n(Hastie,\nNarasimhan)",
+          "GLM extension\n(Tay, Hastie,\nNarasimhan)",
+          "(start, stop] Cox;\nstrata; sparse Cox\n(Tay, Narasimhan,\nHastie)",
+          "Fortran to C++\n(Yang)",
+          "coxdev submodules;\nCox unified\n(Taylor,\nNarasimhan, Hastie)")
+)
+n <- nrow(milestones); ntop <- 5; nbot <- n - ntop
+top_y <- 1.4; bot_y <- -1.4
+col_x <- seq_len(ntop)
+px <- numeric(n); py <- numeric(n)
+px[1:ntop]     <- col_x;                   py[1:ntop]     <- top_y
+px[(ntop+1):n] <- rev(col_x[(ntop-nbot+1):ntop]); py[(ntop+1):n] <- bot_y
+
+plot.new(); plot.window(xlim = c(0.4, ntop + 0.45), ylim = c(-2.3, 2.3))
+
+seg <- function(x0, y0, x1, y1)
+  segments(x0, y0, x1, y1, lwd = 1.4, col = "grey35")
+arr <- function(x0, y0, x1, y1)
+  arrows(x0, y0, x1, y1, length = 0.09, angle = 25, lwd = 1.4,
+         col = "grey35")
+pad <- 0.18
+# top row: left -> right
+for (i in 1:(ntop-1)) arr(px[i] + pad, py[i], px[i+1] - pad, py[i+1])
+# fold down at right: tiny side step to clear labels on the shared column
+fold_x <- ntop + 0.3
+seg(px[ntop] + pad, py[ntop], fold_x, py[ntop])        # right from last top node
+seg(fold_x, py[ntop], fold_x, py[ntop+1])              # down along margin
+arr(fold_x, py[ntop+1], px[ntop+1] + pad, py[ntop+1])  # left into first bottom node
+# bottom row: right -> left
+for (i in (ntop+1):(n-1)) arr(px[i] - pad, py[i], px[i+1] + pad, py[i+1])
+
+points(px, py, pch = 21, bg = "grey90", col = "grey20",
+       cex = 2.0, lwd = 1.3)
+text(px, py, labels = seq_len(n), cex = 0.72, col = "grey15",
+     font = 2)
+
+# version labels: above top row, below bottom row
+text(px[1:ntop], py[1:ntop] + 0.28, milestones$ver[1:ntop],
+     cex = 0.72, col = "grey25", pos = 3, offset = 0)
+text(px[(ntop+1):n], py[(ntop+1):n] - 0.28, milestones$ver[(ntop+1):n],
+     cex = 0.72, col = "grey25", pos = 1, offset = 0)
+
+# description labels: below top row, above bottom row (interior)
+text(px[1:ntop], py[1:ntop] - 0.28, milestones$lbl[1:ntop],
+     cex = 0.66, pos = 1, offset = 0)
+text(px[(ntop+1):n], py[(ntop+1):n] + 0.28, milestones$lbl[(ntop+1):n],
+     cex = 0.66, pos = 3, offset = 0)
+```
+
+**More responses.** The `mgaussian` family for multivariate Gaussian
+regression with a grouped-lasso penalty, and a `grouped` option for
+the multinomial family, arrived in v1.8 (2012). Sparse `x` via
+`Matrix::dgCMatrix` landed even earlier, in v1.6 (2011). This was a
+major step making it possible to use `glmnet` with large, sparse
+design matrices.
+
+
+**Strong rules.** Version 1.6 (April 2011) also introduced *strong
+rules* screening [@strongrules]: at each $\lambda$ along the path a
+cheap inner-product check predicts which variables are likely to
+stay inactive, and the coordinate-descent sweep skips them, with a
+KKT-condition re-check afterwards to catch any violations. For
+sparse problems this screens out the vast majority of predictors and
+was a step-change in speed for large $p$. Like several other `glmnet`
+milestones, the code landed in CRAN a year before the paper appeared.
+
+**Coefficient constraints.** Upper and lower limits on individual
+coefficients, together with `glmnet.control()` for tuning numerical
+parameters, appeared in v1.9-1 (2013). The ability to fix a
+coefficient in an interval --- or pin it to zero from outside via
+`exclude` --- is now routinely relied upon by downstream packages.
+
+**Cross-validation maturity.** The v2.0-1 (2015) release rewrote
+`cv.glmnet`: each fold fits on its own $\lambda$ sequence and is then
+evaluated at the original path. The alignment subtlety that motivated
+this --- paths from different folds do not in general hit the same
+$\lambda$ values --- was subsequently addressed again in v2.0-18
+(2019) via the `alignment` argument.
+
+**Cox refinements.** A bug affecting ties between the death set and
+the risk set was fixed in v2.0-19, and `coxgrad` and an improved
+`coxnet.deviance` were added in v2.0-20. These changes prepared the
+ground for the larger Cox work that followed in v4.1.
+
+**Fortran maintenance.** Substantial effort was spent in making the
+Mortran generated Fortran build cleanly on every CRAN platform:
+portable on every Fortran compiler (v2.0-15),
+double-precision-consistent and `-Wall`-clean (v2.0-16, 2018), native
+Fortran registration (v2.0-8, 2017). These changes were behind the
+scenes, less visible to users, but essential for passing CRAN checks
+for another decade.
+
+## 4. Usability matures: v3.0 (2019)
+
+Version 3.0, released in November 2019, was the first release in
+which the feature set grew faster than the implementation underneath
+it. The headline additions, contributed by Trevor Hastie and
+Balasubramanian Narasimhan, were: the `relax` argument [@best_subset] to both
+`glmnet` and `cv.glmnet`, which refits each active set in the path
+without regularization and blends the two fits through a `gamma`
+parameter (a dedicated `relax` vignette documents the usage);
+`assess.glmnet`, `roc.glmnet`, and `confusion.glmnet` for evaluating
+model performance; `makeX` for building input matrices from raw data
+frames with one-hot encoding of factors and NA handling; and
+`bigGlm` for unpenalized GLM fits using the same algorithmic
+machinery. A `trace.it` progress bar made long paths less opaque,
+and `print` methods for `cv.glmnet` and the new `relaxed` class were
+tidied up.
+
+Importantly, the family dispatch at this point was still entirely
+character-based. A call `glmnet(x, y, family = "binomial")` passed
+through an `if` branch into `lognet.R`, which called a Fortran
+subroutine dedicated to logistic regression. Every family had its
+own subroutine. That was about to change.
+
+## 5. GLM extension: v4.0 (2020)
+
+Before Version 4.0, each family reference such as  `"binomial"` was
+routed to a dedicated routine.  Version 4.0 (May 2020) generalized the objective 
+ 
+$$
+\sum_{i=1}^n w_i\,\text{NLL}_i(\beta_0,\beta) + \lambda\,P_\alpha(\beta),
+$$
+
+where $\text{NLL}_i$ is the negative log-likelihood contribution of
+observation $i$ under *any* GLM family, and the elastic-net penalty is
+$P_\alpha(\beta) = \alpha\|\beta\|_1 +
+\tfrac{1-\alpha}{2}\|\beta\|_2^2$. Similar to classical GLMs, 
+we use an iteratively reweighted lasso or elastic net algorithm at
+each value of `lambda` (along with cyclical coordinate descent) to fit
+this model, which is implemented  pathwise down the sequence of
+`lambda` values. That is, at each value of `lambda`, we implement the
+*proximal Newton* via penalized iterative weighted lease squares
+
+$$
+\frac{1}{2n}\sum_{i=1}^n w_i \bigl(y_i - \beta_0 - x_i^\top\beta\bigr)^2
+ + \lambda\,P_\alpha(\beta).
+$$
+
+  This coordinate-descent kernel that serves this inner loop is
+the weighted least squares routine `wls`, which becomes the engine
+for every family the package does not handle with a dedicated
+subroutine.
+
+The programming was done by Kenneth Tay, then a PhD student at
+Stanford, with  supervision from
+Hastie and Narasimhan. 
+The user-visible
+payoff is that the `family` argument can now be an R `family()`
+object --- any object of class `"family"` in the sense of `stats::glm`,
+including `MASS::negative.binomial`, `statmod::tweedie`, or a
+user-defined family. The published reference is @glmnetFlex. Note
+that the paper appeared three years after the release; the software
+led the publication.
+
+![Family dispatch in `glmnet` v4.0. The new right-hand branch
+(`glmnet.path`, `glmnet.fit`, `wls`) handles any `family()` object;
+the original per-family subroutines remain for the built-in
+string-named families, which stay on the fast
+path.](assets/figures/dispatch_v4.png){width=92%}
+
+Two design decisions deserve explicit mention. First, the pre-v4
+character-named families were retained and continue to go through
+their dedicated subroutines, because a hand-written kernel will
+always beat a generic IRLS loop. So the flexibility was added alongside the
+old code, not on top of it. Second, the v4.0 warm-start convention
+was tightened: the earliest form required passing a full `glmnetfit`
+object, which was awkward; in v4.0.1 this was relaxed so a warm start
+can be a simple list containing the intercept and coefficient vector.
+Consistency with the pre-v4 numerical results --- verified through
+KKT-condition checks against the Fortran output --- was the
+correctness criterion throughout.
+
+## 6. Cox catches up: v4.1 (2021)
+
+Version 4.1 (January 2021) brought the Cox model to something close
+to feature parity with `survival::coxph`, which has served as the
+reference implementation throughout `glmnet`'s Cox history. Four
+things were added in a single release:
+
+1. *Left truncation and time-varying covariates* via $(start, stop]$
+   counting-process input, the same format `survival` has long
+   accepted.
+2. *Strata*, specified via `stratifySurv()`, with the interpretation
+   of `survival::coxph`: a separate baseline hazard per stratum and
+   a single shared coefficient vector.
+3. *Sparse $x$* for Cox models, which had been a notable gap --- the
+   pre-v4.1 Cox path required a dense matrix even when the rest of
+   the package was happy with `dgCMatrix`.
+4. A `survfit` method for `coxnet` objects so that fitted survival
+   curves could be produced without leaving `glmnet`.
+
+Much of this work was also implemented by Tay, building on the v4.0 IRLS machinery
+but targeting the Cox deviance specifically. In v4.1-2, following a
+suggestion by Rob Tibshirani, the `exclude` argument was extended from
+a fixed set of indices to *a function* that is handed `x`, `y`, and
+`weights` and returns the indices to drop. This is the user-level hook
+by which strong-rules screening can be plugged into the path; see
+@strongrules and, for its application at GWAS scale, @snpnet.
+
+## 7. Fortran → C++ port (2021--2022)
+
+During the summer of 2021, first year statistics Ph.D student James
+Yang was looking for a fun activity after completing the grueling
+qualiying exams. He decided to rewrite the fortran backbone in
+`glmnet` in C++!  This caught the attention of Hastie (who became his
+advisor) and Narasimhan, because Yang is a very experienced
+programmer.  Between v4.1-3 (November 2021) and v4.1-6 (November
+2022), Yang replaced essentially all of the Mortran/Fortran in the
+package with a header-only C++ implementation built on `Eigen`. This
+implementation, `glmnetpp`, is a single template kernel that absorbs
+dense and sparse matrices and all the built-in families through
+parametrization rather than code duplication.
+
+The staging was deliberate. In v4.1-3 the weighted least squares
+kernels (`wls` and its sparse counterpart) and the `elnet` family of
+routines were ported first --- these were the engines that the new
+`glmnet.fit` path exercised the most, and porting them delivered
+roughly 4--8$\times$ speedups on the generic GLM path. In v4.1-4 the
+rest of the Fortran was rewritten, leaving only the Cox subroutine.
+In v4.1-6 the legacy Fortran that could be removed was removed.
+
+![Family dispatch after the C++ port (v4.1-3 onwards). Coloured
+boxes indicate kernels rewritten in C++; only `coxnet()` remained in
+Fortran.](assets/figures/dispatch_v4plus.png){width=92%}
+
+Several thousand lines of template C++ replaced several thousand lines
+of Fortran, with comparable or better performance because arguments
+were no longer copied---R version 3.1+ changed this behavior and `dup
+= FALSE` had no effect. This provided a much lower barrier to future
+extension, and removed the dependence on a generated-Fortran
+toolchain. The Cox subroutine was left alone because its numerical
+structure --- stratified risk sets, ties, left truncation --- is
+harder to express cleanly as a template, and because James Yang's
+priority was to get the rest of the package onto the new
+footing. Resolving Cox would take another three years.
+
+## 8. Applications feeding back into the package
+
+`glmnet` is also a piece of infrastructure on which other statistical
+software is built, and some of those applications have exerted
+pressure on the package's interface. We mention three briefly.
+
+*SNPnet* [@snpnet] applies the lasso at the scale of modern
+genome-wide association studies --- hundreds of thousands of samples
+by hundreds of thousands of variants --- by aggressively screening
+predictors using the strong rules of @strongrules. The work
+motivated the v4.1-2 generalization of `exclude` to accept a
+function, so that strong-rules screening can be plugged into the
+standard `glmnet` call rather than requiring a fork.
+
+*The data-shared lasso* [@datasharedlasso] uses `glmnet` as its
+optimization backend to share information across related datasets
+while retaining per-dataset coefficients, an idiom close to multi-task
+learning.
+
+*Cooperative learning* [@coopLearning] is a framework for
+multi-view regression in which multiple data modalities on the same
+subjects (genomics, proteomics, imaging, and so on) are jointly
+regressed against an outcome under a regularization term that
+penalizes disagreement between the views. The companion CRAN
+package `multiview` dispatches its fits to `glmnet`.
+
+## 9. Streamlined Cox and v5.0 (2026)
+
+On the eve of v5.0 the package was in an unusual state: every kernel
+except the Cox subroutine had been rewritten in C++. The Cox kernel
+had survived because of the combinatorial complexity its users
+expect of it --- tie handling, stratified risk
+sets, left truncation --- and because producing a numerically stable
+deviance, gradient, and Hessian in all of these cases in a single
+clean implementation is harder than it looks.
+
+The v5.0 release resolves this. Jonathan Taylor joined the team, and contributed
+`coxdev`, a standalone C++ library that computes the Cox partial
+log-likelihood deviance together with its gradient and Hessian,
+handling Breslow and Efron tie methods, strata, and $(start, stop]$
+data through a small number of well-tested classes. `coxdev` is
+separately developed (a nested git submodule of `glmnetpp`, which is
+itself a submodule of `glmnet`), and the computational details are
+the subject of a companion vignette. At the same time,
+Narasimhan replaced the Fortran code for the Cox regularization path with
+C++, making use of the `coxdev` library for the gradient and Hessian
+computations, which automatically takes care of all the special cases.
+From the point of
+view of `glmnet`, the essential change is that Cox is now a
+first-class GLM type inside `glmnetpp` --- `glm_type::cox` in the
+type enumeration --- and the same IRLS loop that drives the
+Gaussian, binomial, and Poisson paths drives the Cox path, with a
+thin `CoxDevAdapter` handing the deviance and gradient queries off to
+`coxdev`. The last of the Fortran leaves the package in this release.
+
+![Full architecture of `glmnet` v5.0 with the `glmnetpp` and `coxdev`
+submodules, the Rcpp boundary, and the `CoxDevAdapter` bridge from
+the `glmnetpp` IRLS loop to the `coxdev` deviance and gradient
+routines.](assets/figures/dispatch_v5.png){width=100%}
+
+Two user-visible consequences of this unification are worth stating
+plainly. First, the Cox model now takes a `cox.ties` argument
+with choices `"breslow"` or `"efron"`. The v5.0 default is
+`cox.ties = "breslow"`, preserving the pre-v5.0 numerical behavior for
+upgraders; v5.1 will switch the default to `"efron"` to match
+`survival::coxph`. Calls to `glmnet()` with `family = "cox"` that do
+not set `cox.ties` explicitly emit a transition warning until the
+switch occurs.  The performance picture is favourable. On the benchmark set
+in `tests/benchmark_cox.R`, dense Cox paths are roughly 3 times
+faster than the legacy Fortran, sparse Cox paths roughly 90 times
+faster, and stratified Cox paths --- which had been the most
+penalized case in the old implementation --- roughly 300 times
+faster. Full benchmark numbers appear in the NEWS entry for v5.0.
+
+## 10. Looking forward
+
+Development continues along several lines. A Python `glmnet` is
+being prepared by Jonathan Taylor that shares a common C++ codebase with the R package,
+so that the same kernels serve both languages. The shared codebase
+opens the possibility of compiling `glmnet` to WebAssembly for
+in-browser use. Upstream work in `coxdev` is aimed at reducing
+per-call allocation in the IRLS loop, which is the last remaining
+place where the Cox path pays a measurable overhead for its
+extensibility.
+
+## 11. Contributors and acknowledgements
+
+`glmnet` is the work of many hands. Jerome Friedman wrote the
+original coordinate-descent kernel and the Mortran infrastructure,
+and is a co-author of @glmnet, @coxnet, and @pathwise. Trevor
+Hastie has been co-author throughout, as well as the package
+maintainer. He also wrote the bulk of the R interface code, as well as
+methods for plotting, printing, predicting and cross-validation, and
+the corresponding code for the relaxed models (with help from Narasimhan).
+
+Robert Tibshirani introduced the lasso [@lasso] and co-authored the
+ strong-rules work on which the package depends. Noah
+Simon led the original Cox path work and is the first author of
+@coxnet. Kenneth Tay is responsible for the v4.0 GLM extension and
+much of the v4.1 Cox expansion, and is first author of @glmnetFlex.
+Balasubramanian Narasimhan has maintained the package through the
+v4.x and v5.0 architectural transitions and is a co-author of
+@glmnetFlex. James Yang carried out the v4.1-3 through v4.1-6
+port from Fortran to C++ and is the author of `glmnetpp`. Junyang
+Qian is first author of @snpnet, whose screening machinery
+influenced the v4.1-2 `exclude`-as-function interface. Jonathan
+Taylor contributed `coxdev` and with Narasimhan drove the v5.0 unification of the
+Cox path onto the C++ engine. Many bug reports and fixes
+contributed by users over the years are recorded in `NEWS.md`; the
+work of Tomas Kalibera, David Keplinger, and others is gratefully
+acknowledged.
+
+## References

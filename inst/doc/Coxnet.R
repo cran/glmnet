@@ -51,21 +51,20 @@ set.seed(1)
 nobs <- 100; nvars <- 15
 x <- matrix(rnorm(nobs * nvars), nrow = nobs)
 
-# create response
+# create response with many ties
 ty <- rep(rexp(nobs / 5), each = 5)
 tcens <- rbinom(n = nobs, prob = 0.3, size = 1)
 y <- Surv(ty, tcens)
 
-# coefficients from these two models will not line up because
-# of different tie handling methods
-glmnet_fit <- glmnet(x, y, family = "cox", lambda = 0)
+# Efron: set cox.ties = "efron" in glmnet (matches coxph's default)
+glmnet_fit <- glmnet(x, y, family = "cox", lambda = 0, cox.ties = "efron")
 coxph_fit <- coxph(y ~ x)
 plot(coef(glmnet_fit), coef(coxph_fit))
 abline(0, 1)
 
 ## -----------------------------------------------------------------------------
-# coefficients from these two models will line up
-glmnet_fit <- glmnet(x, y, family = "cox", lambda = 0)
+# Breslow: set cox.ties = "breslow" in glmnet, ties = "breslow" in coxph
+glmnet_fit <- glmnet(x, y, family = "cox", lambda = 0, cox.ties = "breslow")
 coxph_fit <- coxph(y ~ x, ties = "breslow")
 plot(coef(glmnet_fit), coef(coxph_fit))
 abline(0, 1)

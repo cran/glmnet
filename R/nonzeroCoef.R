@@ -1,15 +1,15 @@
-nonzeroCoef = function (beta, bystep = FALSE) 
+nonzeroCoef = function (beta, bystep = FALSE)
 {
 ### bystep = FALSE means which variables were ever nonzero
 ### bystep = TRUE means which variables are nonzero for each step
   nr=nrow(beta)
   if (nr == 1) {#degenerate case
-    if (bystep) 
-      apply(beta, 2, function(x) if (abs(x) > 0) 
+    if (bystep)
+      apply(beta, 2, function(x) if (abs(x) > 0)
             1
       else NULL)
     else {
-      if (any(abs(beta) > 0)) 
+      if (any(abs(beta) > 0))
         1
       else NULL
     }
@@ -23,12 +23,10 @@ nonzeroCoef = function (beta, bystep = FALSE)
     if (bystep) {
       if(length(which)>0){
         beta=as.matrix(beta[which,,drop=FALSE])
-        nzel = function(x, which) if (any(x)) 
+        nzel = function(x, which) if (any(x))
           which[x]
         else NULL
-        which=apply(beta, 2, nzel, which)
-        if(!is.list(which))which=data.frame(which)# apply can return a matrix!!
-        which
+        apply(beta, 2, nzel, which=which,simplify=FALSE)
       }
       else{
         dn=dimnames(beta)[[2]]
@@ -36,7 +34,7 @@ nonzeroCoef = function (beta, bystep = FALSE)
         names(which)=dn
         which
       }
-        
+
     }
     else which
   }

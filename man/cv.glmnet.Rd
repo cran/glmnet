@@ -20,6 +20,7 @@ cv.glmnet(
   gamma = c(0, 0.25, 0.5, 0.75, 1),
   relax = FALSE,
   trace.it = 0,
+  control = list(),
   ...
 )
 }
@@ -110,6 +111,10 @@ parameter \code{gamma} as well as \code{lambda}. Default is
 \item{trace.it}{If \code{trace.it=1}, then progress bars are displayed;
 useful for big models that take a long time to fit. Limited tracing if
 \code{parallel=TRUE}}
+
+\item{control}{A named list of algorithm control parameters,
+providing per-call overrides of session defaults set by
+\code{\link{glmnet.control}()}. See \code{glmnet} for details.}
 
 \item{\dots}{Other arguments that can be passed to glmnet, for example \code{alpha}, \code{nlambda}, etc. See \code{glmnet} for details.}
 }

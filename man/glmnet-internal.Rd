@@ -18,7 +18,6 @@
 \alias{lognet}
 \alias{fishnet}
 \alias{coefnorm}
-\alias{coxnet}
 \alias{cv.lognet}
 \alias{cv.elnet}
 \alias{cv.multnet}

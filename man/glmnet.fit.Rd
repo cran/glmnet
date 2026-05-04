@@ -13,8 +13,6 @@ glmnet.fit(
   offset = rep(0, nobs),
   family = gaussian(),
   intercept = TRUE,
-  thresh = 1e-10,
-  maxit = 1e+05,
   penalty.factor = rep(1, nvars),
   exclude = c(),
   lower.limits = -Inf,
@@ -22,7 +20,7 @@ glmnet.fit(
   warm = NULL,
   from.glmnet.path = FALSE,
   save.fit = FALSE,
-  trace.it = 0
+  control = glmnet.control()
 )
 }
 \arguments{
@@ -56,15 +54,6 @@ family functions.)}
 
 \item{intercept}{Should intercept be fitted (default=TRUE) or set to zero (FALSE)?}
 
-\item{thresh}{Convergence threshold for coordinate descent. Each inner
-coordinate-descent loop continues until the maximum change in the objective
-after any coefficient update is less than thresh times the null deviance.
-Default value is \code{1e-10}.}
-
-\item{maxit}{Maximum number of passes over the data; default is \code{10^5}.
-(If a warm start object is provided, the number of passes the warm start object
-performed is included.)}
-
 \item{penalty.factor}{Separate penalty factors can be applied to each
 coefficient. This is a number that multiplies \code{lambda} to allow differential
 shrinkage. Can be 0 for some variables, which implies no shrinkage, and that
@@ -92,11 +81,12 @@ Default is FALSE.This has implications for computation of the penalty factors.}
 
 \item{save.fit}{Return the warm start object? Default is FALSE.}
 
-\item{trace.it}{Controls how much information is printed to screen. If
-\code{trace.it=2}, some information about the fitting procedure is printed to
-the console as the model is being fitted. Default is \code{trace.it=0}
-(no information printed). (\code{trace.it=1} not used for compatibility with
-\code{glmnet.path}.)}
+\item{control}{A fully resolved 17-key control list of the form returned by
+\code{\link{glmnet.control}()}. Default is \code{glmnet.control()} -- current
+session state. This function does not resolve or validate the list; keys
+(\code{thresh}, \code{maxit}, \code{trace.it}, \code{epsnr}, \code{mxitnr},
+\code{big}, etc.) are read directly. See \code{?glmnet.path} for the same
+contract.}
 }
 \value{
 An object with class "glmnetfit" and "glmnet". The list
