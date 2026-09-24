@@ -149,25 +149,6 @@
 #' @export glmnet.control
 ## Factory defaults for all 17 algorithm-control parameters. Used by
 ## glmnet.control(factory = TRUE).
-.GLMNET_CONTROL_FACTORY <- list(
-    fdev     = 1e-5,
-    eps      = 1e-6,
-    big      = 9.9e35,
-    mnlam    = 5L,
-    devmax   = 0.999,
-    pmin     = 1e-9,
-    exmx     = 250,
-    itrace   = 0L,
-    prec     = 1e-10,
-    mxit     = 100L,
-    epsnr    = 1e-6,
-    mxitnr   = 25L,
-    thresh   = 1e-7,
-    maxit    = 100000L,
-    dfmax    = NULL,
-    pmax     = NULL,
-    trace.it = 0L
-)
 
 glmnet.control <-
   function (fdev = 1e-05, devmax = 0.999, eps = 1e-06, big = 9.9e+35,
@@ -293,3 +274,23 @@ glmnet.control <-
 
     list(control = resolved, restore = restore)
 }
+
+.GLMNET_CONTROL_FACTORY <- list(
+    fdev     = 1e-5,
+    eps      = 1e-6,
+    big      = 9.9e35,
+    mnlam    = 5L,
+    devmax   = 0.999,
+    pmin     = 1e-9,
+    exmx     = 250,
+    itrace   = 0L,
+    prec     = 1e-10,
+    mxit     = 100L,
+    epsnr    = 1e-6,
+    mxitnr   = 25L,
+    thresh   = 1e-7,
+    maxit    = 100000L,
+    dfmax    = NULL,
+    pmax     = NULL,
+    trace.it = 0L
+)

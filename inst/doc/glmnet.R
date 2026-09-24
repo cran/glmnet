@@ -99,7 +99,7 @@ print(cvfit)
 # system.time(cv.glmnet(X, Y))
 
 ## ----echo=FALSE---------------------------------------------------------------
-structure(c(2.44, 0.08, 2.518, 0, 0), class = "proc_time", .Names = c("user.self",
+structure(c(2.44, 0.08, 2.518, 0, 0), class = "proc_time", names = c("user.self",
 "sys.self", "elapsed", "user.child", "sys.child"))
 
 ## ----eval=FALSE---------------------------------------------------------------
@@ -107,7 +107,7 @@ structure(c(2.44, 0.08, 2.518, 0, 0), class = "proc_time", .Names = c("user.self
 
 ## ----echo=FALSE---------------------------------------------------------------
 structure(c(0.508999999999999, 0.057, 1.56699999999999, 1.941,
-0.1), class = "proc_time", .Names = c("user.self", "sys.self",
+0.1), class = "proc_time", names = c("user.self", "sys.self",
 "elapsed", "user.child", "sys.child"))
 
 ## ----out.lines = 10-----------------------------------------------------------

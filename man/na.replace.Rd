@@ -5,7 +5,7 @@
 \title{Replace the missing entries in a matrix columnwise with the entries in a
 supplied vector}
 \usage{
-na.replace(x, m = rowSums(x, na.rm = TRUE))
+na.replace(x, m = colMeans(x, na.rm = TRUE))
 }
 \arguments{
 \item{x}{A matrix with potentially missing values, and also potentially in

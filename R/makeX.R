@@ -214,7 +214,7 @@ na_sparse_fix=function(x,dfnames){
 #' na.replace(x, m)
 #'
 #' @export na.replace
-na.replace=function(x,m=rowSums(x,na.rm=TRUE)){
+na.replace=function(x,m=colMeans(x,na.rm=TRUE)){
     if(inherits(x,"sparseMatrix")){
         x=as(x,"CsparseMatrix")
         ccount=diff(x@p)

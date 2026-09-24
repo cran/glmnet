@@ -1,5 +1,10 @@
 # glmnet 5.0 Series
 
+## 5.1 (2026-09-23)
+
+Allow for the penalty.factor argument to be a function, as it is for exclude. 
+Allows for seemless CV, when this function can depend on the response.
+
 ## 5.0 (2026-04-27)
 
 First release since v4.1-10 (July 2025). Major rearchitecture with

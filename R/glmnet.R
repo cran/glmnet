@@ -186,7 +186,12 @@
 #' \code{exclude}). Also, any \code{penalty.factor} that is set to \code{inf} is
 #' converted to an \code{exclude}, and then internally reset to 1.
 #' Note: the penalty factors are internally rescaled to sum to
-#' nvars, and the lambda sequence will reflect this change.
+#' \code{nvars}, and the lambda sequence will reflect this change.
+#' Users can supply instead a \code{penalty.factor} function that generates the penalty factors.
+#' This function is most generally defined as \code{function(x, y, weights, ...)},
+#' and is called inside \code{glmnet} to generate the penalty factors (of length \code{nvars}).
+#' The \code{...} argument is required, the others are optional.
+#' This is useful for adapting the penalty to the data, and works correctly with \code{cv.glmnet}.
 #' @param lower.limits Vector of lower limits for each coefficient; default
 #' \code{-Inf}. Each of these must be non-positive. Can be presented as a
 #' single value (which will then be replicated), else a vector of length
@@ -285,7 +290,7 @@
 #' Forward Stepwise or Lasso? Analysis and Recommendations Based on Extensive Comparisons,
 #' Statist. Sc. Vol. 35(4), 579-592},
 #' \url{https://arxiv.org/abs/1707.08692}.\cr
-#' Glmnet webpage with four vignettes: \url{https://glmnet.stanford.edu}.
+#' Glmnet webpage with  four vignettes for learning how to use glmnet, documnetation for all the functions, a  history of the developments, and more: \url{https://glmnet.stanford.edu}.
 #' @keywords models regression
 #' @examples
 #'
@@ -423,8 +428,8 @@ glmnet=function(x,y,family=c("gaussian","binomial","poisson","multinomial","cox"
     if(is.null(weights))weights=rep(1,nobs)
     else if(length(weights)!=nobs)stop(paste("number of elements in weights (",length(weights),") not equal to the number of rows of x (",nobs,")",sep=""))
     if(is.function(exclude))exclude <- check.exclude(exclude(x=x,y=y,weights=weights),nvars)
-    if (length(penalty.factor) != nvars)
-        stop("the length of penalty.factor does not match the number of variables")
+    if(is.function(penalty.factor)) penalty.factor <- penalty.factor(x=x,y=y,weights=weights)
+        penalty.factor <- check.penalty.factor(penalty.factor,nvars)
 
 ### See whether its a call to glmnet or to glmnet.path, based on family arg
     if(!is.character(family)){
