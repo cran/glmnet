@@ -88,8 +88,10 @@ of the nonzero coefficients for each value of \code{s}.}
 for making predictions (except for \code{type="coefficients"} or
 \code{type="nonzero"})}
 
-\item{gamma}{Single value of \code{gamma} at which predictions are required,
-for "relaxed" objects.}
+\item{gamma}{Value(s) of \code{gamma} at which predictions are required,
+for "relaxed" objects. If more than one value is given, a list of
+predictions is returned, one per \code{gamma}, named by the rounded
+\code{gamma} values.}
 }
 \value{
 The object returned depends on type.

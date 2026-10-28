@@ -24,8 +24,10 @@
 //   pmax        InternalParams::pmax          int (NA_INTEGER == NULL)
 //   trace.it    InternalParams::itrace        int (alias of itrace)
 //
-// Unknown keys passed to glmnet_control_set are silently ignored (per
-// design): no R-side validation, no error.
+// Unknown keys passed to glmnet_control_set are silently skipped. User
+// input is validated on the R side first (.validate_control_keys() in
+// R/glmnet.control.R), so unknown keys never reach here from glmnet()
+// or cv.glmnet().
 
 #include "internal.h"
 #include <Rcpp.h>

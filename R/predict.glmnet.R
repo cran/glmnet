@@ -9,8 +9,8 @@
 #' \code{coef(...)} is equivalent to \code{predict(type="coefficients",...)}
 #'
 #' @aliases coef.glmnet coef.relaxed predict.glmnet predict.relaxed
-#' predict.elnet predict.lognet predict.multnet predict.mrelnet predict.fishnet
-#' predict.coxnet
+#' @aliases predict.elnet predict.lognet predict.multnet predict.mrelnet predict.fishnet
+#' @aliases predict.coxnet
 #' @param object Fitted \code{"glmnet"} model object or a \code{"relaxed"}
 #' model (which inherits from class "glmnet").
 #' @param newx Matrix of new values for \code{x} at which predictions are to be

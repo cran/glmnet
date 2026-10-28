@@ -15,17 +15,20 @@ cv.glmnet.raw <-
   glmnet.object$call = glmnet.call
   subclass=class(glmnet.object)[[1]]
   type.measure=cvtype(type.measure,subclass)
-  is.offset = glmnet.object$offset
+    is.offset = glmnet.object$offset
+### Not sure why a) we recompute this and b) we do something different for multinomial(ungrouped)
+### changing so that it uses the df on glmnet object    
 ###Next line is commented out so each call generates its own lambda sequence
 # lambda=glmnet.object$lambda
- if (inherits(glmnet.object, "multnet") && !glmnet.object$grouped) {
-    nz = predict(glmnet.object, type = "nonzero")
-    nz = sapply(nz, function(x) sapply(x, length))
-    nz = ceiling(apply(nz, 1, median))
-  }
-  else nz = sapply(predict(glmnet.object, type = "nonzero"),
-         length)
-  outlist = as.list(seq(nfolds))
+ ## if (inherits(glmnet.object, "multnet") && !glmnet.object$grouped) {
+ ##    nz = predict(glmnet.object, type = "nonzero")
+ ##    nz = sapply(nz, function(x) sapply(x, length))
+ ##    nz = ceiling(apply(nz, 1, median))
+ ##  }
+ ##  else nz = sapply(predict(glmnet.object, type = "nonzero"),
+ ##         length)
+    nz = glmnet.object$df
+    outlist = as.list(seq(nfolds))
     N=nrow(x)
   if (parallel) {
 #  if (parallel && require(foreach)) {

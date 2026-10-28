@@ -8,7 +8,8 @@ getOptcv.relaxed <-
     cvm=unlist(cvm)
     lambdas=unlist(lapply(statlist,"[[","lambda"))
     cvsd=unlist(lapply(statlist,"[[","cvsd"))
-    nzero=unlist(lapply(statlist,"[[","nzero"))
+    nzero=unlist(lapply(statlist,"[[","nzero"),use.names=FALSE)
+    
     gammas=rep(gamma,nlams)
     index.gamma = rep(seq(along=gamma),nlams)
     names(lambdas)=NULL

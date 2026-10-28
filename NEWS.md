@@ -1,5 +1,30 @@
 # glmnet 5.0 Series
 
+## 5.2 (development)
+
+* `cv.glmnet()` now takes `nzero` from the fitted object's `df` instead of
+  recomputing it. For multinomial and mgaussian fits, `nzero` is now the
+  number of variables with a nonzero coefficient in any class or response.
+  Previously ungrouped multinomial fits reported the median of the
+  per-class counts, and grouped multinomial and mgaussian fits counted
+  the intercept as a variable. `nzero` (and `nzero.min`/`nzero.1se` for
+  relaxed fits) no longer carries names.
+* `predict()` and `coef()` on relaxed fits now accept a vector of `gamma`
+  values, returning a list of results named by `gamma`. This path
+  previously always failed (`could not find function "outlist"`).
+* The coxdev submodule moves to 0.3.0, which fixes the diagonal of the
+  Hessian with Efron's ties at tied failure times. It is used as the
+  IRLS weights, so Efron fits with tied failures may take different
+  iterations, though they converge to the same solution. It is also
+  what `coxgrad(..., diag.hessian = TRUE)` returns.
+* Unpenalized Cox fits (`lambda = 0`) now converge when a coefficient
+  is held at `lower.limits` or `upper.limits`; previously the
+  convergence check never passed in that case.
+* The `coxgrad()` documentation now says that the `"diag_hessian"`
+  attribute is the diagonal of the Hessian of the deviance, i.e. -2
+  times the derivative of the returned gradient, not the Hessian of
+  the log partial likelihood.
+
 ## 5.1 (2026-09-23)
 
 Allow for the penalty.factor argument to be a function, as it is for exclude. 

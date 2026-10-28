@@ -49,7 +49,7 @@ predict.multnet <-
     return(nbeta)
   if (type == "nonzero")
 #    if(object$grouped)return(nonzeroCoef(object$beta[[1]],bystep=TRUE))
-    if(object$grouped)return(nonzeroCoef(nbeta[[1]],bystep=TRUE))
+    if(object$grouped)return(nonzeroCoef(nbeta[[1]][-1, , drop=FALSE],bystep=TRUE))
     else
       return(lapply(nbeta, function(x) nonzeroCoef(x[-1, ,
                                                    drop = FALSE], bystep = TRUE)))

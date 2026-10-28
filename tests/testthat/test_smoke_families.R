@@ -139,15 +139,11 @@ for (sz in list(SIZE_A, SIZE_B)) {
         test_that(sprintf("cox smoke: n=%d p=%d %s %s", n, p, tk, mm), {
           x <- make_X(n, p, SEED)
           y <- make_surv(n, SEED + 6L + (tk == "ties"), ties = tk == "ties")
-          # The (n<p, ties, efron) corner can fail to converge at
-          # deep lambda under the default iteration budget and emit a
-          # warning (solutions for larger lambdas are still returned).
-          # The emission is numerics-dependent, so silence rather than
-          # assert.
-          fit <- if (n < p && tk == "ties" && mm == "efron")
-            suppressWarnings(glmnet(x, y, family = "cox", cox.ties = mm))
-          else
-            glmnet(x, y, family = "cox", cox.ties = mm)
+          # Before coxdev 0.3.0 the (n<p, ties, efron) corner stopped
+          # short of the path (no convergence at the 53rd lambda), from
+          # the Efron diag_hessian bug fixed there (coxdev #28); it now
+          # runs the full path without warnings.
+          fit <- glmnet(x, y, family = "cox", cox.ties = mm)
           expect_s3_class(fit, c("coxnet", "glmnet"))
           nl <- length(fit$lambda)
           expect_true(nl >= 1L && nl <= 100L)

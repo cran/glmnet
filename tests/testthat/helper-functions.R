@@ -43,49 +43,8 @@ drop_call <- function(obj) {
   obj
 }
 
-# Test mode control: "test" (default), "save", or "overwrite"
-# - "test": run tests against saved results in saved_results/
-# - "save": save results to timestamped folder saved_results/YYYY-MM-DD:HH:MM:SS/
-# - "overwrite": overwrite saved results in saved_results/
-# - any other value: skip everything
-test_modes <- c("test", "save", "overwrite")
-test_mode <- "test"
-
-# Check if test_mode is valid - if not, tests should skip everything
-# Can pass a different test_mode to override the default
-valid_test_mode <- function(mode = test_mode) {
-    if (mode %in% test_modes) {
-        return(TRUE)
-    }
-    message(sprintf("Skipping tests: test_mode '%s' is not valid. Expected one of: %s",
-                    mode, paste(test_modes, collapse = ", ")))
-    FALSE
-}
-
-# Save test results based on test_mode
-# - "test": does nothing (returns invisibly)
-# - "save": saves to timestamped folder saved_results/YYYY-MM-DD:HH:MM:SS/
-# - "overwrite": overwrites saved results in saved_results/
-save_test_results <- function(fit.list, filename, mode = test_mode) {
-    if (mode == "test") {
-        return(invisible(NULL))
-    }
-    if (mode == "save") {
-        timestamp_dir <- format(Sys.time(), "%Y-%m-%d:%H:%M:%S")
-        save_dir <- file.path("saved_results", timestamp_dir)
-        if (!dir.exists(save_dir)) {
-            dir.create(save_dir, recursive = TRUE)
-        }
-        save_path <- file.path(save_dir, filename)
-    } else if (mode == "overwrite") {
-        save_path <- file.path("saved_results", filename)
-    } else {
-        return(invisible(NULL))
-    }
-    saveRDS(fit.list, file = save_path)
-    message("Saved results to: ", save_path)
-    invisible(save_path)
-}
+# Test mode and saving of reference results live in helper-ref.R,
+# which is .Rbuildignored along with the test_ref_*.R files.
 
 ## Utility functions from preamble.R
 expectations <- function(file) {

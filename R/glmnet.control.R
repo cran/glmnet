@@ -207,15 +207,30 @@ glmnet.control <-
 .deprecation_emitted <- new.env(parent = emptyenv())
 
 ## Canonical list of valid control keys (the 17 names returned by
-## glmnet.control()). Used by the test helper .control_with() in
-## tests/testthat/helper-functions.R. The package itself no longer
-## validates control= keys -- glmnet_control_set() silently drops
-## unknown names by design.
+## glmnet.control()), in the v5.0 order so the "Valid keys" error
+## message is unchanged. Used by .validate_control_keys() and by the
+## test helper .control_with() in tests/testthat/helper-functions.R.
 .VALID_CONTROL_KEYS <- c(
-    "fdev", "eps", "big", "mnlam", "devmax", "pmin", "exmx", "itrace",
-    "prec", "mxit", "epsnr", "mxitnr",
-    "thresh", "maxit", "dfmax", "pmax", "trace.it"
+    "thresh", "maxit", "dfmax", "pmax", "trace.it",
+    "fdev", "devmax", "eps", "big", "mnlam",
+    "pmin", "exmx", "prec", "mxit", "itrace",
+    "epsnr", "mxitnr"
 )
+
+## Reject unknown control= keys with an informative message. Must run
+## before glmnet_control_set(), which silently skips unknown names, so
+## that a typo errors instead of being dropped.
+.validate_control_keys <- function(control, where = "glmnet()") {
+    if (!length(control)) return(invisible(NULL))
+    bad <- setdiff(names(control), .VALID_CONTROL_KEYS)
+    if (length(bad))
+        stop("Unknown control parameter(s) in ", where, ": ",
+             paste(bad, collapse = ", "),
+             "\n  Valid keys: ",
+             paste(.VALID_CONTROL_KEYS, collapse = ", "),
+             call. = FALSE)
+    invisible(NULL)
+}
 
 ## Resolve the layered algorithm-control configuration for one glmnet()
 ## invocation. Precedence (low to high): session defaults -> control=
@@ -236,6 +251,10 @@ glmnet.control <-
 ##              if no overrides were applied. Caller registers via
 ##              on.exit().
 .resolve_control <- function(control, nvars, deprecated = list()) {
+    ## Validate keys first, as in v5.0: a typo errors before any
+    ## deprecation warning and before C++ session state is touched.
+    .validate_control_keys(control)
+
     ## Fold deprecated top-level args into control= with one warning
     ## per arg per session. Deprecated args win over control= entries.
     deprecated <- deprecated[!vapply(deprecated, is.null, logical(1))]
@@ -251,8 +270,7 @@ glmnet.control <-
 
     ## Snapshot session state. If the caller supplied any overrides,
     ## push them to the C++ globals in one shot and register a single
-    ## restore thunk. The C++ setter silently ignores unknown keys, so
-    ## no R-side validation is needed.
+    ## restore thunk. Keys were validated above.
     gc <- glmnet.control()
     if (length(control)) {
         glmnet_control_set(control)

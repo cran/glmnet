@@ -45,15 +45,15 @@ NULL
 #'
 #' @name glmnet-internal
 #' @aliases auc assess.coxnet auc.mat cvtype cvstats
-#' cvcompute getcoef getcoef.multinomial fix.lam error.bars
-#' getmin elnet mrelnet lognet fishnet coefnorm cv.lognet cv.elnet
-#' cv.multnet cv.mrelnet cv.coxnet cv.fishnet cv.glmnet.raw cv.relaxed.raw
-#' blend.relaxed checkgamma.relax buildPredmat buildPredmat.mrelnetlist
-#' buildPredmat.multnetlist buildPredmat.lognetlist buildPredmat.array
-#' buildPredmat.coxnetlist buildPredmat.default lambda.interp nonzeroCoef
-#' glmnet_softmax getOptcv.glmnet getOptcv.relaxed jerr jerr.elnet jerr.lognet
-#' jerr.fishnet jerr.coxnet jerr.mrelnet plotCoef zeromat na.mean check_dots
-#' na_sparse_fix prepareX
+#' @aliases cvcompute getcoef getcoef.multinomial fix.lam error.bars
+#' @aliases getmin elnet mrelnet lognet fishnet coefnorm cv.lognet cv.elnet
+#' @aliases cv.multnet cv.mrelnet cv.coxnet cv.fishnet cv.glmnet.raw cv.relaxed.raw
+#' @aliases blend.relaxed checkgamma.relax buildPredmat buildPredmat.mrelnetlist
+#' @aliases buildPredmat.multnetlist buildPredmat.lognetlist buildPredmat.array
+#' @aliases buildPredmat.coxnetlist buildPredmat.default lambda.interp nonzeroCoef
+#' @aliases glmnet_softmax getOptcv.glmnet getOptcv.relaxed jerr jerr.elnet jerr.lognet
+#' @aliases jerr.fishnet jerr.coxnet jerr.mrelnet plotCoef zeromat na.mean check_dots
+#' @aliases na_sparse_fix prepareX
 #'
 #' @author Trevor Hastie
 #' @keywords internal

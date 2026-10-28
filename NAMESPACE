@@ -72,38 +72,46 @@ import(methods)
 importFrom(Matrix,sparse.model.matrix)
 importFrom(Rcpp,sourceCpp)
 importFrom(grDevices,rainbow)
-importFrom(graphics,abline)
-importFrom(graphics,axis)
-importFrom(graphics,matplot)
-importFrom(graphics,par)
-importFrom(graphics,plot)
-importFrom(graphics,points)
-importFrom(graphics,segments)
-importFrom(graphics,text)
+importFrom(graphics,
+  abline,
+  axis,
+  matplot,
+  par,
+  plot,
+  points,
+  segments,
+  text
+)
 importFrom(shape,colorlegend)
-importFrom(stats,approx)
-importFrom(stats,as.formula)
-importFrom(stats,binomial)
-importFrom(stats,coef)
-importFrom(stats,contrasts)
-importFrom(stats,family)
-importFrom(stats,gaussian)
-importFrom(stats,glm)
-importFrom(stats,glm.fit)
-importFrom(stats,median)
-importFrom(stats,model.matrix)
-importFrom(stats,na.pass)
-importFrom(stats,predict)
-importFrom(stats,rmultinom)
-importFrom(stats,rnorm)
-importFrom(stats,runif)
-importFrom(stats,weighted.mean)
-importFrom(survival,Surv)
-importFrom(survival,concordance)
-importFrom(survival,coxph)
-importFrom(survival,is.Surv)
-importFrom(survival,strata)
-importFrom(survival,survfit)
-importFrom(utils,modifyList)
-importFrom(utils,packageDescription)
+importFrom(stats,
+  approx,
+  as.formula,
+  binomial,
+  coef,
+  contrasts,
+  family,
+  gaussian,
+  glm,
+  glm.fit,
+  median,
+  model.matrix,
+  na.pass,
+  predict,
+  rmultinom,
+  rnorm,
+  runif,
+  weighted.mean
+)
+importFrom(survival,
+  Surv,
+  concordance,
+  coxph,
+  is.Surv,
+  strata,
+  survfit
+)
+importFrom(utils,
+  modifyList,
+  packageDescription
+)
 useDynLib(glmnet)

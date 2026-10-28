@@ -1,6 +1,8 @@
 #' @method predict relaxed
-#' @param gamma Single value of \code{gamma} at which predictions are required,
-#' for "relaxed" objects.
+#' @param gamma Value(s) of \code{gamma} at which predictions are required,
+#' for "relaxed" objects. If more than one value is given, a list of
+#' predictions is returned, one per \code{gamma}, named by the rounded
+#' \code{gamma} values.
 #' @rdname predict.glmnet
 #' @export
 #' @export predict.relaxed
@@ -12,9 +14,10 @@ predict.relaxed=function (object, newx, s = NULL, gamma=1,type = c("link", "resp
     gamma=checkgamma.relax(gamma)
     if(length(gamma)>1){
         ng=length(gamma)
-        outlist=as.list(length(ng))
-        names(outlist(format(round(gamma,2))))
-        for( i in 1:ng)outlist[[i]]=predict(object, newx, s, gamma=gamma[i], exact, newoffset,  ...)
+        outlist=vector("list", ng)
+        for( i in 1:ng)outlist[[i]]=predict(object, newx, s, gamma=gamma[i], type=type,
+                                            exact=exact, newoffset=newoffset, ...)
+        names(outlist)=format(round(gamma,2))
         return(outlist)
     }
     if(gamma==1)return(NextMethod("predict"))

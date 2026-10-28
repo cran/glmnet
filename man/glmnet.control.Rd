@@ -36,7 +36,7 @@ both paths. Factory default \code{0.999}.}
 
 \item{eps}{Path-termination parameter: floor on
 \code{lambda.min.ratio} (smallest allowed \eqn{\lambda_{\min} /
-  \lambda_{\max}}). Scope: both paths. Factory default
+\lambda_{\max}}). Scope: both paths. Factory default
 \code{1.0e-6}.}
 
 \item{big}{Numerical guard: finite substitute for \code{Inf} in
@@ -94,7 +94,7 @@ via \code{control = list(maxit = ...)}.}
 \item{dfmax}{Coefficient-count cap: limit the maximum number of
 variables in the model at any lambda. Scope: both paths. Factory
 default \code{NULL}, which resolves at call time to \code{nvars +
-  1} (i.e., unconstrained). Can also be set per-call via
+1} (i.e., unconstrained). Can also be set per-call via
 \code{control = list(dfmax = ...)}.}
 
 \item{pmax}{Coefficient-count cap: limit the maximum number of

@@ -233,8 +233,10 @@ cv.glmnet <-
       warning("fraction of path alignment not available if lambda given as argument; switched to alignment=`lambda`")
       alignment="lambda"
   }
-  ## (No up-front control-key validation: glmnet_control_set() in the
-  ## inner glmnet() calls silently ignores unknown names by design.)
+  ## Light up-front validation of control keys so a typo surfaces once
+  ## here rather than per-fold. Actual application of overrides happens
+  ## in each inner glmnet() call via .resolve_control().
+  .validate_control_keys(control, where = "cv.glmnet()")
    N = nrow(x)
  if (is.null(weights))
     weights = rep(1, N)

@@ -275,10 +275,19 @@ protected:
             // optimum has X_k^T*score = lambda*beta_k != 0, so requiring the
             // score-norm to be small there makes the IRLS loop never converge.
             if (l1_regul < 1e-10 && l2_regul < 1e-10) {
+                // A coefficient held at a limit has a nonzero score at the
+                // constrained optimum: KKT asks only that the score point past
+                // the limit (the score is d loglik / d beta, so >= 0 at an upper
+                // limit and <= 0 at a lower one). Leave those out, or the loop
+                // never converges when a limit binds.
+                const auto& cl = this->endpts();
                 value_t max_active_score = 0.0;
                 for (auto it = this->active_begin(); it != this->active_end(); ++it) {
                     auto k = *it;
-                    max_active_score = std::max(max_active_score, std::abs(grad_f(k)));
+                    auto gk = grad_f(k);
+                    if ((beta(k) >= cl(1,k) && gk >= 0) ||
+                        (beta(k) <= cl(0,k) && gk <= 0)) continue;
+                    max_active_score = std::max(max_active_score, std::abs(gk));
                 }
 
                 // Score should be small relative to threshold.

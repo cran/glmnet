@@ -40,7 +40,11 @@ buildPredmat.coxnetlist <-
                 cvraw[i, seq(nlami)] = plk[seq(nlami)]
             }
         }
-        predmat[which, seq(nlami)] = as.matrix(x[which,]%*% coefmat[,seq(nlami)])
+        ## Bug found by Jonathan/Claude on Oct 8, 2026, and fix provided via Claude
+        #predmat[which, seq(nlami)] = as.matrix(x[which,]%*% coefmat[,seq(nlami)])
+        lp = as.matrix(x[which,] %*% coefmat[,seq(nlami)])
+        if (!is.null(offset)) lp = lp + drop(offset)[which]
+        predmat[which, seq(nlami)] = lp
         if (nlami < nlambda){
             if(devtrue)cvraw[i, seq(from = nlami, to = nlambda)] = cvraw[i, nlami]
             predmat[which,seq(from=nlami,to=nlambda)]=predmat[which,nlami]

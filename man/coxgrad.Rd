@@ -25,7 +25,8 @@ coxgrad(
 to sum to 1.}
 
 \item{diag.hessian}{If \code{TRUE}, compute the diagonal of the Hessian
-of the log partial likelihood as well. Default is \code{FALSE}.}
+of the deviance (minus twice the log partial likelihood) as well.
+Default is \code{FALSE}.}
 
 \item{cox.ties}{Character; the method for handling ties. One of
 \code{"breslow"} (the current default) or \code{"efron"}. The default
@@ -34,8 +35,10 @@ will change to \code{"efron"} in glmnet 5.1 to match
 }
 \value{
 A single gradient vector the same length as \code{eta}. If
-\code{diag.hessian=TRUE}, the diagonal of the Hessian is
-included as an attribute "diag_hessian".
+\code{diag.hessian=TRUE}, the diagonal of the Hessian of the deviance
+with respect to \code{eta} is included as an attribute "diag_hessian".
+It is on the deviance scale while the gradient is on the log partial
+likelihood scale, so it equals -2 times the derivative of the gradient.
 }
 \description{
 Compute the gradient of the log partial likelihood at a particular fit for Cox
